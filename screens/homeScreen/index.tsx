@@ -1,14 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../../theme/ThemeProvider';
+import { BottomTabBar, TabType } from '../../components/bottomTabBar';
 
 export const HomeScreen: React.FC = () => {
   const { colors, spacing, typography } = useTheme();
+  const [activeTab, setActiveTab] = useState<TabType>('home');
 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: colors.background.primary,
+    },
+    content: {
+      flex: 1,
       padding: spacing.md,
     },
     text: {
@@ -18,9 +23,17 @@ export const HomeScreen: React.FC = () => {
     },
   });
 
+  const handleTabPress = (tab: TabType) => {
+    setActiveTab(tab);
+    // Handle navigation logic here
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Home Screen</Text>
+      <View style={styles.content}>
+        <Text style={styles.text}>Home Screen</Text>
+      </View>
+      <BottomTabBar activeTab={activeTab} onTabPress={handleTabPress} />
     </View>
   );
 };
