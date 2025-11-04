@@ -12,7 +12,8 @@ export const HomeScreen: React.FC = () => {
       padding: spacing.md,
     },
     text: {
-      ...typography.h2,
+      fontSize: typography.h2.fontSize,
+      fontWeight: typography.h2.fontWeight as any,
       color: colors.text.primary,
     },
   });
