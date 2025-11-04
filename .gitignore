@@ -3,6 +3,10 @@
 # dependencies
 node_modules/
 
+# Lock files (use pnpm only)
+package-lock.json
+yarn.lock
+
 # Expo
 .expo/
 dist/
