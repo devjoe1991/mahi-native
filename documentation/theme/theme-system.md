@@ -2,7 +2,7 @@
 
 ## 📋 Overview
 
-This document defines the comprehensive theming system for Mahi, ensuring every component, screen, and dynamic element supports responsive dark/light mode with modern design principles. Mahi's theme system reflects the concept of a personal aura: ethereal, calming, and full of life.
+This document defines the comprehensive theming system for Mahi, ensuring every component, screen, and dynamic element supports responsive dark/light mode with modern design principles. Mahi's theme system reflects the concept of a fitness-focused social app that celebrates daily effort and streaks.
 
 ---
 
@@ -239,19 +239,20 @@ interface ComponentTheme {
 ```typescript
 const homeTheme = {
   light: {
-    aura: {
+    streakCircles: {
       background: '#F5F5F5',
       primaryColor: '#0077B6',
       secondaryColor: '#00BFA5',
-      glowColor: 'rgba(0, 119, 182, 0.3)',
+      lockedColor: '#555555',
+      milestoneColor: '#FF6B6B',
     },
-    moodSelector: {
+    feed: {
       background: '#FFFFFF',
       border: '#E5E7EB',
       active: '#0077B6',
       text: '#333333',
     },
-    streakCounter: {
+    addStory: {
       background: '#FFFDD0',
       border: '#0077B6',
       text: '#333333',
@@ -259,19 +260,20 @@ const homeTheme = {
     }
   },
   dark: {
-    aura: {
+    streakCircles: {
       background: '#111827',
       primaryColor: '#38BDF8',
       secondaryColor: '#4ADE80',
-      glowColor: 'rgba(56, 189, 248, 0.3)',
+      lockedColor: '#6B7280',
+      milestoneColor: '#F87171',
     },
-    moodSelector: {
+    feed: {
       background: '#1F2937',
       border: '#374151',
       active: '#38BDF8',
       text: '#F9FAFB',
     },
-    streakCounter: {
+    addStory: {
       background: '#374151',
       border: '#38BDF8',
       text: '#F9FAFB',
@@ -281,31 +283,33 @@ const homeTheme = {
 };
 ```
 
-### **Aura Screen Theme:**
+### **Explore Screen Theme:**
 ```typescript
-const auraTheme = {
+const exploreTheme = {
   light: {
-    visualizer: {
-      background: '#F5F5F5',
-      auraColors: ['#0077B6', '#00BFA5', '#8B5CF6', '#F59E0B'],
-      intensity: '#0077B6',
-    },
-    colorPicker: {
+    searchBar: {
       background: '#FFFFFF',
       border: '#E5E7EB',
       active: '#0077B6',
+      text: '#333333',
+    },
+    contentGrid: {
+      background: '#F5F5F5',
+      cardBackground: '#FFFFFF',
+      border: '#E5E7EB',
     }
   },
   dark: {
-    visualizer: {
-      background: '#111827',
-      auraColors: ['#38BDF8', '#4ADE80', '#A78BFA', '#FBBF24'],
-      intensity: '#38BDF8',
-    },
-    colorPicker: {
+    searchBar: {
       background: '#1F2937',
       border: '#374151',
       active: '#38BDF8',
+      text: '#F9FAFB',
+    },
+    contentGrid: {
+      background: '#111827',
+      cardBackground: '#1F2937',
+      border: '#374151',
     }
   }
 };

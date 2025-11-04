@@ -2,7 +2,7 @@
 
 ## 📋 Overview
 
-This is the comprehensive design system for Mahi, ensuring consistent, modern, and accessible design across all components and screens with full dark/light mode support. Mahi's design system is built to reflect the concept of a personal aura: ethereal, calming, and full of life. It's modern, minimalistic, and elegant, prioritizing a clean user experience that feels both intuitive and uplifting.
+This is the comprehensive design system for Mahi, ensuring consistent, modern, and accessible design across all components and screens with full dark/light mode support. Mahi's design system is built to reflect the concept of a fitness-focused social app that celebrates daily effort and streaks. It's modern, minimalistic, and elegant, prioritizing a clean user experience that feels both intuitive and motivating.
 
 ---
 
@@ -45,11 +45,11 @@ const brandColors = {
 };
 
 // Mahi Color Psychology:
-// Spirit Blue: Clarity, focus, serenity, trust
-// Ember Green: Growth, health, vitality, success
-// Purple: Creativity, luxury, wisdom, mystery
-// Amber: Energy, warmth, caution, optimism
-// Red: Urgency, passion, danger, action
+// Spirit Blue: Clarity, focus, serenity, trust - perfect for fitness motivation
+// Ember Green: Growth, health, vitality, success - represents fitness progress
+// Purple: Creativity, luxury, wisdom, mystery - premium features and achievements
+// Amber: Energy, warmth, caution, optimism - streak milestones and warnings
+// Red: Urgency, passion, danger, action - streak achievements and celebrations
 ```
 
 ### **Light Mode Colors:**

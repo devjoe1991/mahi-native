@@ -2,7 +2,11 @@
 
 ## 📋 Overview
 
-Mahi is a **next-generation personal aura and wellness app** built entirely with React Native, designed to deliver a seamless, intuitive, and visually appealing mobile experience. This architecture document outlines the technical foundation for creating a visually delightful app with smooth transitions, interactive animations, and real-time feedback.
+Mahi is a **lightweight social accountability fitness app** built entirely with React Native, designed to deliver a seamless, intuitive, and visually appealing mobile experience. Users create streak-based posts to hold themselves accountable for their fitness and healthy lifestyle routines. 
+
+**Current Phase:** Frontend-only development with mock data, designed for easy transition to Supabase backend when ready.
+
+This architecture document outlines the technical foundation for creating a visually delightful app with smooth transitions, interactive animations, and real-time feedback that celebrates daily effort and streaks.
 
 ---
 
@@ -116,6 +120,63 @@ const animationArchitecture = {
 
 ---
 
+## 🌐 Global Components Architecture
+
+### **Global Components Overview:**
+
+Mahi uses global components that are accessible throughout the app for consistent UI patterns:
+
+```typescript
+const globalComponents = {
+  // Global Bottom Sheet
+  globalBottomSheet: {
+    purpose: 'Swipe-up modal for flexible content presentation',
+    useCases: [
+      'View post comments',
+      'Access settings',
+      'Quick user profiles',
+      'Action menus',
+      'Any scrollable content'
+    ],
+    features: [
+      'No height limit',
+      'Scrollable content',
+      'Swipe-up animation',
+      'Backdrop dismiss',
+      'Theme support'
+    ],
+    location: 'components/globals/GlobalBottomSheet/'
+  },
+  
+  // Global Header
+  globalHeader: {
+    purpose: 'Consistent navigation header across screens',
+    useCases: [
+      'Main navigation',
+      'Quick actions (settings, messages)',
+      'Screen context',
+      'Brand consistency'
+    ],
+    features: [
+      'Pill navigation',
+      'Circular icon buttons',
+      'Floating design',
+      'Active states',
+      'Theme support'
+    ],
+    location: 'components/globals/GlobalHeader/'
+  }
+};
+```
+
+### **Global Components Pattern:**
+- **Provider Pattern** - Global components use context providers
+- **Hook-based** - Easy access via custom hooks (`useGlobalBottomSheet`, etc.)
+- **Theme Integration** - Full light/dark mode support
+- **Mock Data Ready** - Designed for easy backend integration
+
+---
+
 ## 📱 Component Architecture
 
 ### **Component Hierarchy:**
@@ -125,20 +186,23 @@ Mahi App
 │   ├── ThemeProvider
 │   ├── useTheme Hook
 │   └── Color/Spacing/Typography Systems
+├── 🌐 Global Components (components/globals/)
+│   ├── GlobalBottomSheet (Swipe-up modal for comments, settings, etc.)
+│   ├── GlobalHeader (Pill navigation + circular icon buttons)
+│   └── Global Components Provider
 ├── 🧩 Base Components
 │   ├── UI Components (Button, Card, Input, etc.)
 │   ├── Layout Components (Container, Grid, etc.)
 │   └── Feedback Components (Loading, Toast, etc.)
-├── 🌟 Feature Components
-│   ├── Aura Components (AuraCircle, AuraIndicator, etc.)
-│   ├── Streak Components (StreakCounter, StreakCircle, etc.)
-│   └── Wellness Components (MoodTracker, ProgressChart, etc.)
+├── 🔥 Feature Components
+│   ├── Streak Components (StreakCounter, StreakCircle, StreakModal, etc.)
+│   ├── Post Components (PostCard, ReactionBar, etc.)
+│   └── User Components (UserProfile, Avatar, etc.)
 ├── 📱 Screen Components
 │   ├── Home Screen
-│   ├── Aura Screen
-│   ├── Streaks Screen
-│   ├── Progress Screen
-│   └── Profile Screen
+│   ├── Explore Screen
+│   ├── Profile Screen
+│   └── Onboarding Screen (with multiple views)
 └── 🚀 App Navigation
     ├── Bottom Tab Navigation
     ├── Stack Navigation
@@ -176,33 +240,33 @@ interface ComponentArchitecture {
 
 ---
 
-## 🌟 Aura & Wellness Architecture
+## 🔥 Streak & Social Architecture
 
-### **Aura System:**
+### **Streak System:**
 ```typescript
-const auraArchitecture = {
-  // Aura Visualization
-  auraVisualization: {
-    colors: 'Dynamic aura colors based on mood and energy',
-    intensity: 'Aura strength and vibrancy indicators',
-    patterns: 'Flowing, organic aura patterns',
-    interactions: 'Touch-responsive aura interactions'
+const streakArchitecture = {
+  // Streak Visualization
+  streakVisualization: {
+    circles: 'Color-coded streak circles with progression',
+    levels: 'Sequential streak numbering (1, 2, 3, etc.)',
+    locked: 'Padlocked future streaks with unlock requirements',
+    milestones: 'Special colors for milestone streaks (10, 20, 30+)'
   },
   
-  // Mood Tracking
-  moodTracking: {
-    input: 'Intuitive mood selection interface',
-    visualization: 'Mood patterns and trends',
-    insights: 'Personalized mood insights',
-    history: 'Mood history and patterns'
+  // Streak Progression
+  streakProgression: {
+    emojis: 'Dynamic emoji indicators (🎯🔥💪⚡🚀⭐🌟👑💎🏆🎉🎊🎆🏅)',
+    unlock: 'Progressive unlock system for future streaks',
+    premium: 'Premium unlock packages and Mahi+ subscription',
+    insurance: 'Streak insurance system for protection'
   },
   
-  // Energy Levels
-  energyLevels: {
-    tracking: 'Energy level monitoring',
-    visualization: 'Energy flow visualization',
-    optimization: 'Energy optimization suggestions',
-    patterns: 'Energy pattern analysis'
+  // Social Features
+  socialFeatures: {
+    feed: 'Streak-based content discovery',
+    reactions: 'Emoji reaction bar with long-press interaction',
+    comments: 'Social interaction and community support',
+    sharing: 'Post sharing and streak celebration'
   }
 };
 ```
@@ -218,16 +282,16 @@ const stateArchitecture = {
   globalState: {
     theme: 'Light/dark mode preference',
     user: 'Current user profile and settings',
-    aura: 'Current aura state and preferences',
+    streaks: 'Current streak state and preferences',
     navigation: 'Navigation state and history'
   },
   
   // Feature State
   featureState: {
-    mood: 'Mood tracking data and trends',
-    streaks: 'Streak data and progress',
-    wellness: 'Wellness metrics and insights',
-    progress: 'Progress tracking and goals'
+    streaks: 'Streak data and progression',
+    posts: 'User posts and workout proof',
+    social: 'Social interactions and reactions',
+    premium: 'Premium features and subscription status'
   },
   
   // Local State
@@ -277,82 +341,239 @@ const performanceArchitecture = {
 
 ## 🔐 Security Architecture
 
-### **Security & Privacy:**
+### **Lightweight Development Phase (Current):**
+
+Mahi is currently in **lightweight frontend-only development** using mock data. The architecture is designed for easy transition to Supabase backend when ready.
+
 ```typescript
 const securityArchitecture = {
-  // Authentication
-  authentication: {
-    provider: 'Supabase Auth with social login',
-    verification: 'Email and phone verification',
-    biometrics: 'Biometric authentication support',
-    session: 'Secure session management'
+  // Current Phase: Mock Data
+  currentPhase: {
+    dataSource: 'Mock data (local TypeScript/JSON)',
+    authentication: 'Mock user sessions (local state)',
+    storage: 'Local state management (React Context)',
+    api: 'Mock API service layer (prepared for Supabase)',
+    transition: 'Easy migration path to Supabase'
   },
   
-  // Data Privacy
+  // Future Phase: Supabase Integration
+  futurePhase: {
+    authentication: 'Supabase Auth with social login',
+    database: 'Supabase PostgreSQL (via secure API endpoints)',
+    storage: 'Supabase Storage for media',
+    realtime: 'Supabase Realtime for live updates',
+    security: 'Row Level Security (RLS) policies',
+    api: 'Edge Functions for custom logic'
+  },
+  
+  // Data Privacy (Applies to Both Phases)
   dataPrivacy: {
-    encryption: 'End-to-end encryption for sensitive data',
     wellness: 'Granular wellness data privacy controls',
     profile: 'Privacy settings for profile visibility',
-    gdpr: 'GDPR compliance and data protection'
+    gdpr: 'GDPR compliance and data protection',
+    local: 'Secure local storage for sensitive data (AsyncStorage)'
   },
   
-  // Content Security
+  // Content Security (Applies to Both Phases)
   contentSecurity: {
     dataValidation: 'Input validation and sanitization',
     secureStorage: 'Secure local storage for sensitive data',
-    apiSecurity: 'API security and rate limiting',
+    apiSecurity: 'API security and rate limiting (when backend ready)',
     userData: 'User data protection and anonymization'
   }
 };
 ```
 
+### **Mock Data Architecture:**
+
+```typescript
+// Mock data structure mirrors Supabase schema for easy transition
+const mockDataStructure = {
+  // User Profiles
+  users: {
+    id: 'string',
+    username: 'string',
+    avatar: 'string',
+    streak: 'number',
+    // Mirrors Supabase users table
+  },
+  
+  // Streak Posts
+  posts: {
+    id: 'string',
+    userId: 'string',
+    content: 'string',
+    image: 'string',
+    createdAt: 'date',
+    // Mirrors Supabase posts table
+  },
+  
+  // Comments
+  comments: {
+    id: 'string',
+    postId: 'string',
+    userId: 'string',
+    content: 'string',
+    createdAt: 'date',
+    // Mirrors Supabase comments table
+  }
+};
+
+// API Service Layer (Mock → Supabase)
+interface ApiService {
+  // Mock implementation now, Supabase implementation later
+  getUsers: () => Promise<User[]>;
+  getPosts: () => Promise<Post[]>;
+  getComments: (postId: string) => Promise<Comment[]>;
+  createPost: (post: CreatePostInput) => Promise<Post>;
+  // Same interface for both mock and Supabase
+}
+```
+
+### **Migration Path to Supabase:**
+
+```typescript
+// Phase 1: Mock Data (Current)
+// - Mock API service layer
+// - Local state management
+// - TypeScript interfaces ready
+
+// Phase 2: Supabase Integration (Future)
+// - Replace mock services with Supabase client
+// - Add authentication flow
+// - Implement Row Level Security
+// - Add real-time subscriptions
+
+// Transition Strategy:
+// 1. Keep API service interface consistent
+// 2. Swap implementation from mock → Supabase
+// 3. Add authentication layer
+// 4. Enable real-time features
+// 5. Implement security policies
+```
+
+### **Security Best Practices (Current & Future):**
+
+- ✅ **Input Validation** - Validate and sanitize all user inputs (even with mock data)
+- ✅ **Type Safety** - TypeScript interfaces for all data structures
+- ✅ **Secure Storage** - Use AsyncStorage for sensitive local data
+- ✅ **API Abstraction** - Service layer for easy backend swap
+- ✅ **Error Handling** - Proper error boundaries and handling
+- 🔜 **Authentication** - Ready for Supabase Auth integration
+- 🔜 **API Security** - Ready for rate limiting and security policies
+- 🔜 **Data Encryption** - Ready for end-to-end encryption
+
 ---
 
 ## 📱 Screen Architecture
 
-### **Screen Structure:**
+### **Screen Organization:**
 ```typescript
 const screenArchitecture = {
+  // Singular Screens (One screen = one folder)
+  singularScreens: {
+    home: {
+      location: 'screens/home/index.tsx',
+      purpose: 'Main dashboard with streak circles and fitness feed',
+      components: ['GlobalHeader', 'StreakCircles', 'FeedList', 'PostCard'],
+      globalComponents: ['GlobalHeader'],
+    },
+    explore: {
+      location: 'screens/explore/index.tsx',
+      purpose: 'Discover fitness content and users',
+      components: ['GlobalHeader', 'SearchBar', 'ContentGrid', 'UserCards'],
+      globalComponents: ['GlobalHeader'],
+    },
+    profile: {
+      location: 'screens/profile/index.tsx',
+      purpose: 'User profile and settings',
+      components: ['GlobalHeader', 'ProfileHeader', 'StreakHistory', 'SettingsList'],
+      globalComponents: ['GlobalHeader'],
+    },
+  },
+  
+  // Reusable Screens with Views (Multiple steps/views)
+  reusableScreens: {
+    onboarding: {
+      location: 'screens/onboarding/index.tsx',
+      purpose: 'User onboarding flow with multiple steps',
+      views: [
+        { name: 'EmailView', location: 'screens/onboarding/views/EmailView.tsx' },
+        { name: 'PhoneView', location: 'screens/onboarding/views/PhoneView.tsx' },
+        { name: 'PrivacyView', location: 'screens/onboarding/views/PrivacyView.tsx' },
+      ],
+      orchestrator: 'Main onboarding component manages view transitions',
+    },
+  },
+};
+```
+
+### **Screen Structure:**
+```typescript
+const screenStructure = {
   // Home Screen
   home: {
-    purpose: 'Main dashboard with aura visualization',
-    components: ['AuraCircle', 'MoodSelector', 'StreakCounter', 'QuickActions'],
-    interactions: ['Aura interactions', 'Mood selection', 'Quick actions'],
-    animations: ['Aura animations', 'Mood transitions', 'Streak celebrations']
+    purpose: 'Main dashboard with streak circles and fitness feed',
+    components: ['GlobalHeader', 'StreakCircles', 'FeedList', 'PostCard'],
+    interactions: ['Streak interactions', 'Post creation', 'Social interactions'],
+    animations: ['Streak animations', 'Feed transitions', 'Post celebrations'],
+    globalComponents: {
+      header: 'GlobalHeader with pill navigation',
+      bottomSheet: 'GlobalBottomSheet for comments and actions',
+    },
   },
   
-  // Aura Screen
-  aura: {
-    purpose: 'Detailed aura visualization and customization',
-    components: ['AuraVisualizer', 'ColorPicker', 'IntensitySlider', 'AuraHistory'],
-    interactions: ['Aura customization', 'Color selection', 'Intensity adjustment'],
-    animations: ['Aura flow animations', 'Color transitions', 'Intensity changes']
-  },
-  
-  // Streaks Screen
-  streaks: {
-    purpose: 'Streak tracking and progress visualization',
-    components: ['StreakCircle', 'ProgressChart', 'MilestoneTracker', 'StreakHistory'],
-    interactions: ['Streak management', 'Progress tracking', 'Milestone celebration'],
-    animations: ['Streak animations', 'Progress transitions', 'Milestone celebrations']
-  },
-  
-  // Progress Screen
-  progress: {
-    purpose: 'Wellness progress and insights',
-    components: ['ProgressChart', 'InsightCard', 'GoalTracker', 'TrendAnalysis'],
-    interactions: ['Progress viewing', 'Insight exploration', 'Goal setting'],
-    animations: ['Chart animations', 'Insight reveals', 'Goal progress']
+  // Explore Screen
+  explore: {
+    purpose: 'Discover fitness content and users',
+    components: ['GlobalHeader', 'SearchBar', 'ContentGrid', 'UserCards'],
+    interactions: ['Content discovery', 'User browsing', 'Search functionality'],
+    animations: ['Search animations', 'Content reveals', 'Filter transitions'],
+    globalComponents: {
+      header: 'GlobalHeader with pill navigation',
+      bottomSheet: 'GlobalBottomSheet for user profiles',
+    },
   },
   
   // Profile Screen
   profile: {
     purpose: 'User profile and settings',
-    components: ['ProfileHeader', 'SettingsList', 'PreferencesForm', 'ThemeToggle'],
-    interactions: ['Profile editing', 'Settings management', 'Theme switching'],
-    animations: ['Profile transitions', 'Settings animations', 'Theme transitions']
-  }
+    components: ['GlobalHeader', 'ProfileHeader', 'StreakHistory', 'SettingsList'],
+    interactions: ['Profile editing', 'Streak viewing', 'Settings management'],
+    animations: ['Profile transitions', 'Streak celebrations', 'Settings animations'],
+    globalComponents: {
+      header: 'GlobalHeader with settings icon',
+      bottomSheet: 'GlobalBottomSheet for settings view',
+    },
+  },
+  
+  // Onboarding Screen (Reusable with Views)
+  onboarding: {
+    purpose: 'User onboarding flow with multiple steps',
+    views: [
+      { name: 'EmailView', step: 1, purpose: 'Email input and verification' },
+      { name: 'PhoneView', step: 2, purpose: 'Phone input and verification' },
+      { name: 'PrivacyView', step: 3, purpose: 'Privacy policy acceptance' },
+    ],
+    orchestrator: 'Main component manages view transitions and state',
+    components: ['OnboardingViews', 'NavigationButtons', 'ProgressIndicator'],
+    globalComponents: {
+      bottomSheet: 'GlobalBottomSheet for help/terms (if needed)',
+    },
+  },
 };
+```
+
+### **Screen Import Pattern:**
+```typescript
+// Example: screens/home/index.tsx
+import { GlobalHeader } from '@/components/globals/GlobalHeader';
+import { useGlobalBottomSheet } from '@/components/globals/GlobalBottomSheet';
+
+// Example: screens/onboarding/index.tsx
+import { EmailView } from './views/EmailView';
+import { PhoneView } from './views/PhoneView';
+import { PrivacyView } from './views/PrivacyView';
 ```
 
 ---
