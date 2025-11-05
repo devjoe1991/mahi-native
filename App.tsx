@@ -1,20 +1,49 @@
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+import {
+  Urbanist_400Regular,
+  Urbanist_600SemiBold,
+  Urbanist_700Bold,
+} from '@expo-google-fonts/urbanist';
+import { ThemeProvider } from './theme/ThemeProvider';
+import { SidebarProvider, SidebarContainer } from './components/globals/Sidebar';
+import { HomeScreen } from './screens/homeScreen';
+
+// Prevent the splash screen from auto-hiding before fonts are loaded
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
+  const [fontsLoaded, fontError] = useFonts({
+    Urbanist_400Regular,
+    Urbanist_600SemiBold,
+    Urbanist_700Bold,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
+      // Hide the splash screen once fonts are loaded or if there's an error
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+
+  // Don't render until fonts are loaded
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <SidebarProvider>
+          <SidebarContainer>
+            <HomeScreen />
+          </SidebarContainer>
+        </SidebarProvider>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
