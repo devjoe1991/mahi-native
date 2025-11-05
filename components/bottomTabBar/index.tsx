@@ -1,14 +1,25 @@
-import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { Fragment, useState } from 'react';
+import { View, Pressable, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, {
+  FadeIn,
+  FadeOut,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 import { useTheme } from '../../theme/ThemeProvider';
 import { BottomTabBarProps, TabItem, TabType } from './types';
+import { TabBarSvg } from './TabBarSvg';
+import { PlusButton } from './PlusButton';
 
 // Re-export TabType for convenience
 export type { TabType } from './types';
 
 export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onTabPress }) => {
-  const { colors, spacing } = useTheme();
+  const { colors, theme } = useTheme();
+  const [tabBarHeight, setTabBarHeight] = useState(80);
+  const [plusButtonPressed, setPlusButtonPressed] = useState(false);
 
   const tabs: TabItem[] = [
     { id: 'home', icon: 'home-outline', activeIcon: 'home', label: 'Home' },
@@ -21,91 +32,153 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onTabPres
   const styles = StyleSheet.create({
     container: {
       flexDirection: 'row',
-      backgroundColor: colors.background.primary,
-      borderTopWidth: 1,
-      borderTopColor: colors.border.primary,
-      paddingTop: spacing.sm,
-      paddingBottom: spacing.sm,
-      paddingHorizontal: spacing.xs,
+      justifyContent: 'space-between',
       alignItems: 'center',
-      justifyContent: 'space-around',
-      shadowColor: colors.text.primary, // Theme-aware shadow
-      shadowOffset: { width: 0, height: -2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 5,
+      paddingHorizontal: 20,
+      paddingTop: 8,
+      paddingBottom: 8,
+      backgroundColor: 'transparent',
+      position: 'relative',
+      zIndex: 20,
+      minHeight: 60,
     },
     tab: {
       flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingVertical: spacing.xs,
     },
-    plusTab: {
+    tabPressable: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
       flex: 1,
-      alignItems: 'center',
+      padding: 15,
+    },
+    iconContainer: {
+      width: 24,
+      height: 24,
       justifyContent: 'center',
-      paddingVertical: spacing.xs,
+      alignItems: 'center',
     },
-    icon: {
-      color: colors.text.secondary,
+    backdrop: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.5)',
+      zIndex: 15,
     },
-    iconActive: {
-      color: colors.primary[500], // Spirit Blue
-    },
-    plusIcon: {
-      color: colors.primary[500], // Spirit Blue for plus button
+    tabBarWrapper: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      zIndex: 20,
+      backgroundColor: 'transparent',
     },
   });
 
   const handleTabPress = (tab: TabType) => {
-    // Optional: Add haptic feedback later if desired
-    // Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (plusButtonPressed) {
+      setPlusButtonPressed(false);
+    }
     onTabPress(tab);
   };
 
-  const renderTab = (tab: TabItem) => {
+  const handlePlusPress = () => {
+    setPlusButtonPressed(!plusButtonPressed);
+    onTabPress('plus');
+  };
+
+  const renderTab = (tab: TabItem, index: number) => {
     const isActive = activeTab === tab.id;
     const iconName = isActive && tab.activeIcon ? tab.activeIcon : tab.icon;
-    
-    // Plus icon is larger and always uses primary color for hierarchy
-    if (tab.isPlus) {
+
+    // Combined animation styles for active tabs (transform + opacity in one)
+    const animatedStyles = useAnimatedStyle(() => {
+      return {
+        transform: [
+          { translateX: isActive ? withTiming(-10) : withTiming(0) },
+          { translateY: isActive ? withTiming(-6) : withTiming(0) },
+        ],
+        opacity: isActive ? withTiming(1) : withTiming(0.2),
+      };
+    });
+
+    // Plus button in center (index 2)
+    if (tab.isPlus && index === 2) {
       return (
-        <TouchableOpacity
+        <View
           key={tab.id}
-          style={styles.plusTab}
-          onPress={() => handleTabPress(tab.id)}
-          activeOpacity={0.7}
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
         >
-          <Ionicons
-            name={iconName}
-            size={32}
-            style={styles.plusIcon}
-          />
-        </TouchableOpacity>
+          <View
+            style={{
+              transform: [{ translateY: -(50 / 2 + 5) }],
+            }}
+          >
+            <PlusButton
+              pressed={plusButtonPressed}
+              onPress={handlePlusPress}
+            />
+          </View>
+        </View>
       );
     }
 
     return (
-      <TouchableOpacity
-        key={tab.id}
-        style={styles.tab}
-        onPress={() => handleTabPress(tab.id)}
-        activeOpacity={0.7}
-      >
-        <Ionicons
-          name={iconName}
-          size={24}
-          style={isActive ? styles.iconActive : styles.icon}
-        />
-      </TouchableOpacity>
+      <View key={tab.id} style={styles.tab}>
+        <Pressable onPress={() => handleTabPress(tab.id)}>
+          <View style={styles.tabPressable}>
+            <Animated.View style={[styles.iconContainer, animatedStyles]}>
+              <Ionicons
+                name={iconName}
+                size={24}
+                color={isActive ? colors.primary[500] : colors.text.secondary}
+              />
+            </Animated.View>
+          </View>
+        </Pressable>
+      </View>
     );
   };
 
   return (
-    <View style={styles.container}>
-      {tabs.map(renderTab)}
-    </View>
+    <Fragment>
+      {plusButtonPressed && (
+        <Animated.View
+          style={styles.backdrop}
+          entering={FadeIn}
+          exiting={FadeOut}
+        >
+          <Pressable
+            onPress={() => setPlusButtonPressed(false)}
+            style={{ flex: 1 }}
+          />
+        </Animated.View>
+      )}
+      <SafeAreaView edges={['bottom']} style={styles.tabBarWrapper}>
+        <View style={{ position: 'relative', width: '100%', minHeight: 70 }}>
+          <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1 }}>
+            <TabBarSvg height={tabBarHeight || 70} />
+          </View>
+          <View
+            style={styles.container}
+            onLayout={(e) => {
+              const newHeight = e.nativeEvent.layout.height;
+              if (newHeight !== tabBarHeight) {
+                setTabBarHeight(newHeight);
+              }
+            }}
+          >
+            {tabs.map((tab, index) => renderTab(tab, index))}
+          </View>
+        </View>
+      </SafeAreaView>
+    </Fragment>
   );
 };
 

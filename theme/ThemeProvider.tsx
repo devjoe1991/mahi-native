@@ -30,19 +30,23 @@ interface Spacing {
 }
 
 interface Typography {
+  fontFamily: string;
   h1: {
     fontSize: number;
     fontWeight: string;
+    fontFamily: string;
     color?: string;
   };
   h2: {
     fontSize: number;
     fontWeight: string;
+    fontFamily: string;
     color?: string;
   };
   body: {
     fontSize: number;
     fontWeight: string;
+    fontFamily: string;
     color?: string;
   };
 }
@@ -57,15 +61,15 @@ interface ThemeContextType {
 
 const lightColors: Colors = {
   primary: {
-    500: '#0077B6', // Spirit Blue
+    500: '#2176AE', // Spirit Blue (matches screenshot)
   },
   background: {
-    primary: '#F5F5F5', // Aura White
-    secondary: '#FFFDD0', // Vapor Cream
+    primary: '#F8F8F8', // Light Gray (matches screenshot)
+    secondary: '#FFFBEB', // Light Yellow (matches screenshot)
   },
   text: {
     primary: '#333333', // Shadow Gray
-    secondary: '#6B7280',
+    secondary: '#666666', // Lighter gray for subtitles
   },
   border: {
     primary: '#E5E7EB',
@@ -74,7 +78,7 @@ const lightColors: Colors = {
 
 const darkColors: Colors = {
   primary: {
-    500: '#0077B6', // Spirit Blue
+    500: '#2176AE', // Spirit Blue (matches light theme)
   },
   background: {
     primary: '#111827',
@@ -97,20 +101,24 @@ const spacing: Spacing = {
   xl: 32,
 };
 
-const createTypography = (textColor: string): Typography => ({
+const createTypography = (textColor: string, fontFamily: string = 'Urbanist'): Typography => ({
+  fontFamily,
   h1: {
     fontSize: 32,
     fontWeight: '700',
+    fontFamily: 'Urbanist_700Bold',
     color: textColor,
   },
   h2: {
     fontSize: 24,
     fontWeight: '600',
+    fontFamily: 'Urbanist_600SemiBold',
     color: textColor,
   },
   body: {
     fontSize: 16,
     fontWeight: '400',
+    fontFamily: 'Urbanist_400Regular',
     color: textColor,
   },
 });
@@ -130,7 +138,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   const colors = theme === 'light' ? lightColors : darkColors;
-  const typography = createTypography(colors.text.primary);
+  const typography = createTypography(colors.text.primary, 'Urbanist');
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, colors, spacing, typography }}>
