@@ -9,8 +9,10 @@ import {
   Urbanist_700Bold,
 } from '@expo-google-fonts/urbanist';
 import { ThemeProvider } from './theme/ThemeProvider';
+import { AuthProvider } from './store/auth-context';
+import { NavigationProvider } from './store/navigation-context';
+import { GlobalBottomSheetProvider } from './components/globals/globalBottomSheet';
 import { SidebarProvider, SidebarContainer } from './components/globals/Sidebar';
-import { HomeScreen } from './screens/homeScreen';
 
 // Prevent the splash screen from auto-hiding before fonts are loaded
 SplashScreen.preventAutoHideAsync();
@@ -37,11 +39,11 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <SidebarProvider>
-          <SidebarContainer>
-            <HomeScreen />
-          </SidebarContainer>
-        </SidebarProvider>
+        <AuthProvider>
+          <GlobalBottomSheetProvider>
+            <NavigationProvider />
+          </GlobalBottomSheetProvider>
+        </AuthProvider>
         <StatusBar style="auto" />
       </ThemeProvider>
     </SafeAreaProvider>

@@ -61,11 +61,11 @@ interface ThemeContextType {
 
 const lightColors: Colors = {
   primary: {
-    500: '#2176AE', // Spirit Blue (matches screenshot)
+    500: '#2176AE', // Spirit Blue
   },
   background: {
-    primary: '#F8F8F8', // Light Gray (matches screenshot)
-    secondary: '#FFFBEB', // Light Yellow (matches screenshot)
+    primary: '#FFFFFF', // Aura White - Pure white for main backgrounds
+    secondary: '#F5F5F5', // Vapor Cream - Very subtle light gray, neutral (NOT yellow)
   },
   text: {
     primary: '#333333', // Shadow Gray

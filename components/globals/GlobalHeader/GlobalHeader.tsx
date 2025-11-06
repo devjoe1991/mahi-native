@@ -31,19 +31,19 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
 
   const styles = StyleSheet.create({
     safeArea: {
-      backgroundColor: colors.background.secondary,
+      backgroundColor: 'transparent', // Transparent to show curve
       zIndex: 10,
       overflow: 'visible',
-      paddingBottom: 20, // Allow space for curve
+      paddingBottom: 25, // Allow space for curve
     },
     container: {
       justifyContent: 'center',
       alignItems: 'center',
       flexDirection: 'row',
       marginBottom: 0,
-      marginHorizontal: horizontalMargin,
       paddingTop: spacing.md,
       paddingBottom: spacing.lg,
+      paddingHorizontal: horizontalMargin, // Use padding instead of margin for proper positioning
       minHeight: 75,
       position: 'relative',
       width: '100%',
@@ -51,7 +51,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
     },
     leftContainer: {
       position: 'absolute',
-      left: horizontalPadding,
+      left: horizontalMargin, // Position from container's left edge (which is now at screen edge)
       flexDirection: 'row',
       alignItems: 'center',
       zIndex: 100, // Increased to ensure it's above SVG and other elements
@@ -66,7 +66,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
     },
     rightContainer: {
       position: 'absolute',
-      right: horizontalPadding,
+      right: horizontalMargin, // Match left container positioning
       flexDirection: 'row',
       alignItems: 'center',
       zIndex: 2,
@@ -77,7 +77,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
       top: 0,
       left: 0,
       right: 0,
-      bottom: -20, // Extend below to show curve
+      bottom: -25, // Extend below to show curve
       zIndex: 0,
       overflow: 'visible',
     },
@@ -85,42 +85,42 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
 
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
-      <View
-        style={styles.container}
-        onLayout={(e) => {
-          setHeaderHeight(e.nativeEvent.layout.height);
-        }}
-      >
-        <View style={styles.svgContainer}>
-          <HeaderSVG headerHeight={headerHeight} />
-        </View>
+    <View
+      style={styles.container}
+      onLayout={(e) => {
+        setHeaderHeight(e.nativeEvent.layout.height);
+      }}
+    >
+      <View style={styles.svgContainer}>
+        <HeaderSVG headerHeight={headerHeight} />
+      </View>
 
-        <View style={styles.leftContainer}>
-          <AnimatedHamburgerMenu
+      <View style={styles.leftContainer}>
+        <AnimatedHamburgerMenu
             size={SCREEN_WIDTH < 375 ? 26 : 30}
-          />
-        </View>
+        />
+      </View>
 
-        <View style={styles.centerContainer}>
+      <View style={styles.centerContainer}>
           <MahiTextLogo 
             size={SCREEN_WIDTH < 375 ? 'medium' : 'large'} 
             showSubtitle={true} 
           />
-        </View>
-
-        <View style={styles.rightContainer}>
-          <IconButton
-            icon="search"
-            onPress={onSearchPress || (() => {})}
-          />
-          <IconButton
-            icon="notifications-outline"
-            onPress={onNotificationsPress || (() => {})}
-            badge={showUnreadBadge}
-            badgeCount={unreadCount}
-          />
-        </View>
       </View>
+
+      <View style={styles.rightContainer}>
+        <IconButton
+          icon="search"
+          onPress={onSearchPress || (() => {})}
+        />
+        <IconButton
+          icon="notifications-outline"
+          onPress={onNotificationsPress || (() => {})}
+          badge={showUnreadBadge}
+          badgeCount={unreadCount}
+        />
+      </View>
+    </View>
     </SafeAreaView>
   );
 };
