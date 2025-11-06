@@ -225,12 +225,13 @@ export const StreakModal: React.FC<StreakModalProps> = ({ streak, onClose, onNav
                   color: colors.text.secondary,
                   textAlign: 'center',
                   marginBottom: spacing.lg,
+                  lineHeight: 22,
                 }}
               >
-                Complete today's daily goal by making a new post to unlock this streak!
+                Keep up your streak! Upload a post today to unlock this streak level.
               </Text>
               <Pressable style={styles.button} onPress={onNavigateToAddStory}>
-                <Text style={styles.buttonText}>Complete Daily Goal (Free)</Text>
+                <Text style={styles.buttonText}>Upload Daily Post</Text>
               </Pressable>
             </View>
           ) : (
