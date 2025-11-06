@@ -6,6 +6,7 @@ import Animated, {
   useSharedValue,
   withSpring,
   withTiming,
+  Easing,
 } from 'react-native-reanimated';
 import { useTheme } from '../../../theme/ThemeProvider';
 import { useSidebar } from './SidebarContext';
@@ -62,7 +63,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
     } else {
       translateX.value = withTiming(-SIDEBAR_WIDTH, { 
         duration: 220, // Slightly longer for smoother close
-        easing: 'easeInOut', // Smooth easing curve
+        easing: Easing.inOut(Easing.ease), // Smooth easing curve
       });
     }
   }, [isOpen, translateX]);

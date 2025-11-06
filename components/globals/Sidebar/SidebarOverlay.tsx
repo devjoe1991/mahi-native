@@ -5,6 +5,7 @@ import Animated, {
   useSharedValue,
   withTiming,
   withSpring,
+  Easing,
 } from 'react-native-reanimated';
 import { useTheme } from '../../../theme/ThemeProvider';
 import { useSidebar } from './SidebarContext';
@@ -52,11 +53,11 @@ export const SidebarOverlay: React.FC = () => {
       // Hide overlay smoothly
       opacity.value = withTiming(0, { 
         duration: 220, // Match sidebar close duration
-        easing: 'easeInOut',
+        easing: Easing.inOut(Easing.ease),
       });
       scale.value = withTiming(0.98, { 
         duration: 220, // Slightly less scale for smoother feel
-        easing: 'easeInOut',
+        easing: Easing.inOut(Easing.ease),
       });
     }
   }, [isOpen, opacity, scale]);
