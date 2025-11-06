@@ -12,6 +12,8 @@ export interface UserData {
   followings?: number;
   streak_days?: number; // Current streak count - Ready for Supabase integration
   streak_level?: number; // Current streak level - Ready for Supabase integration
+  longest_streak?: number; // Longest streak ever achieved - For loss aversion
+  rest_days?: string[]; // Days of week when user takes rest (e.g., ['sunday', 'saturday'])
 }
 
 export interface PostData {

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { View, StyleSheet, Pressable, Text, Dimensions, Animated, PanResponder } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../../theme/ThemeProvider';
@@ -6,6 +6,7 @@ import { StreakData } from './types';
 import { StreakModal } from './StreakModal';
 import { useBottomSheet } from '../globalBottomSheet';
 import { useNavigation } from '../../../store/navigation-context';
+import { useAuth } from '../../../store/auth-context';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('screen');
 const ITEM_SIZE = SCREEN_WIDTH / 5;
@@ -18,7 +19,7 @@ interface StreakBarProps {
   onStreakPress?: (streak: StreakData) => void;
 }
 
-// Get streak color based on level and state
+// Get streak color based on level and state - Colors intensify as streak grows
 const getStreakColor = (
   level: number,
   feedType: string,
@@ -31,22 +32,35 @@ const getStreakColor = (
     return theme === 'dark' ? colors.border.primary : colors.text.secondary;
   }
 
+  // Milestone colors (every 10 days) - Special colors
   const isMilestone = streakDays > 0 && streakDays % 10 === 0;
   if (isMilestone) {
-    return '#EF4444'; // Error red for milestones
+    return colors.brand.yellow; // Gold for milestones
   }
 
+  // Color progression based on streak days - More vibrant as streak grows
+  if (streakDays >= 30) {
+    return colors.brand.purpleDark; // Deep purple for 30+ days
+  }
+  if (streakDays >= 14) {
+    return colors.brand.magenta; // Magenta for 14+ days
+  }
+  if (streakDays >= 7) {
+    return colors.brand.orange; // Orange for 7+ days
+  }
+
+  // Base colors by feed type
   const feedColors: Record<string, string> = {
-    streak1: colors.primary[500], // Spirit Blue
-    streak2: '#4ECDC4', // Teal
-    streak3: '#45B7D1', // Blue
-    streak4: '#8B5CF6', // Purple
-    streak5: '#10B981', // Green
-    streak6: '#F59E0B', // Orange
+    streak1: colors.brand.blue, // Blue
+    streak2: colors.brand.cyan, // Cyan
+    streak3: colors.brand.blue100, // Light blue
+    streak4: colors.brand.purple, // Purple
+    streak5: colors.brand.green, // Green
+    streak6: colors.brand.orange, // Orange
     creation: colors.text.primary,
   };
 
-  return feedColors[feedType] || colors.primary[500];
+  return feedColors[feedType] || colors.brand.blue;
 };
 
 // Get progression emoji
@@ -70,14 +84,41 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
   const { colors, spacing, typography, theme } = useTheme();
   const { openSheet } = useBottomSheet();
   const { navigate } = useNavigation();
+  const { userData } = useAuth();
   const [selectedStreak, setSelectedStreak] = useState<StreakData | null>(null);
+  const [timeUntilReset, setTimeUntilReset] = useState<string>('');
   const scrollX = useRef(new Animated.Value(0)).current;
   const flatListRef = useRef<Animated.FlatList>(null);
 
+  // Calculate time until streak reset (midnight)
+  useEffect(() => {
+    const updateCountdown = () => {
+      const now = new Date();
+      const midnight = new Date();
+      midnight.setHours(24, 0, 0, 0);
+      const diff = midnight.getTime() - now.getTime();
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      
+      if (hours > 0) {
+        setTimeUntilReset(`${hours}h ${minutes}m`);
+      } else if (minutes > 0) {
+        setTimeUntilReset(`${minutes}m`);
+      } else {
+        setTimeUntilReset('Soon!');
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, []);
+
   const handleStreakPress = (streak: StreakData) => {
     if (streak.type === 'add_story') {
+      // Open streak update sheet with Mahi prompt
       openSheet('STREAK_UPDATE', {
-        userId: undefined,
+        userId: userData?._id,
         onSaved: () => {
           // Refresh streaks after update
           onStreakPress?.(streak);
@@ -90,18 +131,44 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
     }
   };
 
+  // Get current active streak for countdown display
+  const currentStreak = userData?.streak_days || 0;
+
   const styles = StyleSheet.create({
     container: {
       height: CONTAINER_HEIGHT,
       backgroundColor: colors.background.primary,
       width: '100%',
-      paddingBottom: spacing.xs, // Extra padding to ensure text is never cut off
-      overflow: 'visible', // Ensure text is visible even with animations
+      paddingBottom: spacing.xs,
+      overflow: 'visible',
+    },
+    countdownContainer: {
+      paddingHorizontal: spacing.md,
+      paddingTop: spacing.xs,
+      paddingBottom: spacing.xs,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    countdownText: {
+      fontSize: 11,
+      fontFamily: typography.body.fontFamily,
+      color: colors.text.muted,
+      marginLeft: spacing.xs,
     },
   });
 
   return (
     <View style={styles.container}>
+      {/* Countdown Timer */}
+      {currentStreak > 0 && timeUntilReset && (
+        <View style={styles.countdownContainer}>
+          <Ionicons name="time-outline" size={14} color={colors.text.muted} />
+          <Text style={styles.countdownText}>
+            {timeUntilReset} until reset
+          </Text>
+        </View>
+      )}
       <Animated.FlatList
         ref={flatListRef}
         data={streaks}

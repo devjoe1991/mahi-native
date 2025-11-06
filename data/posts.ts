@@ -12,7 +12,8 @@ export const MOCK_POSTS: PostData[] = [
     caption: 'Beautiful autumn run in the park! 🍂🏃‍♂️',
     likes: 245,
     comments: 32,
-    createdAt: new Date().toISOString(),
+    // Set to yesterday to test daily check-in (user hasn't posted today)
+    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     _id: '2',

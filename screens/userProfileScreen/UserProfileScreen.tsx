@@ -9,6 +9,7 @@ import { ProfileBody } from '../../components/userProfile/ProfileBody';
 import { ProfileHeaderSVG } from '../../components/userProfile/ProfileHeaderSVG';
 import { ProfileHeaderComponent } from '../../components/userProfile/ProfileHeaderComponent';
 import { getUserById } from '../../data/user';
+import { CalendarHeatmap } from '../../components/calendarHeatmap';
 
 export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({
   viewMode = false,
@@ -109,6 +110,9 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({
       </View>
 
       <View style={styles.contentContainer}>
+        {/* Calendar Heatmap */}
+        <CalendarHeatmap streakDays={userData.streak_days || 0} />
+        
         <ProfileBody
           userId={userData._id}
           refreshing={refreshing}

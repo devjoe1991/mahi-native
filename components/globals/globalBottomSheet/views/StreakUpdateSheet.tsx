@@ -7,33 +7,21 @@ import { useBottomSheet } from '../context';
 import { useAuth } from '../../../../store/auth-context';
 import { StreakUpdateSheetProps } from '../types';
 
-export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({ userId, onSaved }) => {
+export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({
+  userId,
+  onSaved,
+  initialImage,
+}) => {
   const { colors, spacing, typography } = useTheme();
   const { closeSheet } = useBottomSheet();
   const { userData } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [caption, setCaption] = useState('');
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(initialImage || null);
 
-  const pickImage = useCallback(async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission needed', 'We need camera roll permissions to upload images.');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      setSelectedImage(result.assets[0].uri);
-    }
-  }, []);
+  // REMOVED: pickImage function - camera roll uploads not allowed
+  // Users must take photos in real-time as proof of streak
 
   const takePhoto = useCallback(async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -54,16 +42,16 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({ userId, on
   }, []);
 
   const showImagePicker = useCallback(() => {
+    // Only show camera option - no camera roll allowed
     Alert.alert(
-      'Add Photo',
-      'Choose an option',
+      'Have you done your Mahi today?',
+      'Take a photo now to prove you completed your daily goal.',
       [
-        { text: 'Camera', onPress: takePhoto },
-        { text: 'Photo Library', onPress: pickImage },
+        { text: 'Take Photo', onPress: takePhoto },
         { text: 'Cancel', style: 'cancel' },
       ]
     );
-  }, [pickImage, takePhoto]);
+  }, [takePhoto]);
 
   const onCancel = useCallback(() => {
     closeSheet();
@@ -215,7 +203,7 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({ userId, on
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Update Streak</Text>
+      <Text style={styles.title}>Have you done your Mahi today? 🔥</Text>
 
       {selectedImage ? (
         <View style={styles.imageContainer}>
@@ -230,7 +218,7 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({ userId, on
       ) : (
         <Pressable style={styles.addImageButton} onPress={showImagePicker}>
           <Ionicons name="camera-outline" size={24} color={colors.text.primary} />
-          <Text style={styles.addImageButtonText}>Add Photo</Text>
+          <Text style={styles.addImageButtonText}>Take Photo Now</Text>
         </Pressable>
       )}
 

@@ -21,6 +21,7 @@ export type ProfileEditSheetProps = {
 export type StreakUpdateSheetProps = {
   userId?: string;
   onSaved?: () => void;
+  initialImage?: string; // Pre-loaded image URI (from camera)
 };
 
 export type SheetPropsMap = {

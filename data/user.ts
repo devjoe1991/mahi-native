@@ -17,6 +17,8 @@ export const MOCK_USER_DATA: UserData = {
   followings: 378,
   streak_days: 1, // Current streak - Ready for Supabase: SELECT streak_days FROM profiles WHERE id = userId
   streak_level: 1, // Current level - Ready for Supabase: SELECT streak_level FROM profiles WHERE id = userId
+  longest_streak: 5, // Longest streak ever - For loss aversion warnings
+  rest_days: [], // Rest days - Ready for Supabase: SELECT rest_days FROM profiles WHERE id = userId
 };
 
 /**
@@ -70,5 +72,40 @@ export const getCurrentUser = async (): Promise<UserData | null> => {
   // Simulate API call
   await new Promise((resolve) => setTimeout(resolve, 200));
   return MOCK_USER_DATA;
+};
+
+/**
+ * Get all users for leaderboard
+ */
+export const getAllUsers = async (): Promise<UserData[]> => {
+  await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
+  // Add some mock users with different streak values for leaderboard
+  return [
+    ...MOCK_USERS,
+    {
+      _id: '4',
+      fullName: 'Alex Runner',
+      username: 'alex',
+      email: 'alex@example.com',
+      bio: 'Daily runner',
+      streak_days: 45,
+      streak_level: 5,
+      posts: 120,
+      followers: 5000,
+      followings: 200,
+    },
+    {
+      _id: '5',
+      fullName: 'Emma Fitness',
+      username: 'emma',
+      email: 'emma@example.com',
+      bio: 'Fitness coach',
+      streak_days: 30,
+      streak_level: 4,
+      posts: 200,
+      followers: 8000,
+      followings: 300,
+    },
+  ];
 };
 
