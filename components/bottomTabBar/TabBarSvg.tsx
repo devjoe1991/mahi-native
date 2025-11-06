@@ -39,7 +39,7 @@ export const TabBarSvg: React.FC<TabBarSvgProps> = ({ height }) => {
       left: 0,
       right: 0,
       zIndex: 1,
-      shadowColor: theme === 'dark' ? '#000' : '#000',
+      shadowColor: colors.text.primary, // Theme-aware shadow color
       shadowOffset: { width: 0, height: -2 },
       shadowOpacity: theme === 'dark' ? 0.3 : 0.05,
       shadowRadius: 4,

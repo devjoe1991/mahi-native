@@ -85,42 +85,42 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
 
   return (
     <SafeAreaView edges={['top']} style={styles.safeArea}>
-      <View
-        style={styles.container}
-        onLayout={(e) => {
-          setHeaderHeight(e.nativeEvent.layout.height);
-        }}
-      >
-        <View style={styles.svgContainer}>
-          <HeaderSVG headerHeight={headerHeight} />
-        </View>
+    <View
+      style={styles.container}
+      onLayout={(e) => {
+        setHeaderHeight(e.nativeEvent.layout.height);
+      }}
+    >
+      <View style={styles.svgContainer}>
+        <HeaderSVG headerHeight={headerHeight} />
+      </View>
 
-        <View style={styles.leftContainer}>
-          <AnimatedHamburgerMenu
+      <View style={styles.leftContainer}>
+        <AnimatedHamburgerMenu
             size={SCREEN_WIDTH < 375 ? 26 : 30}
-          />
-        </View>
+        />
+      </View>
 
-        <View style={styles.centerContainer}>
+      <View style={styles.centerContainer}>
           <MahiTextLogo 
             size={SCREEN_WIDTH < 375 ? 'medium' : 'large'} 
             showSubtitle={true} 
           />
-        </View>
-
-        <View style={styles.rightContainer}>
-          <IconButton
-            icon="search"
-            onPress={onSearchPress || (() => {})}
-          />
-          <IconButton
-            icon="notifications-outline"
-            onPress={onNotificationsPress || (() => {})}
-            badge={showUnreadBadge}
-            badgeCount={unreadCount}
-          />
-        </View>
       </View>
+
+      <View style={styles.rightContainer}>
+        <IconButton
+          icon="search"
+          onPress={onSearchPress || (() => {})}
+        />
+        <IconButton
+          icon="notifications-outline"
+          onPress={onNotificationsPress || (() => {})}
+          badge={showUnreadBadge}
+          badgeCount={unreadCount}
+        />
+      </View>
+    </View>
     </SafeAreaView>
   );
 };

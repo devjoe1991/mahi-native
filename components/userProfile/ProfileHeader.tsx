@@ -1,0 +1,206 @@
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  ImageBackground,
+  Dimensions,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../../theme/ThemeProvider';
+import { ProfileHeaderProps, ProfileStatProps } from './types';
+import { RemoteImage } from './RemoteImage';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('screen');
+const DEFAULT_AVATAR = 'https://via.placeholder.com/150';
+
+const ProfileStat: React.FC<ProfileStatProps> = ({ text, subText, onPress }) => {
+  const { colors, typography } = useTheme();
+
+  const styles = StyleSheet.create({
+    container: {
+      alignItems: 'center',
+    },
+    text: {
+      fontWeight: typography.body.fontWeight as any,
+      fontSize: 25,
+      fontFamily: typography.body.fontFamily,
+      color: colors.text.primary,
+    },
+    subText: {
+      fontSize: 12,
+      fontFamily: typography.body.fontFamily,
+      color: colors.text.secondary,
+    },
+  });
+
+  return (
+    <Pressable style={styles.container} onPress={onPress}>
+      <Text style={styles.text}>{text}</Text>
+      <Text style={styles.subText}>{subText}</Text>
+    </Pressable>
+  );
+};
+
+export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
+  userData,
+  viewMode = false,
+  onEditPress,
+  onMessagePress,
+}) => {
+  const { colors, spacing, typography } = useTheme();
+  const profilePic = userData.picturePath || DEFAULT_AVATAR;
+
+  const styles = StyleSheet.create({
+    container: {
+      alignItems: 'center',
+      margin: spacing.md,
+      paddingTop: spacing.lg,
+    },
+    avatarContainer: {
+      width: 150,
+      height: 150,
+      marginHorizontal: spacing.md,
+      position: 'relative',
+    },
+    avatar: {
+      width: 150,
+      height: 150,
+      borderRadius: 75,
+    },
+    avatarImage: {
+      borderRadius: 75,
+    },
+    editButton: {
+      position: 'absolute',
+      right: 0,
+      bottom: 5,
+      backgroundColor: colors.background.primary,
+      padding: spacing.sm,
+      borderRadius: 25,
+      shadowColor: colors.text.primary,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    messageButton: {
+      position: 'absolute',
+      left: 0,
+      top: 5,
+      backgroundColor: colors.background.primary,
+      padding: spacing.sm,
+      borderRadius: 25,
+      shadowColor: colors.text.primary,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    name: {
+      fontWeight: typography.h2.fontWeight as any,
+      fontSize: 25,
+      fontFamily: typography.h2.fontFamily,
+      color: colors.text.primary,
+      marginTop: spacing.md,
+    },
+    username: {
+      fontSize: 15,
+      fontFamily: typography.body.fontFamily,
+      color: colors.text.secondary,
+      marginTop: spacing.xs,
+    },
+    statsContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      marginTop: spacing.lg,
+      marginBottom: spacing.lg,
+      backgroundColor: colors.background.secondary,
+      borderRadius: 20,
+      marginHorizontal: spacing.md,
+      paddingVertical: spacing.md,
+      width: SCREEN_WIDTH - spacing.md * 2,
+    },
+  });
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.avatarContainer}>
+        <ImageBackground
+          style={styles.avatar}
+          imageStyle={styles.avatarImage}
+          source={
+            typeof profilePic === 'number' 
+              ? profilePic 
+              : typeof profilePic === 'string' && profilePic
+              ? { uri: profilePic }
+              : { uri: DEFAULT_AVATAR }
+          }
+        >
+          {!viewMode && (
+            <Pressable style={styles.editButton} onPress={onEditPress}>
+              <Ionicons
+                name="create-outline"
+                size={25}
+                color={colors.text.primary}
+              />
+            </Pressable>
+          )}
+          {viewMode && (
+            <>
+              <Pressable style={styles.messageButton} onPress={onMessagePress}>
+                <Ionicons
+                  name="chatbubble-ellipses"
+                  size={30}
+                  color={colors.text.primary}
+                />
+              </Pressable>
+              <Pressable style={styles.editButton} onPress={onEditPress}>
+                <Ionicons
+                  name="person-add-outline"
+                  size={25}
+                  color={colors.text.primary}
+                />
+              </Pressable>
+            </>
+          )}
+        </ImageBackground>
+      </View>
+
+      <Text style={styles.name}>{userData.fullName}</Text>
+      <Text style={styles.username}>@{userData.username}</Text>
+      {userData.bio && (
+        <Text
+          style={[
+            styles.username,
+            {
+              marginTop: spacing.sm,
+              textAlign: 'center',
+              paddingHorizontal: spacing.lg,
+            },
+          ]}
+        >
+          {userData.bio}
+        </Text>
+      )}
+
+      <View style={styles.statsContainer}>
+        <ProfileStat
+          text={String(userData.posts || 0)}
+          subText="Posts"
+        />
+        <ProfileStat
+          text={String(userData.followers || 0)}
+          subText="Followers"
+        />
+        <ProfileStat
+          text={String(userData.followings || 0)}
+          subText="Followings"
+        />
+      </View>
+    </View>
+  );
+};
+

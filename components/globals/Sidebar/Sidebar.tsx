@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Dimensions, Pressable, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
   useAnimatedStyle,
@@ -10,6 +10,8 @@ import Animated, {
 import { useTheme } from '../../../theme/ThemeProvider';
 import { useSidebar } from './SidebarContext';
 import { SidebarItem } from './SidebarItem';
+import { useAuth } from '../../../store/auth-context';
+import { useBottomSheet } from '../globalBottomSheet';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('screen');
 const SIDEBAR_WIDTH = SCREEN_WIDTH * 0.85;
@@ -21,8 +23,10 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   const { theme, toggleTheme, colors, spacing, typography } = useTheme();
   const { isOpen, closeSidebar } = useSidebar();
+  const { userData } = useAuth();
+  const { openSheet } = useBottomSheet();
 
-  // Get user initials from fullName (mock data for now)
+  // Get user initials from fullName
   const getUserInitials = (fullName?: string) => {
     if (!fullName) return 'U';
     return fullName
@@ -33,10 +37,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
       .slice(0, 2);
   };
 
-  // Mock user data (will be replaced with real data later)
-  const mockUser = {
-    fullName: 'Joe John',
-    username: 'joejohn',
+  const getDisplayName = () => {
+    return userData?.fullName || userData?.username || 'User';
   };
 
   // Animation values
@@ -49,15 +51,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
     };
   });
 
-  // Animation effects
+  // Animation effects - Seamless, polished spring animation
   useEffect(() => {
     if (isOpen) {
       translateX.value = withSpring(0, {
-        damping: 15,
-        stiffness: 200,
+        damping: 25, // Higher damping for smooth, controlled motion
+        stiffness: 180, // Balanced stiffness for responsive but smooth feel
+        mass: 0.8, // Slightly lighter mass for more natural movement
       });
     } else {
-      translateX.value = withTiming(-SIDEBAR_WIDTH, { duration: 300 });
+      translateX.value = withTiming(-SIDEBAR_WIDTH, { 
+        duration: 220, // Slightly longer for smoother close
+        easing: 'easeInOut', // Smooth easing curve
+      });
     }
   }, [isOpen, translateX]);
 
@@ -106,6 +112,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
       title: 'Profile',
       color: '#F472B6', // Pink
       screenName: 'UserProfileScreen',
+    },
+    {
+      icon: 'settings-outline' as keyof typeof Ionicons.glyphMap,
+      title: 'Settings',
+      color: '#EC4899', // Magenta
+      onPress: () => {
+        closeSidebar();
+        setTimeout(() => {
+          openSheet('SETTINGS');
+        }, 100);
+      },
     },
   ];
 
@@ -249,12 +266,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
         }}
       >
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {getUserInitials(mockUser.fullName)}
-          </Text>
+          {userData?.picturePath ? (
+            <Image
+              source={
+                typeof userData.picturePath === 'number'
+                  ? userData.picturePath
+                  : { uri: userData.picturePath }
+              }
+              style={{ width: 50, height: 50, borderRadius: 25 }}
+            />
+          ) : (
+            <Text style={styles.avatarText}>
+              {getUserInitials(userData?.fullName)}
+            </Text>
+          )}
         </View>
         <View style={styles.userInfo}>
-          <Text style={styles.userName}>{mockUser.fullName || mockUser.username || 'User'}</Text>
+          <Text style={styles.userName}>{getDisplayName()}</Text>
           <Text style={styles.userStatus}>Active now</Text>
         </View>
         {/* Close Button - Inside Profile Section */}
@@ -284,7 +312,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
             color={item.color}
             badge={item.badge}
             onPress={() => {
-              if (onNavigate) {
+              if (item.onPress) {
+                item.onPress();
+              } else if (onNavigate && item.screenName) {
                 onNavigate(item.screenName);
               }
             }}

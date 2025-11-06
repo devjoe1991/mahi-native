@@ -34,22 +34,30 @@ export const SidebarOverlay: React.FC = () => {
     }
   };
 
-  // Animation effects
+  // Animation effects - Seamless overlay animation that complements sidebar
   useEffect(() => {
     if (isOpen) {
-      // Show overlay with spring animation
+      // Show overlay with smooth spring animation
       opacity.value = withSpring(1, {
-        damping: 15,
-        stiffness: 200,
+        damping: 25, // Match sidebar damping for consistency
+        stiffness: 180, // Match sidebar stiffness
+        mass: 0.8,
       });
       scale.value = withSpring(1, {
-        damping: 15,
-        stiffness: 200,
+        damping: 25,
+        stiffness: 180,
+        mass: 0.8,
       });
     } else {
-      // Hide overlay with timing animation
-      opacity.value = withTiming(0, { duration: 200 });
-      scale.value = withTiming(0.95, { duration: 200 });
+      // Hide overlay smoothly
+      opacity.value = withTiming(0, { 
+        duration: 220, // Match sidebar close duration
+        easing: 'easeInOut',
+      });
+      scale.value = withTiming(0.98, { 
+        duration: 220, // Slightly less scale for smoother feel
+        easing: 'easeInOut',
+      });
     }
   }, [isOpen, opacity, scale]);
 
