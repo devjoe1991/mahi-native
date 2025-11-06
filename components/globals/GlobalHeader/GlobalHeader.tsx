@@ -42,10 +42,10 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
       alignItems: 'center',
       flexDirection: 'row',
       marginBottom: 0,
-      paddingTop: spacing.md,
-      paddingBottom: spacing.lg,
+      paddingTop: spacing.md + spacing.xs,
+      paddingBottom: spacing.lg + spacing.xs,
       paddingHorizontal: horizontalMargin, // Use padding instead of margin for proper positioning
-      minHeight: 75,
+      minHeight: 80,
       position: 'relative',
       width: '100%',
       overflow: 'visible',

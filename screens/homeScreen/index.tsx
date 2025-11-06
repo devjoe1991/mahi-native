@@ -115,14 +115,14 @@ export const HomeScreen: React.FC = () => {
     streakBarContainer: {
       backgroundColor: colors.background.primary,
       // No visible border - clean separation
-      marginBottom: 0, // No margin to prevent gap
+      marginBottom: spacing.lg, // Add breathing room to avoid underlap with feed
     },
     content: {
       flex: 1,
       paddingBottom: 100, // Space for tab bar
     },
     feed: {
-      paddingTop: spacing.md,
+      paddingTop: spacing.lg,
     },
     loadingContainer: {
       flex: 1,

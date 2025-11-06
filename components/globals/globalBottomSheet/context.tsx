@@ -108,17 +108,27 @@ export const GlobalBottomSheetProvider: React.FC<Props> = ({ children }) => {
         propagateSwipe={true}
       >
         <View
-          style={[
-            styles.container,
-            {
-              backgroundColor: colors.background.secondary,
-              borderTopLeftRadius: spacing.lg,
-              borderTopRightRadius: spacing.lg,
-              ...(dynamicHeight ? { height: dynamicHeight, maxHeight: maxSheetHeight } : { maxHeight: maxSheetHeight }),
-            },
-          ]}
-        >
-          <View style={[styles.handle, { backgroundColor: colors.border.primary }]} />
+            style={[
+              styles.container,
+              {
+                backgroundColor: colors.background.secondary,
+                borderTopLeftRadius: 28,
+                borderTopRightRadius: 28,
+                ...(dynamicHeight ? { height: dynamicHeight, maxHeight: maxSheetHeight } : { maxHeight: maxSheetHeight }),
+                shadowColor: '#000000',
+                shadowOffset: { width: 0, height: -4 },
+                shadowOpacity: 0.2,
+                shadowRadius: 16,
+                elevation: 16,
+              },
+            ]}
+          >
+            <View style={[styles.handle, { 
+              backgroundColor: colors.border.primary,
+              width: 40,
+              height: 4,
+              borderRadius: 2,
+            }]} />
           
           <KeyboardAvoidingView 
             style={styles.flex} 

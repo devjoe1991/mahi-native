@@ -49,33 +49,41 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       width: POST_WIDTH,
       alignSelf: 'center',
       backgroundColor: colors.background.secondary,
-      marginBottom: spacing.md,
+      marginBottom: spacing.lg,
       marginHorizontal: POST_HORIZONTAL_MARGIN, // Consistent horizontal margin
-      borderRadius: 12,
+      borderRadius: 20,
       overflow: 'hidden',
-      borderWidth: 1,
-      borderColor: colors.border.primary,
-      // Subtle aura shadow for motivational feel
-      shadowColor: theme === 'dark' ? AURA_BLUE : MOTIVATIONAL_PURPLE,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: theme === 'dark' ? 0.2 : 0.08,
-      shadowRadius: 8,
-      elevation: 3,
+      borderWidth: theme === 'dark' ? 0 : 1,
+      borderColor: theme === 'dark' ? 'transparent' : colors.border.primary,
+      // Refined shadow for depth and elegance
+      shadowColor: theme === 'dark' ? '#000000' : '#000000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: theme === 'dark' ? 0.4 : 0.08,
+      shadowRadius: theme === 'dark' ? 12 : 16,
+      elevation: theme === 'dark' ? 8 : 4,
     },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
-      padding: spacing.md,
+      padding: spacing.md + spacing.xs,
+      paddingBottom: spacing.md,
     },
     avatar: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      marginRight: spacing.sm,
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      marginRight: spacing.md,
       backgroundColor: colors.primary[500],
-      // Subtle aura border
-      borderWidth: 2,
-      borderColor: theme === 'dark' ? `${AURA_BLUE}40` : `${MOTIVATIONAL_PURPLE}30`,
+      // Refined border with subtle glow
+      borderWidth: 2.5,
+      borderColor: theme === 'dark' 
+        ? `${colors.brand.blue}60` 
+        : `${colors.brand.purple}40`,
+      shadowColor: theme === 'dark' ? colors.brand.blue : colors.brand.purple,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+      elevation: 3,
     },
     headerText: {
       flex: 1,
@@ -93,10 +101,15 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: colors.brand.orange,
-      paddingHorizontal: spacing.xs,
-      paddingVertical: 2,
-      borderRadius: 8,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+      borderRadius: 12,
       marginLeft: spacing.xs,
+      shadowColor: colors.brand.orange,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+      elevation: 2,
     },
     streakText: {
       fontSize: 10,
@@ -111,7 +124,8 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       resizeMode: 'cover',
     },
     footer: {
-      padding: spacing.md,
+      padding: spacing.md + spacing.xs,
+      paddingTop: spacing.md,
     },
     caption: {
       fontSize: typography.body.fontSize,
@@ -122,7 +136,8 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
     stats: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginTop: spacing.xs,
+      marginTop: spacing.sm,
+      marginBottom: spacing.xs,
     },
     statText: {
       fontSize: 12,
@@ -180,8 +195,8 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
           <Pressable style={styles.heartIcon}>
             <Ionicons 
               name="heart-outline" 
-              size={20} 
-              color={theme === 'dark' ? `${AURA_BLUE}CC` : `${MOTIVATIONAL_PURPLE}CC`} 
+              size={22} 
+              color={theme === 'dark' ? colors.brand.red : colors.brand.pink} 
             />
           </Pressable>
           <Text style={styles.statText}>{post.likes || 0}</Text>
@@ -191,8 +206,8 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
           >
             <Ionicons 
               name="chatbubble-outline" 
-              size={20} 
-              color={theme === 'dark' ? `${AURA_BLUE}CC` : `${MOTIVATIONAL_PURPLE}CC`} 
+              size={22} 
+              color={theme === 'dark' ? colors.brand.blue : colors.brand.blue100} 
             />
             <Text style={styles.statText}>{post.comments || 0}</Text>
           </Pressable>

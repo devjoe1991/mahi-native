@@ -108,9 +108,11 @@ export const NotificationsScreen: React.FC = () => {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: spacing.md,
+      padding: spacing.md + spacing.xs,
+      paddingVertical: spacing.md,
       borderBottomWidth: 1,
       borderBottomColor: colors.border.primary,
+      backgroundColor: colors.background.primary,
     },
     backButton: {
       padding: spacing.xs,

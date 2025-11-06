@@ -85,7 +85,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
   const styles = StyleSheet.create({
     container: {
       flexDirection: 'row',
-      padding: spacing.md,
+      padding: spacing.md + spacing.xs,
       backgroundColor: notification.isRead
         ? colors.background.primary
         : colors.background.secondary,
@@ -93,13 +93,15 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
       borderBottomColor: colors.border.primary,
     },
     iconContainer: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
+      width: 44,
+      height: 44,
+      borderRadius: 22,
       backgroundColor: getIconColor() + '20',
       justifyContent: 'center',
       alignItems: 'center',
       marginRight: spacing.md,
+      borderWidth: 2,
+      borderColor: getIconColor() + '30',
     },
     content: {
       flex: 1,
@@ -147,11 +149,16 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
       fontWeight: typography.body.fontWeight as any,
     },
     unreadIndicator: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
+      width: 10,
+      height: 10,
+      borderRadius: 5,
       backgroundColor: colors.brand.blue,
       marginLeft: spacing.xs,
+      shadowColor: colors.brand.blue,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.5,
+      shadowRadius: 4,
+      elevation: 2,
     },
   });
 

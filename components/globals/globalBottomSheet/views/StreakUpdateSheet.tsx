@@ -12,7 +12,7 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({
   onSaved,
   initialImage,
 }) => {
-  const { colors, spacing, typography } = useTheme();
+  const { colors, spacing, typography, theme } = useTheme();
   const { closeSheet } = useBottomSheet();
   const { userData } = useAuth();
 
@@ -107,12 +107,17 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({
     imageContainer: {
       width: '100%',
       aspectRatio: 1,
-      borderRadius: spacing.md,
+      borderRadius: 20,
       backgroundColor: colors.background.primary,
-      borderWidth: 1,
+      borderWidth: theme === 'dark' ? 0 : 1,
       borderColor: colors.border.primary,
       marginBottom: spacing.md,
       overflow: 'hidden',
+      shadowColor: '#000000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: theme === 'dark' ? 0.3 : 0.1,
+      shadowRadius: 8,
+      elevation: 4,
     },
     image: {
       width: '100%',
@@ -131,10 +136,11 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({
     },
     addImageButton: {
       backgroundColor: colors.background.primary,
-      borderWidth: 1,
-      borderColor: colors.border.primary,
-      borderRadius: spacing.md,
-      padding: spacing.md,
+      borderWidth: 2,
+      borderColor: colors.brand.blue + '40',
+      borderStyle: 'dashed',
+      borderRadius: 20,
+      padding: spacing.lg,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
@@ -150,8 +156,8 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({
       backgroundColor: colors.background.primary,
       borderWidth: 1,
       borderColor: colors.border.primary,
-      borderRadius: spacing.md,
-      padding: spacing.md,
+      borderRadius: 16,
+      padding: spacing.md + spacing.xs,
       color: colors.text.primary,
       fontSize: typography.body.fontSize,
       fontFamily: typography.body.fontFamily,
@@ -165,18 +171,25 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({
     },
     button: {
       flex: 1,
-      padding: spacing.md,
-      borderRadius: spacing.md,
+      padding: spacing.md + spacing.xs,
+      borderRadius: 16,
       alignItems: 'center',
       justifyContent: 'center',
+      shadowColor: '#000000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 2,
     },
     cancelButton: {
       backgroundColor: colors.background.primary,
-      borderWidth: 1,
+      borderWidth: 1.5,
       borderColor: colors.border.primary,
     },
     saveButton: {
       backgroundColor: colors.primary[500],
+      shadowColor: colors.primary[500],
+      shadowOpacity: 0.3,
     },
     buttonText: {
       fontSize: typography.body.fontSize,
