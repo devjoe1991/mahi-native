@@ -10,7 +10,8 @@ import { useNavigation } from '../../../store/navigation-context';
 const { width: SCREEN_WIDTH } = Dimensions.get('screen');
 const ITEM_SIZE = SCREEN_WIDTH / 5;
 const TRANSLATE_VALUE = ITEM_SIZE / 2;
-export const CONTAINER_HEIGHT = ITEM_SIZE + TRANSLATE_VALUE + 10;
+const TEXT_HEIGHT = 20; // Space for text label (fontSize 10 + marginTop 5 + padding)
+export const CONTAINER_HEIGHT = ITEM_SIZE + TRANSLATE_VALUE + TEXT_HEIGHT + 10; // Added TEXT_HEIGHT to prevent text cutoff
 
 interface StreakBarProps {
   streaks: StreakData[];
@@ -94,6 +95,8 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
       height: CONTAINER_HEIGHT,
       backgroundColor: colors.background.primary,
       width: '100%',
+      paddingBottom: spacing.xs, // Extra padding to ensure text is never cut off
+      overflow: 'visible', // Ensure text is visible even with animations
     },
   });
 
@@ -106,8 +109,9 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          height: CONTAINER_HEIGHT + 20,
+          paddingVertical: spacing.xs, // Vertical padding to prevent text cutoff
           paddingHorizontal: SCREEN_WIDTH / 2 - ITEM_SIZE / 2,
+          paddingBottom: spacing.sm, // Extra bottom padding for text labels
         }}
         snapToInterval={ITEM_SIZE}
         decelerationRate="fast"
@@ -272,11 +276,14 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
                     fontSize: 10,
                     color: colors.text.primary,
                     textAlign: 'center',
-                    marginTop: 5,
+                    marginTop: spacing.xs,
+                    paddingTop: spacing.xs, // Extra padding to prevent cutoff
                     fontWeight: '600',
                     fontFamily: typography.body.fontFamily,
+                    minHeight: 16, // Ensure minimum height for text
                   }}
                   numberOfLines={1}
+                  ellipsizeMode="tail"
                 >
                   {item.title}
                 </Text>

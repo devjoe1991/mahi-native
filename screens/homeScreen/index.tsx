@@ -1,5 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Animated } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 import { useTheme } from '../../theme/ThemeProvider';
 import { BottomTabBar, TabType } from '../../components/bottomTabBar';
 import { GlobalHeader } from '../../components/globals/GlobalHeader';
@@ -18,10 +23,10 @@ export const HomeScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [posts, setPosts] = useState<PostData[]>([]);
   const [loading, setLoading] = useState(true);
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const streakBarOpacity = useRef(new Animated.Value(1)).current;
-  const streakBarTranslateY = useRef(new Animated.Value(0)).current;
-  const lastScrollY = useRef(0);
+
+  // Reanimated shared values for scroll detection
+  const StoryTranslate = useSharedValue(false); // true = hide, false = show
+  const lastScrollY = useSharedValue(0);
 
   // Get streak data based on user's current streak
   const streakDays = userData?.streak_days || 1;
@@ -43,50 +48,48 @@ export const HomeScreen: React.FC = () => {
     fetchPosts();
   }, []);
 
-  // Handle scroll to hide/show streak bar
-  const handleScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-    {
-      useNativeDriver: false,
-      listener: (event: any) => {
-        const currentScrollY = event.nativeEvent.contentOffset.y;
-        const scrollingDown = currentScrollY > lastScrollY.current;
-        const scrollingUp = currentScrollY < lastScrollY.current;
+  // Animated style for streak bar based on scroll direction
+  const streakBarAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      marginTop: StoryTranslate.value
+        ? withTiming(-CONTAINER_HEIGHT, { duration: 250 })
+        : withTiming(0, { duration: 250 }),
+      opacity: StoryTranslate.value
+        ? withTiming(0, { duration: 250 })
+        : withTiming(1, { duration: 250 }),
+    };
+  });
 
-        if (scrollingDown && currentScrollY > 50) {
-          // Hide streak bar when scrolling down
-          Animated.parallel([
-            Animated.timing(streakBarOpacity, {
-              toValue: 0,
-              duration: 200,
-              useNativeDriver: true,
-            }),
-            Animated.timing(streakBarTranslateY, {
-              toValue: -CONTAINER_HEIGHT,
-              duration: 200,
-              useNativeDriver: true,
-            }),
-          ]).start();
-        } else if (scrollingUp || currentScrollY <= 50) {
-          // Show streak bar when scrolling up or near top
-          Animated.parallel([
-            Animated.timing(streakBarOpacity, {
-              toValue: 1,
-              duration: 200,
-              useNativeDriver: true,
-            }),
-            Animated.timing(streakBarTranslateY, {
-              toValue: 0,
-              duration: 200,
-              useNativeDriver: true,
-            }),
-          ]).start();
-        }
-
-        lastScrollY.current = currentScrollY;
-      },
+  // Handle momentum scroll begin - detect scroll direction
+  const handleMomentumScrollBegin = (event: any) => {
+    const scrollY = event.nativeEvent.contentOffset.y;
+    
+    // Always show streak bar when near top (within 50px)
+    if (scrollY <= 50) {
+      StoryTranslate.value = false;
+      return;
     }
-  );
+    
+    // Determine scroll direction
+    if (scrollY > lastScrollY.value) {
+      // Scrolling down - hide streak bar
+      StoryTranslate.value = true;
+    } else {
+      // Scrolling up - show streak bar
+      StoryTranslate.value = false;
+    }
+  };
+
+  // Handle momentum scroll end - save final scroll position
+  const handleMomentumScrollEnd = (event: any) => {
+    const scrollY = event.nativeEvent.contentOffset.y;
+    lastScrollY.value = scrollY;
+    
+    // Ensure streak bar is visible when at top
+    if (scrollY <= 50) {
+      StoryTranslate.value = false;
+    }
+  };
 
   const styles = StyleSheet.create({
     container: {
@@ -98,8 +101,8 @@ export const HomeScreen: React.FC = () => {
     },
     streakBarContainer: {
       backgroundColor: colors.background.primary,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border.primary,
+      // No visible border - clean separation
+      marginBottom: 0, // No margin to prevent gap
     },
     content: {
       flex: 1,
@@ -178,13 +181,7 @@ export const HomeScreen: React.FC = () => {
       {/* Streak Bar - Hidden/Shown on scroll */}
       {streaks.length > 0 && (
         <Animated.View
-          style={[
-            styles.streakBarContainer,
-            {
-              opacity: streakBarOpacity,
-              transform: [{ translateY: streakBarTranslateY }],
-            },
-          ]}
+          style={[styles.streakBarContainer, streakBarAnimatedStyle]}
         >
           <StreakBar streaks={streaks} />
         </Animated.View>
@@ -196,17 +193,17 @@ export const HomeScreen: React.FC = () => {
             <ActivityIndicator size="large" color={colors.primary[500]} />
           </View>
         ) : posts.length > 0 ? (
-          <Animated.ScrollView
+          <ScrollView
             style={styles.feed}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: spacing.md }}
-            onScroll={handleScroll}
-            scrollEventThrottle={16}
+            onMomentumScrollBegin={handleMomentumScrollBegin}
+            onMomentumScrollEnd={handleMomentumScrollEnd}
           >
             {posts.map((post) => (
               <FeedPost key={post._id} post={post} />
             ))}
-          </Animated.ScrollView>
+          </ScrollView>
         ) : (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>No posts yet</Text>

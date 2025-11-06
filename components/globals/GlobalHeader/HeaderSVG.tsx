@@ -12,14 +12,14 @@ export const HeaderSVG: React.FC<HeaderSVGProps> = ({
   headerHeight, 
   storyHeight = 0 
 }) => {
-  const { colors } = useTheme();
+  const { colors, theme } = useTheme();
   const { width: WIDTH } = Dimensions.get('screen');
-  const HEIGHT = Math.max(headerHeight, 60) + storyHeight; // Minimum height
-  const CURVE_DEPTH = 20; // How deep the curve goes (increased for visibility)
-  const CURVE_START = HEIGHT - 2; // Where the curve starts (near the bottom)
+  const HEIGHT = Math.max(headerHeight, 60) + storyHeight;
+  const CURVE_DEPTH = 25; // Increased curve depth for better visibility
+  const CURVE_START = HEIGHT; // Curve starts at the bottom edge
 
   const controlPointX = WIDTH / 2;
-  const controlPointY = HEIGHT + CURVE_DEPTH; // Control point for curve depth
+  const controlPointY = HEIGHT + CURVE_DEPTH; // Control point for smooth curve
 
   // Path: Start at top-left, go straight across top, then curve down smoothly at bottom
   const path = `
@@ -29,6 +29,17 @@ export const HeaderSVG: React.FC<HeaderSVGProps> = ({
     Q${controlPointX},${controlPointY} 0,${CURVE_START}
     Z
   `;
+
+  const styles = StyleSheet.create({
+    svg: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: -CURVE_DEPTH, // Extend below to show curve
+      zIndex: 0,
+    },
+  });
 
   return (
     <Svg
@@ -47,6 +58,8 @@ export const HeaderSVG: React.FC<HeaderSVGProps> = ({
     </Svg>
   );
 };
+
+
 
 const styles = StyleSheet.create({
   svg: {
