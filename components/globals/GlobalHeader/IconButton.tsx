@@ -9,6 +9,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
   onPress,
   badge = false,
   badgeCount,
+  iconColor,
 }) => {
   const { colors, typography } = useTheme();
 
@@ -54,7 +55,11 @@ export const IconButton: React.FC<IconButtonProps> = ({
       onPress={onPress}
       android_ripple={{ color: colors.primary[500] + '20' }}
     >
-      <Ionicons name={icon as any} size={25} color={colors.text.primary} />
+      <Ionicons
+        name={icon as any}
+        size={25}
+        color={iconColor || colors.text.primary}
+      />
       {badge && (
         <View style={badgeCount ? styles.badgeWithCount : styles.badge}>
           {badgeCount && badgeCount > 0 && (

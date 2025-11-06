@@ -5,6 +5,7 @@ import { useTheme } from '../../theme/ThemeProvider';
 import { PostData } from '../../screens/userProfileScreen/types';
 import { useAuth } from '../../store/auth-context';
 import { useBottomSheet } from '../globals/globalBottomSheet';
+import { getUserById } from '../../data/user';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('screen');
 const POST_HORIZONTAL_MARGIN = 16; // Horizontal margin on each side
@@ -28,6 +29,20 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
   const { colors, spacing, typography, theme } = useTheme();
   const { userData } = useAuth();
   const { openSheet } = useBottomSheet();
+  const [postAuthorStreak, setPostAuthorStreak] = React.useState<number | null>(null);
+
+  // Fetch post author's streak
+  React.useEffect(() => {
+    const fetchAuthorStreak = async () => {
+      try {
+        const author = await getUserById(post.userId);
+        setPostAuthorStreak(author?.streak_days || null);
+      } catch (error) {
+        // Silently fail - streak badge is optional
+      }
+    };
+    fetchAuthorStreak();
+  }, [post.userId]);
 
   const styles = StyleSheet.create({
     container: {
@@ -64,12 +79,31 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
     },
     headerText: {
       flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
     },
     username: {
       fontSize: typography.body.fontSize,
       fontWeight: typography.h2.fontWeight as any,
       fontFamily: typography.h2.fontFamily,
       color: colors.text.primary,
+    },
+    streakBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.brand.orange,
+      paddingHorizontal: spacing.xs,
+      paddingVertical: 2,
+      borderRadius: 8,
+      marginLeft: spacing.xs,
+    },
+    streakText: {
+      fontSize: 10,
+      fontFamily: typography.body.fontFamily,
+      fontWeight: '600',
+      color: colors.background.primary,
+      marginLeft: 2,
     },
     image: {
       width: POST_WIDTH, // Match container width exactly
@@ -130,6 +164,12 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
         )}
         <View style={styles.headerText}>
           <Text style={styles.username}>{userData?.username || 'joe'}</Text>
+          {postAuthorStreak !== null && postAuthorStreak > 0 && (
+            <View style={styles.streakBadge}>
+              <Ionicons name="flame" size={12} color={colors.background.primary} />
+              <Text style={styles.streakText}>{postAuthorStreak}</Text>
+            </View>
+          )}
         </View>
       </View>
       

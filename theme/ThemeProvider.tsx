@@ -5,19 +5,58 @@ import { useColorScheme } from 'react-native';
 export type Theme = 'light' | 'dark';
 
 interface Colors {
-  primary: {
-    500: string;
-  };
+  // Background colors
   background: {
-    primary: string;
-    secondary: string;
+    primary: string;        // Main background
+    secondary: string;      // Legacy: maps to primary200 (card backgrounds)
+    primary100: string;     // Lightest/darkest background
+    primary200: string;     // Card backgrounds
+    primary300: string;     // Secondary backgrounds
+    primary500: string;     // Elevated surfaces
+    primary600: string;     // Borders
+    tabBar: string;         // Tab bar background
   };
+  // Text colors
   text: {
-    primary: string;
-    secondary: string;
+    primary: string;        // Primary text
+    muted: string;          // Secondary text (mutedTextColor)
+    secondary: string;      // Muted text (textSecondary)
+  };
+  // Grays
+  gray: {
+    default: string;        // gray
+    light: string;          // gray100
+  };
+  // Brand colors (same in both modes)
+  brand: {
+    blue: string;
+    blue100: string;
+    cyan: string;
+    purple: string;
+    purpleDark: string;
+    magenta: string;
+    orange: string;
+    greenLight: string;
+    green: string;
+    red: string;
+    pink: string;
+    persianRed: string;
+    darkGreen: string;
+    yellow: string;
+  };
+  // Sidebar colors
+  sidebar: {
+    background: string;
+    overlay: string;
+    border: string;
+    shadow: string;
+  };
+  // Legacy support (mapped to new structure)
+  primary: {
+    500: string;            // Maps to brand.blue for compatibility
   };
   border: {
-    primary: string;
+    primary: string;        // Maps to background.primary600
   };
 }
 
@@ -43,6 +82,12 @@ interface Typography {
     fontFamily: string;
     color?: string;
   };
+  h3: {
+    fontSize: number;
+    fontWeight: string;
+    fontFamily: string;
+    color?: string;
+  };
   body: {
     fontSize: number;
     fontWeight: string;
@@ -60,36 +105,114 @@ interface ThemeContextType {
 }
 
 const lightColors: Colors = {
-  primary: {
-    500: '#2176AE', // Spirit Blue
-  },
+  // Background colors
   background: {
-    primary: '#FFFFFF', // Aura White - Pure white for main backgrounds
-    secondary: '#F5F5F5', // Vapor Cream - Very subtle light gray, neutral (NOT yellow)
+    primary: '#FFFFFF',      // Main background
+    secondary: '#F9F9F9',    // Legacy: maps to primary200 (card backgrounds)
+    primary100: '#F5F5F5',   // Lightest background
+    primary200: '#F9F9F9',   // Card backgrounds
+    primary300: '#F0F0F0',   // Secondary backgrounds
+    primary500: '#E8E8E8',   // Elevated surfaces
+    primary600: '#D0D0D0',   // Borders
+    tabBar: '#FFFFFF',       // Tab bar background
   },
+  // Text colors
   text: {
-    primary: '#333333', // Shadow Gray
-    secondary: '#666666', // Lighter gray for subtitles
+    primary: '#000000',                    // Primary text
+    muted: 'rgba(0, 0, 0, 0.6)',          // Secondary text
+    secondary: 'rgba(0, 0, 0, 0.3)',      // Muted text
+  },
+  // Grays
+  gray: {
+    default: 'rgba(0, 0, 0, 0.5)',
+    light: 'rgba(0, 0, 0, 0.05)',
+  },
+  // Brand colors (same in both modes)
+  brand: {
+    blue: '#7A40F8',
+    blue100: '#6BB0f5',
+    cyan: '#4cc9f0',
+    purple: '#C3B1E1',
+    purpleDark: '#C459F4',
+    magenta: '#F49AC2',
+    orange: '#fdac1d',
+    greenLight: '#00ECCA',
+    green: '#7fff62',
+    red: '#ef3e55',
+    pink: '#f72585',
+    persianRed: '#C44536',
+    darkGreen: '#297e2b',
+    yellow: '#E0FF55',
+  },
+  // Sidebar colors
+  sidebar: {
+    background: 'rgba(249, 249, 249, 0.95)',
+    overlay: 'rgba(0, 0, 0, 0.3)',
+    border: 'rgba(208, 208, 208, 0.3)',
+    shadow: 'rgba(0, 0, 0, 0.1)',
+  },
+  // Legacy support
+  primary: {
+    500: '#7A40F8', // Maps to brand.blue
   },
   border: {
-    primary: '#E5E7EB',
+    primary: '#D0D0D0', // Maps to background.primary600
   },
 };
 
 const darkColors: Colors = {
-  primary: {
-    500: '#2176AE', // Spirit Blue (matches light theme)
-  },
+  // Background colors
   background: {
-    primary: '#111827',
-    secondary: '#1F2937',
+    primary: '#262938',      // Main background
+    secondary: '#2B2C3E',    // Legacy: maps to primary200 (card backgrounds)
+    primary100: 'rgb(8, 8, 8)', // Darkest background
+    primary200: '#2B2C3E',   // Card backgrounds
+    primary300: '#2E2F40',   // Secondary backgrounds
+    primary500: '#363747',   // Elevated surfaces
+    primary600: '#3f4152',   // Borders
+    tabBar: '#07070F',       // Tab bar background
   },
+  // Text colors
   text: {
-    primary: '#F9FAFB',
-    secondary: '#D1D5DB',
+    primary: '#FFFFFF',                    // Primary text
+    muted: 'rgba(255, 255, 255, 0.5)',    // Secondary text
+    secondary: 'rgba(255, 255, 255, 0.3)', // Muted text
+  },
+  // Grays
+  gray: {
+    default: 'rgba(225, 225, 225, 0.5)',
+    light: 'rgba(225, 225, 225, 0.05)',
+  },
+  // Brand colors (same in both modes)
+  brand: {
+    blue: '#7A40F8',
+    blue100: '#6BB0f5',
+    cyan: '#4cc9f0',
+    purple: '#C3B1E1',
+    purpleDark: '#C459F4',
+    magenta: '#F49AC2',
+    orange: '#fdac1d',
+    greenLight: '#00ECCA',
+    green: '#7fff62',
+    red: '#ef3e55',
+    pink: '#f72585',
+    persianRed: '#C44536',
+    darkGreen: '#297e2b',
+    yellow: '#E0FF55',
+  },
+  // Sidebar colors
+  sidebar: {
+    background: 'rgba(43, 44, 62, 0.95)',
+    overlay: 'rgba(0, 0, 0, 0.5)',
+    border: 'rgba(63, 65, 82, 0.3)',
+    shadow: 'rgba(0, 0, 0, 0.3)',
+  },
+  // Legacy support
+  primary: {
+    500: '#7A40F8', // Maps to brand.blue
   },
   border: {
-    primary: '#374151',
+    primary: '#3f4152', // Maps to background.primary600
   },
 };
 
@@ -113,6 +236,12 @@ const createTypography = (textColor: string, fontFamily: string = 'Urbanist'): T
     fontSize: 24,
     fontWeight: '600',
     fontFamily: 'Urbanist_600SemiBold',
+    color: textColor,
+  },
+  h3: {
+    fontSize: 20,
+    fontWeight: '500',
+    fontFamily: 'Urbanist_500Medium',
     color: textColor,
   },
   body: {

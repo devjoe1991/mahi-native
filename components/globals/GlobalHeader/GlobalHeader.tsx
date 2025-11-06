@@ -14,6 +14,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
   onMenuPress,
   showUnreadBadge = false,
   unreadCount,
+  hasStreakNotification = false,
 }) => {
   const { colors, spacing } = useTheme();
   const { width: SCREEN_WIDTH } = Dimensions.get('screen');
@@ -118,6 +119,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
           onPress={onNotificationsPress || (() => {})}
           badge={showUnreadBadge}
           badgeCount={unreadCount}
+          iconColor={hasStreakNotification ? colors.brand.orange : undefined}
         />
       </View>
     </View>

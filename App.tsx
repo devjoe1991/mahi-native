@@ -12,6 +12,7 @@ import { ThemeProvider } from './theme/ThemeProvider';
 import { AuthProvider } from './store/auth-context';
 import { NavigationProvider } from './store/navigation-context';
 import { GlobalBottomSheetProvider } from './components/globals/globalBottomSheet';
+import { GlobalModalProvider } from './components/globals/globalModal';
 import { SidebarProvider, SidebarContainer } from './components/globals/Sidebar';
 
 // Prevent the splash screen from auto-hiding before fonts are loaded
@@ -41,7 +42,9 @@ export default function App() {
       <ThemeProvider>
         <AuthProvider>
           <GlobalBottomSheetProvider>
-            <NavigationProvider />
+            <GlobalModalProvider>
+              <NavigationProvider />
+            </GlobalModalProvider>
           </GlobalBottomSheetProvider>
         </AuthProvider>
         <StatusBar style="auto" />

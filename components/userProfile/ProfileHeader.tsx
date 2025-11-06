@@ -199,6 +199,10 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           text={String(userData.followings || 0)}
           subText="Followings"
         />
+        <ProfileStat
+          text={`${userData.streak_days || 0} 🔥`}
+          subText="Streak"
+        />
       </View>
     </View>
   );

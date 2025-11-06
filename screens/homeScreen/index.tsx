@@ -15,14 +15,21 @@ import { useBottomSheet } from '../../components/globals/globalBottomSheet';
 import { useAuth } from '../../store/auth-context';
 import { StreakBar, CONTAINER_HEIGHT } from '../../components/globals/StreakBar';
 import { getStreakFeeds } from '../../data/streaks';
+import { MilestoneCelebration } from '../../components/milestoneCelebration';
+import { DailyCheckInTrigger } from '../../components/dailyCheckIn/DailyCheckInTrigger';
+import { getUnreadCount, hasStreakNotification } from '../../data/notifications';
+import { useNavigation } from '../../store/navigation-context';
 
 export const HomeScreen: React.FC = () => {
   const { colors, spacing, typography } = useTheme();
   const { openSheet } = useBottomSheet();
   const { userData } = useAuth();
+  const { navigate } = useNavigation();
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [posts, setPosts] = useState<PostData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [hasStreakNotif, setHasStreakNotif] = useState(false);
 
   // Reanimated shared values for scroll detection
   const StoryTranslate = useSharedValue(false); // true = hide, false = show
@@ -33,20 +40,26 @@ export const HomeScreen: React.FC = () => {
   const streaks = getStreakFeeds(streakDays);
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        const allPosts = await getAllPosts();
-        setPosts(allPosts);
-      } catch (error) {
-        console.error('Failed to fetch posts:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchPosts();
   }, []);
+
+  // Fetch notification counts
+  useEffect(() => {
+    const fetchNotificationData = async () => {
+      if (userData?._id) {
+        const [count, hasStreak] = await Promise.all([
+          getUnreadCount(userData._id),
+          hasStreakNotification(userData._id),
+        ]);
+        setUnreadCount(count);
+        setHasStreakNotif(hasStreak);
+      }
+    };
+    fetchNotificationData();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchNotificationData, 30000);
+    return () => clearInterval(interval);
+  }, [userData]);
 
   // Animated style for streak bar based on scroll direction
   const streakBarAnimatedStyle = useAnimatedStyle(() => {
@@ -160,7 +173,7 @@ export const HomeScreen: React.FC = () => {
   };
 
   const handleNotificationsPress = () => {
-    console.log('Notifications pressed');
+    navigate('NotificationsScreen');
   };
 
   const handleMenuPress = () => {
@@ -174,7 +187,9 @@ export const HomeScreen: React.FC = () => {
           onSearchPress={handleSearchPress}
           onNotificationsPress={handleNotificationsPress}
           onMenuPress={handleMenuPress}
-          showUnreadBadge={true}
+          showUnreadBadge={unreadCount > 0}
+          unreadCount={unreadCount}
+          hasStreakNotification={hasStreakNotif}
         />
       </View>
 
@@ -186,6 +201,20 @@ export const HomeScreen: React.FC = () => {
           <StreakBar streaks={streaks} />
         </Animated.View>
       )}
+
+      {/* Milestone Celebration */}
+      <MilestoneCelebration
+        streakDays={streakDays}
+        onClose={() => {}}
+      />
+
+      {/* Daily Check-In Trigger - Only shows if user hasn't posted today */}
+      <DailyCheckInTrigger
+        onComplete={() => {
+          // Refresh posts after posting
+          fetchPosts();
+        }}
+      />
 
       <View style={styles.content}>
         {loading ? (

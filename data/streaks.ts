@@ -15,7 +15,7 @@ export const getStreakFeeds = (userStreakDays: number = 1): StreakData[] => {
       type: 'add_story',
       streak_days: 0,
       streak_level: 0,
-      title: 'Add Story',
+      title: 'Have you done your Mahi today?',
       description: 'Share your fitness journey',
       active: false,
       isCurrentUser: true,

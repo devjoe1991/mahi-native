@@ -4,6 +4,7 @@ export interface GlobalHeaderProps {
   onMenuPress?: () => void;
   showUnreadBadge?: boolean;
   unreadCount?: number;
+  hasStreakNotification?: boolean; // If true, icon turns orange
 }
 
 export interface IconButtonProps {
@@ -11,5 +12,6 @@ export interface IconButtonProps {
   onPress: () => void;
   badge?: boolean;
   badgeCount?: number;
+  iconColor?: string; // Custom icon color (e.g., orange for streak notifications)
 }
 
