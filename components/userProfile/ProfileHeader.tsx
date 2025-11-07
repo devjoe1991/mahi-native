@@ -46,8 +46,10 @@ const ProfileStat: React.FC<ProfileStatProps> = ({ text, subText, onPress }) => 
 export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   userData,
   viewMode = false,
+  isFollowing = false,
   onEditPress,
   onMessagePress,
+  onFollowPress,
 }) => {
   const { colors, spacing, typography, theme } = useTheme();
   const profilePic = userData.picturePath || DEFAULT_AVATAR;
@@ -122,6 +124,31 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       color: colors.text.secondary,
       marginTop: spacing.xs,
     },
+    followButton: {
+      marginTop: spacing.md,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.xl,
+      borderRadius: 50,
+      backgroundColor: colors.primary[500],
+      borderWidth: 1,
+      borderColor: colors.primary[500],
+      shadowColor: '#000000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 4,
+    },
+    followingButton: {
+      backgroundColor: colors.background.primary500,
+      borderColor: colors.border.primary,
+    },
+    followButtonText: {
+      fontSize: typography.body.fontSize,
+      fontFamily: typography.body.fontFamily,
+      fontWeight: '700' as any,
+      color: colors.text.primary,
+      letterSpacing: 0.5,
+    },
     statsContainer: {
       flexDirection: 'row',
       justifyContent: 'space-around',
@@ -168,22 +195,13 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             </Pressable>
           )}
           {viewMode && (
-            <>
-              <Pressable style={styles.messageButton} onPress={onMessagePress}>
-                <Ionicons
-                  name="chatbubble-ellipses"
-                  size={30}
-                  color={colors.text.primary}
-                />
-              </Pressable>
-              <Pressable style={styles.editButton} onPress={onEditPress}>
-                <Ionicons
-                  name="person-add-outline"
-                  size={25}
-                  color={colors.text.primary}
-                />
-              </Pressable>
-            </>
+            <Pressable style={styles.messageButton} onPress={onMessagePress}>
+              <Ionicons
+                name="chatbubble-ellipses"
+                size={30}
+                color={colors.text.primary}
+              />
+            </Pressable>
           )}
         </ImageBackground>
       </View>
@@ -203,6 +221,21 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         >
           {userData.bio}
         </Text>
+      )}
+
+      {/* Follow Button - Only show in viewMode */}
+      {viewMode && onFollowPress && (
+        <Pressable
+          style={[
+            styles.followButton,
+            isFollowing && styles.followingButton,
+          ]}
+          onPress={onFollowPress}
+        >
+          <Text style={styles.followButtonText}>
+            {isFollowing ? 'Following' : 'Follow'}
+          </Text>
+        </Pressable>
       )}
 
       <View style={styles.statsContainer}>

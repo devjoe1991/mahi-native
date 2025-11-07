@@ -109,3 +109,96 @@ export const getAllUsers = async (): Promise<UserData[]> => {
   ];
 };
 
+/**
+ * Mock follow relationships
+ * In real app, this would be stored in Supabase follows table
+ */
+const MOCK_FOLLOWS: { followerId: string; followingId: string }[] = [
+  // User 1 (current user) follows user 2
+  { followerId: '1', followingId: '2' },
+];
+
+/**
+ * Check if current user is following another user
+ */
+export const isFollowing = async (
+  currentUserId: string,
+  targetUserId: string
+): Promise<boolean> => {
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  return MOCK_FOLLOWS.some(
+    (f) => f.followerId === currentUserId && f.followingId === targetUserId
+  );
+};
+
+/**
+ * Follow a user
+ */
+export const followUser = async (
+  currentUserId: string,
+  targetUserId: string
+): Promise<boolean> => {
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  
+  // Check if already following
+  const alreadyFollowing = MOCK_FOLLOWS.some(
+    (f) => f.followerId === currentUserId && f.followingId === targetUserId
+  );
+  
+  if (alreadyFollowing) {
+    return false;
+  }
+  
+  // Add follow relationship
+  MOCK_FOLLOWS.push({ followerId: currentUserId, followingId: targetUserId });
+  
+  // Update follower count for target user
+  const targetUser = MOCK_USERS.find((u) => u._id === targetUserId);
+  if (targetUser) {
+    targetUser.followers = (targetUser.followers || 0) + 1;
+  }
+  
+  // Update following count for current user
+  const currentUser = MOCK_USERS.find((u) => u._id === currentUserId);
+  if (currentUser) {
+    currentUser.followings = (currentUser.followings || 0) + 1;
+  }
+  
+  return true;
+};
+
+/**
+ * Unfollow a user
+ */
+export const unfollowUser = async (
+  currentUserId: string,
+  targetUserId: string
+): Promise<boolean> => {
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  
+  // Find and remove follow relationship
+  const index = MOCK_FOLLOWS.findIndex(
+    (f) => f.followerId === currentUserId && f.followingId === targetUserId
+  );
+  
+  if (index === -1) {
+    return false;
+  }
+  
+  MOCK_FOLLOWS.splice(index, 1);
+  
+  // Update follower count for target user
+  const targetUser = MOCK_USERS.find((u) => u._id === targetUserId);
+  if (targetUser && targetUser.followers && targetUser.followers > 0) {
+    targetUser.followers = targetUser.followers - 1;
+  }
+  
+  // Update following count for current user
+  const currentUser = MOCK_USERS.find((u) => u._id === currentUserId);
+  if (currentUser && currentUser.followings && currentUser.followings > 0) {
+    currentUser.followings = currentUser.followings - 1;
+  }
+  
+  return true;
+};
+
