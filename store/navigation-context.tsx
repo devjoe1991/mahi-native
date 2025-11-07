@@ -4,9 +4,10 @@ import { UserProfileScreen } from '../screens/userProfileScreen';
 import { EditProfileScreen } from '../screens/userProfileScreen';
 import { NotificationsScreen } from '../screens/notificationsScreen';
 import { MessagesScreen } from '../screens/messagesScreen';
+import { NearbyScreen } from '../screens/nearbyScreen';
 import { SidebarProvider, SidebarContainer } from '../components/globals/Sidebar';
 
-type ScreenName = 'HomeScreen' | 'UserProfileScreen' | 'EditProfileScreen' | 'NotificationsScreen' | 'MessagesScreen';
+type ScreenName = 'HomeScreen' | 'UserProfileScreen' | 'EditProfileScreen' | 'NotificationsScreen' | 'MessagesScreen' | 'NearbyScreen';
 
 interface NavigationContextType {
   currentScreen: ScreenName;
@@ -36,7 +37,7 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = () => {
 
   const navigate = useCallback((screen: ScreenName | string, navigationParams?: any) => {
     const screenName = screen as ScreenName;
-    if (['HomeScreen', 'UserProfileScreen', 'EditProfileScreen', 'NotificationsScreen', 'MessagesScreen'].includes(screenName)) {
+    if (['HomeScreen', 'UserProfileScreen', 'EditProfileScreen', 'NotificationsScreen', 'MessagesScreen', 'NearbyScreen'].includes(screenName)) {
       setScreenHistory((prev) => [...prev, currentScreen]);
       setCurrentScreen(screenName);
       setParams(navigationParams || {});
@@ -98,6 +99,14 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = () => {
           <SidebarProvider>
             <SidebarContainer>
               <MessagesScreen />
+            </SidebarContainer>
+          </SidebarProvider>
+        );
+      case 'NearbyScreen':
+        return (
+          <SidebarProvider>
+            <SidebarContainer>
+              <NearbyScreen />
             </SidebarContainer>
           </SidebarProvider>
         );

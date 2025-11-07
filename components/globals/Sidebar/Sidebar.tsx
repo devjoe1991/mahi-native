@@ -77,10 +77,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
       screenName: 'HomeScreen',
     },
     {
-      icon: 'compass' as keyof typeof Ionicons.glyphMap,
-      title: 'Explore',
+      icon: 'location' as keyof typeof Ionicons.glyphMap,
+      title: 'Nearby',
       color: '#06B6D4', // Cyan
-      screenName: 'ExploreScreen',
+      screenName: 'NearbyScreen',
     },
     {
       icon: 'play-circle' as keyof typeof Ionicons.glyphMap,

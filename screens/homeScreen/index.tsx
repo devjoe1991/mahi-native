@@ -165,6 +165,8 @@ export const HomeScreen: React.FC = () => {
       });
     } else if (tab === 'messages') {
       navigate('MessagesScreen');
+    } else if (tab === 'nearby') {
+      navigate('NearbyScreen');
     } else {
       setActiveTab(tab);
     }
