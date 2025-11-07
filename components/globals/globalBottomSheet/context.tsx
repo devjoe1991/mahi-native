@@ -71,6 +71,10 @@ export const GlobalBottomSheetProvider: React.FC<Props> = ({ children }) => {
       const { CommentsSheet } = require('./views/CommentsSheet');
       return <CommentsSheet {...(sheetProps as any)} />;
     }
+    if (sheetType === 'SEARCH') {
+      const { SearchSheet } = require('./views/SearchSheet');
+      return <SearchSheet {...(sheetProps as any)} />;
+    }
     return null;
   }, [sheetType, sheetProps]);
 

@@ -13,7 +13,12 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCalendarsUsageDescription": "Mahi needs access to your calendar to detect scheduled workouts and help you complete your daily goals.",
+        "NSHealthShareUsageDescription": "Mahi would like to access your health data to track your workouts and help you maintain your streak. (Coming soon)",
+        "NSHealthUpdateUsageDescription": "Mahi would like to write workout data to Apple Health. (Coming soon)"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,13 +26,23 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "READ_CALENDAR",
+        "WRITE_CALENDAR"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "Allow Mahi to access your calendar to detect scheduled workouts and help you complete your daily goals."
+        }
+      ]
     ]
   }
 }

@@ -167,13 +167,15 @@ export const HomeScreen: React.FC = () => {
       navigate('MessagesScreen');
     } else if (tab === 'nearby') {
       navigate('NearbyScreen');
+    } else if (tab === 'diary') {
+      navigate('DiaryScreen');
     } else {
       setActiveTab(tab);
     }
   };
 
   const handleSearchPress = () => {
-    console.log('Search pressed');
+    openSheet('SEARCH');
   };
 
   const handleNotificationsPress = () => {

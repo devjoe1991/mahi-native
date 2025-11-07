@@ -24,7 +24,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onTabPres
     { id: 'home', icon: 'home-outline', activeIcon: 'home', label: 'Home' },
     { id: 'nearby', icon: 'location-outline', activeIcon: 'location', label: 'Nearby' },
     { id: 'plus', icon: 'add-circle', activeIcon: 'add-circle', label: 'Create', isPlus: true },
-    { id: 'reels', icon: 'play-outline', activeIcon: 'play', label: 'Reels' },
+    { id: 'diary', icon: 'book-outline', activeIcon: 'book', label: 'Diary' },
     { id: 'messages', icon: 'chatbubbles-outline', activeIcon: 'chatbubbles', label: 'Messages' },
   ];
 

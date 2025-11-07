@@ -83,10 +83,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
       screenName: 'NearbyScreen',
     },
     {
-      icon: 'play-circle' as keyof typeof Ionicons.glyphMap,
-      title: 'Reels',
+      icon: 'book' as keyof typeof Ionicons.glyphMap,
+      title: 'Diary',
       color: '#8B5CF6', // Purple
-      screenName: 'ReelsScreen',
+      screenName: 'DiaryScreen',
     },
     {
       icon: 'chatbubbles' as keyof typeof Ionicons.glyphMap,
@@ -94,12 +94,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
       color: '#10B981', // Green
       badge: 3,
       screenName: 'MessagesScreen',
-    },
-    {
-      icon: 'search' as keyof typeof Ionicons.glyphMap,
-      title: 'Search',
-      color: '#F59E0B', // Orange
-      screenName: 'SearchScreen',
     },
     {
       icon: 'notifications' as keyof typeof Ionicons.glyphMap,

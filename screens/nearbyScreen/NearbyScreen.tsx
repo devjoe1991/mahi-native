@@ -6,12 +6,15 @@ import {
   ScrollView,
   Pressable,
   ActivityIndicator,
+  FlatList,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../theme/ThemeProvider';
 import { useNavigation } from '../../store/navigation-context';
 import { GlobalHeader } from '../../components/globals/GlobalHeader';
 import { BottomTabBar, TabType } from '../../components/bottomTabBar';
+import { useBottomSheet } from '../../components/globals/globalBottomSheet';
 import { getAllUsers } from '../../data/user';
 import { UserData } from '../userProfileScreen/types';
 
@@ -24,6 +27,7 @@ interface LeaderboardItem {
 export const NearbyScreen: React.FC = () => {
   const { colors, spacing, typography } = useTheme();
   const { navigate } = useNavigation();
+  const { openSheet } = useBottomSheet();
   const [activeTab, setActiveTab] = useState<TabType>('nearby');
   const [leaderboard, setLeaderboard] = useState<LeaderboardItem[]>([]);
   const [loadingLeaderboard, setLoadingLeaderboard] = useState(true);
@@ -39,7 +43,7 @@ export const NearbyScreen: React.FC = () => {
   };
 
   const handleSearchPress = () => {
-    console.log('Search pressed');
+    openSheet('SEARCH');
   };
 
   const handleNotificationsPress = () => {
@@ -173,48 +177,52 @@ export const NearbyScreen: React.FC = () => {
     },
     featuresSection: {
       paddingHorizontal: spacing.lg,
-      paddingTop: spacing.lg,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.sm,
     },
     sectionTitle: {
       fontSize: typography.h2.fontSize,
       fontWeight: typography.h2.fontWeight as any,
       fontFamily: typography.h2.fontFamily,
       color: colors.text.primary,
-      marginBottom: spacing.lg,
+      marginBottom: spacing.md,
       letterSpacing: 0.5,
       lineHeight: typography.h2.fontSize * 1.2,
     },
-    featureCard: {
+    carouselContent: {
+      paddingRight: spacing.lg,
+    },
+    featureCardCarousel: {
       backgroundColor: colors.background.primary500,
-      borderRadius: 24,
-      padding: spacing.lg,
-      marginBottom: spacing.md,
-      flexDirection: 'row',
-      alignItems: 'center',
+      borderRadius: 20,
+      padding: spacing.md,
+      marginRight: spacing.md,
+      width: Dimensions.get('window').width * 0.75,
       elevation: 8,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.3,
       shadowRadius: 8,
       overflow: 'hidden',
+      justifyContent: 'flex-start',
     },
-    featureIconContainer: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
+    featureIconContainerCarousel: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
       justifyContent: 'center',
       alignItems: 'center',
-      marginRight: spacing.md,
+      marginBottom: spacing.sm,
       elevation: 4,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.25,
       shadowRadius: 4,
     },
-    featureContent: {
+    featureContentCarousel: {
       flex: 1,
     },
-    featureTitle: {
+    featureTitleCarousel: {
       fontSize: typography.h3.fontSize,
       fontWeight: typography.h3.fontWeight as any,
       fontFamily: typography.h3.fontFamily,
@@ -223,17 +231,17 @@ export const NearbyScreen: React.FC = () => {
       letterSpacing: 0.2,
       lineHeight: typography.h3.fontSize * 1.2,
     },
-    featureDescription: {
-      fontSize: typography.body.fontSize,
+    featureDescriptionCarousel: {
+      fontSize: typography.body.fontSize - 1,
       fontFamily: typography.body.fontFamily,
       color: colors.text.muted,
       letterSpacing: 0.2,
-      lineHeight: typography.body.fontSize * 1.5,
+      lineHeight: (typography.body.fontSize - 1) * 1.4,
     },
     leaderboardSection: {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.md,
-      marginBottom: spacing.lg,
+      marginBottom: spacing.md,
     },
     leaderboardCard: {
       backgroundColor: colors.background.primary500,
@@ -319,7 +327,7 @@ export const NearbyScreen: React.FC = () => {
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: spacing.xl }}
+        contentContainerStyle={{ paddingBottom: 120 }}
       >
         {/* Hero Section */}
         <View style={styles.heroSection}>
@@ -386,31 +394,38 @@ export const NearbyScreen: React.FC = () => {
           ) : null}
         </View>
 
-        {/* Coming Soon Features Section */}
+        {/* Coming Soon Features Section - Horizontal Carousel */}
         <View style={styles.featuresSection}>
           <Text style={styles.sectionTitle}>Coming Soon</Text>
-          {features.slice(0, 4).map((feature, index) => (
-            <Pressable key={index} style={styles.featureCard}>
-              <View
-                style={[
-                  styles.featureIconContainer,
-                  { backgroundColor: feature.color + '20' },
-                ]}
-              >
-                <Ionicons
-                  name={feature.icon as any}
-                  size={28}
-                  color={feature.color}
-                />
-              </View>
-              <View style={styles.featureContent}>
-                <Text style={styles.featureTitle}>{feature.title}</Text>
-                <Text style={styles.featureDescription}>
-                  {feature.description}
-                </Text>
-              </View>
-            </Pressable>
-          ))}
+          <FlatList
+            data={features}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item, index) => `feature-${index}`}
+            contentContainerStyle={styles.carouselContent}
+            renderItem={({ item }) => (
+              <Pressable style={styles.featureCardCarousel}>
+                <View
+                  style={[
+                    styles.featureIconContainerCarousel,
+                    { backgroundColor: item.color + '20' },
+                  ]}
+                >
+                  <Ionicons
+                    name={item.icon as any}
+                    size={24}
+                    color={item.color}
+                  />
+                </View>
+                <View style={styles.featureContentCarousel}>
+                  <Text style={styles.featureTitleCarousel}>{item.title}</Text>
+                  <Text style={styles.featureDescriptionCarousel} numberOfLines={3}>
+                    {item.description}
+                  </Text>
+                </View>
+              </Pressable>
+            )}
+          />
         </View>
       </ScrollView>
 
