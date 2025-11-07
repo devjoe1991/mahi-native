@@ -116,6 +116,7 @@ export const HomeScreen: React.FC = () => {
       backgroundColor: colors.background.primary,
       // No visible border - clean separation
       marginBottom: spacing.lg, // Add breathing room to avoid underlap with feed
+      marginTop: -spacing.sm, // Move streak bar up slightly
     },
     content: {
       flex: 1,

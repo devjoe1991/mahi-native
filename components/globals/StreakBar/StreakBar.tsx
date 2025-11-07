@@ -11,8 +11,8 @@ import { useAuth } from '../../../store/auth-context';
 const { width: SCREEN_WIDTH } = Dimensions.get('screen');
 const ITEM_SIZE = SCREEN_WIDTH / 5;
 const TRANSLATE_VALUE = ITEM_SIZE / 2;
-const TEXT_HEIGHT = 32; // Space for text label (fontSize 10 + marginTop 5 + padding) - increased significantly for Outfit font
-export const CONTAINER_HEIGHT = ITEM_SIZE + TRANSLATE_VALUE + TEXT_HEIGHT + 16; // Added TEXT_HEIGHT to prevent text cutoff
+const TEXT_HEIGHT = 40; // Space for text label (fontSize 10 + marginTop 5 + padding) - increased significantly for Outfit font
+export const CONTAINER_HEIGHT = ITEM_SIZE + TRANSLATE_VALUE + TEXT_HEIGHT + 20; // Added TEXT_HEIGHT to prevent text cutoff
 
 interface StreakBarProps {
   streaks: StreakData[];
@@ -139,7 +139,7 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
       height: CONTAINER_HEIGHT,
       backgroundColor: colors.background.primary,
       width: '100%',
-      paddingBottom: spacing.lg,
+      paddingBottom: spacing.xl,
       overflow: 'visible',
     },
     countdownContainer: {
@@ -178,7 +178,7 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
         contentContainerStyle={{
           paddingVertical: spacing.sm, // Vertical padding to prevent text cutoff
           paddingHorizontal: SCREEN_WIDTH / 2 - ITEM_SIZE / 2,
-          paddingBottom: spacing.lg, // Extra bottom padding for text labels (increased for Outfit font)
+          paddingBottom: spacing.xl, // Extra bottom padding for text labels (increased for Outfit font)
         }}
         snapToInterval={ITEM_SIZE}
         decelerationRate="fast"
