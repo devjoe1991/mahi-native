@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -222,17 +222,23 @@ export const HomeScreen: React.FC = () => {
             <ActivityIndicator size="large" color={colors.primary[500]} />
           </View>
         ) : posts.length > 0 ? (
-          <ScrollView
-            style={styles.feed}
+          <FlatList
+            data={posts}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => <FeedPost post={item} />}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: spacing.md }}
+            contentContainerStyle={[
+              styles.feed,
+              { paddingBottom: spacing.md }
+            ]}
             onMomentumScrollBegin={handleMomentumScrollBegin}
             onMomentumScrollEnd={handleMomentumScrollEnd}
-          >
-            {posts.map((post) => (
-              <FeedPost key={post._id} post={post} />
-            ))}
-          </ScrollView>
+            ListEmptyComponent={
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No posts yet</Text>
+              </View>
+            }
+          />
         ) : (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>No posts yet</Text>

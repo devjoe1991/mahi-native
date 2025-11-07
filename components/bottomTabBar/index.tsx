@@ -1,6 +1,5 @@
 import React, { Fragment, useState } from 'react';
 import { View, Pressable, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
   FadeIn,
@@ -124,7 +123,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onTabPres
         >
           <View
             style={{
-              transform: [{ translateY: -(50 / 2 + 5) }],
+              transform: [{ translateY: -(56 / 2 + 12) }], // Increased upward offset for floating effect
             }}
           >
             <PlusButton
@@ -167,7 +166,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onTabPres
           />
         </Animated.View>
       )}
-      <SafeAreaView edges={['bottom']} style={styles.tabBarWrapper}>
+      <View style={styles.tabBarWrapper}>
         <View style={{ position: 'relative', width: '100%', minHeight: 70 }}>
           <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1 }}>
             <TabBarSvg height={tabBarHeight || 70} />
@@ -184,7 +183,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onTabPres
             {tabs.map((tab, index) => renderTab(tab, index))}
           </View>
         </View>
-      </SafeAreaView>
+      </View>
     </Fragment>
   );
 };
