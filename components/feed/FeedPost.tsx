@@ -30,18 +30,22 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
   const { userData } = useAuth();
   const { openSheet } = useBottomSheet();
   const [postAuthorStreak, setPostAuthorStreak] = React.useState<number | null>(null);
+  const [postAuthorTrophyCount, setPostAuthorTrophyCount] = React.useState<number>(0);
 
-  // Fetch post author's streak
+  // Fetch post author's streak and trophy count
   React.useEffect(() => {
-    const fetchAuthorStreak = async () => {
+    const fetchAuthorData = async () => {
       try {
         const author = await getUserById(post.userId);
         setPostAuthorStreak(author?.streak_days || null);
+        // Calculate trophy count (every 7 days = 1 trophy)
+        const trophyCount = author?.streak_days ? Math.floor(author.streak_days / 7) : 0;
+        setPostAuthorTrophyCount(trophyCount);
       } catch (error) {
-        // Silently fail - streak badge is optional
+        // Silently fail - badges are optional
       }
     };
-    fetchAuthorStreak();
+    fetchAuthorData();
   }, [post.userId]);
 
   const styles = StyleSheet.create({
@@ -117,6 +121,30 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       color: colors.background.primary,
       marginLeft: 2,
     },
+    trophyBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.brand.yellow,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+      borderRadius: 15,
+      marginLeft: spacing.xs,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 4,
+    },
+    trophyEmoji: {
+      fontSize: 10,
+    },
+    trophyText: {
+      fontSize: 10,
+      fontFamily: typography.body.fontFamily,
+      fontWeight: '600',
+      color: colors.background.primary,
+      marginLeft: 2,
+    },
     image: {
       width: POST_WIDTH, // Match container width exactly
       height: Math.min(POST_WIDTH / IMAGE_ASPECT_RATIO, MAX_IMAGE_HEIGHT), // Calculate height, cap at max
@@ -186,6 +214,12 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
             <View style={styles.streakBadge}>
               <Ionicons name="flame" size={12} color={colors.background.primary} />
               <Text style={styles.streakText}>{postAuthorStreak}</Text>
+            </View>
+          )}
+          {postAuthorTrophyCount > 0 && (
+            <View style={styles.trophyBadge}>
+              <Text style={styles.trophyEmoji}>🏆</Text>
+              <Text style={styles.trophyText}>{postAuthorTrophyCount}</Text>
             </View>
           )}
         </View>

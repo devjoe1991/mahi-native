@@ -207,8 +207,8 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
       <View style={styles.statsContainer}>
         <ProfileStat
-          text={String(userData.posts || 0)}
-          subText="Posts"
+          text={`${Math.floor((userData.streak_days || 0) / 7)} 🏆`}
+          subText="Milestones"
         />
         <ProfileStat
           text={String(userData.followers || 0)}

@@ -111,7 +111,11 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({
 
       <View style={styles.contentContainer}>
         {/* Calendar Heatmap */}
-        <CalendarHeatmap streakDays={userData.streak_days || 0} />
+        <CalendarHeatmap 
+          streakDays={userData.streak_days || 0}
+          lastPostDate={userData.last_post_date ? new Date(userData.last_post_date) : null}
+          restDays={userData.rest_days || []}
+        />
         
         <ProfileBody
           userId={userData._id}
