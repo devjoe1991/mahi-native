@@ -127,7 +127,7 @@ export const SearchSheet: React.FC = () => {
     } else if (result.type === 'user' && result.userId) {
       closeSheet();
       setTimeout(() => {
-        navigate('UserProfileScreen', { userId: result.userId });
+        navigate('UserProfileScreen', { userId: result.userId, viewMode: true });
       }, 100);
     }
   };

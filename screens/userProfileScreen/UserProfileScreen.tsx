@@ -20,7 +20,7 @@ import { PostData } from './types';
 import { Post } from '../../components/userProfile/Post';
 
 export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({
-  viewMode = false,
+  viewMode: propViewMode,
   userId,
   onNavigate,
 }) => {
@@ -40,6 +40,11 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({
   // Reanimated shared values for scroll detection
   const heatmapTranslate = useSharedValue(false); // true = hide, false = show
   const lastScrollY = useSharedValue(0);
+
+  // Automatically determine viewMode: if userId is provided and different from current user, it's viewMode
+  const viewMode = propViewMode !== undefined 
+    ? propViewMode 
+    : (userId !== undefined && userId !== currentUserData?._id);
 
   // Fetch user data if viewing another user's profile
   useEffect(() => {

@@ -360,7 +360,7 @@ export const NearbyScreen: React.FC = () => {
                     styles.leaderboardItem,
                     index === leaderboard.length - 1 && styles.leaderboardItemLast,
                   ]}
-                  onPress={() => navigate('UserProfileScreen', { userId: item.user._id })}
+                  onPress={() => navigate('UserProfileScreen', { userId: item.user._id, viewMode: true })}
                 >
                   <View
                     style={[
