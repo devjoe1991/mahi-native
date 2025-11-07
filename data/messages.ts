@@ -14,8 +14,8 @@ export const getConversations = async (userId: string): Promise<ConversationData
     {
       _id: '1',
       userId: 'user2',
-      username: 'sarah',
-      fullName: 'Sarah Johnson',
+      username: 'maximus',
+      fullName: 'Maximus',
       avatarUrl: 'https://via.placeholder.com/150',
       lastMessage: 'Great workout today! 🔥',
       lastMessageTime: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 mins ago
@@ -25,8 +25,8 @@ export const getConversations = async (userId: string): Promise<ConversationData
     {
       _id: '2',
       userId: 'user3',
-      username: 'mike',
-      fullName: 'Mike Chen',
+      username: 'verity',
+      fullName: 'Verity',
       avatarUrl: 'https://via.placeholder.com/150',
       lastMessage: 'Thanks for the motivation!',
       lastMessageTime: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
@@ -36,8 +36,8 @@ export const getConversations = async (userId: string): Promise<ConversationData
     {
       _id: '3',
       userId: 'user4',
-      username: 'emma',
-      fullName: 'Emma Wilson',
+      username: 'ellie',
+      fullName: 'Ellie',
       avatarUrl: 'https://via.placeholder.com/150',
       lastMessage: 'Keep up the streak! 💪',
       lastMessageTime: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago

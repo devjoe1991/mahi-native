@@ -124,7 +124,7 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
     trophyBadge: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: colors.brand.yellow,
+      backgroundColor: colors.primary[500],
       paddingHorizontal: spacing.sm,
       paddingVertical: 4,
       borderRadius: 15,

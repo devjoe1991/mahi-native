@@ -15,9 +15,9 @@ export const MOCK_USER_DATA: UserData = {
   posts: 255,
   followers: 14600,
   followings: 378,
-  streak_days: 1, // Current streak - Ready for Supabase: SELECT streak_days FROM profiles WHERE id = userId
-  streak_level: 1, // Current level - Ready for Supabase: SELECT streak_level FROM profiles WHERE id = userId
-  longest_streak: 5, // Longest streak ever - For loss aversion warnings
+  streak_days: 21, // Current streak - Ready for Supabase: SELECT streak_days FROM profiles WHERE id = userId (21 days = 3 milestone badges)
+  streak_level: 7, // Current level - Ready for Supabase: SELECT streak_level FROM profiles WHERE id = userId
+  longest_streak: 21, // Longest streak ever - For loss aversion warnings
   rest_days: [], // Rest days - Ready for Supabase: SELECT rest_days FROM profiles WHERE id = userId
 };
 
@@ -28,9 +28,9 @@ export const MOCK_USERS: UserData[] = [
   MOCK_USER_DATA,
   {
     _id: '2',
-    fullName: 'Sarah Smith',
-    username: 'sarah',
-    email: 'sarah@example.com',
+    fullName: 'Maximus',
+    username: 'maximus',
+    email: 'maximus@example.com',
     bio: 'Yoga instructor | Mindfulness advocate',
     occupation: 'Yoga Instructor',
     picturePath: undefined,
@@ -40,9 +40,9 @@ export const MOCK_USERS: UserData[] = [
   },
   {
     _id: '3',
-    fullName: 'Mike Johnson',
-    username: 'mike',
-    email: 'mike@example.com',
+    fullName: 'Verity',
+    username: 'verity',
+    email: 'verity@example.com',
     bio: 'Marathon runner | Fitness coach',
     occupation: 'Personal Trainer',
     picturePath: undefined,
@@ -96,9 +96,9 @@ export const getAllUsers = async (): Promise<UserData[]> => {
     },
     {
       _id: '5',
-      fullName: 'Emma Fitness',
-      username: 'emma',
-      email: 'emma@example.com',
+      fullName: 'Ellie',
+      username: 'ellie',
+      email: 'ellie@example.com',
       bio: 'Fitness coach',
       streak_days: 30,
       streak_level: 4,
