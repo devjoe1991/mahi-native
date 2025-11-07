@@ -119,11 +119,14 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
     },
     content: {
       flex: 1,
+      minWidth: 0, // Allow content to shrink properly
     },
     header: {
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       marginBottom: spacing.xs,
+      flexWrap: 'wrap',
+      flex: 1,
     },
     username: {
       fontSize: typography.body.fontSize,
@@ -140,6 +143,9 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
       color: colors.text.muted,
       letterSpacing: 0.2,
       lineHeight: typography.body.fontSize * 1.5,
+      flex: 1,
+      flexShrink: 1,
+      paddingRight: spacing.xs, // Add padding to prevent text cutoff
     },
     time: {
       fontSize: 12,
@@ -160,7 +166,8 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
       paddingHorizontal: spacing.lg,
       paddingVertical: spacing.sm,
       borderRadius: 50,
-      marginTop: spacing.xs,
+      marginTop: spacing.sm, // Increased margin for better spacing
+      alignSelf: 'flex-start', // Align button to the left
       elevation: 4,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
