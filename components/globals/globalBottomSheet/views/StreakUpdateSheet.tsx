@@ -158,7 +158,7 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({
       backgroundColor: colors.background.primary500,
       borderWidth: 1,
       borderColor: colors.border.primary,
-      borderRadius: 50,
+      borderRadius: 16,
       padding: 15,
       color: colors.text.primary,
       fontSize: typography.body.fontSize,
