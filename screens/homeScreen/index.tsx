@@ -163,6 +163,8 @@ export const HomeScreen: React.FC = () => {
           fetchPosts();
         },
       });
+    } else if (tab === 'messages') {
+      navigate('MessagesScreen');
     } else {
       setActiveTab(tab);
     }

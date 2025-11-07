@@ -3,9 +3,10 @@ import { HomeScreen } from '../screens/homeScreen';
 import { UserProfileScreen } from '../screens/userProfileScreen';
 import { EditProfileScreen } from '../screens/userProfileScreen';
 import { NotificationsScreen } from '../screens/notificationsScreen';
+import { MessagesScreen } from '../screens/messagesScreen';
 import { SidebarProvider, SidebarContainer } from '../components/globals/Sidebar';
 
-type ScreenName = 'HomeScreen' | 'UserProfileScreen' | 'EditProfileScreen' | 'NotificationsScreen';
+type ScreenName = 'HomeScreen' | 'UserProfileScreen' | 'EditProfileScreen' | 'NotificationsScreen' | 'MessagesScreen';
 
 interface NavigationContextType {
   currentScreen: ScreenName;
@@ -35,7 +36,7 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = () => {
 
   const navigate = useCallback((screen: ScreenName | string, navigationParams?: any) => {
     const screenName = screen as ScreenName;
-    if (['HomeScreen', 'UserProfileScreen', 'EditProfileScreen', 'NotificationsScreen'].includes(screenName)) {
+    if (['HomeScreen', 'UserProfileScreen', 'EditProfileScreen', 'NotificationsScreen', 'MessagesScreen'].includes(screenName)) {
       setScreenHistory((prev) => [...prev, currentScreen]);
       setCurrentScreen(screenName);
       setParams(navigationParams || {});
@@ -89,6 +90,14 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = () => {
           <SidebarProvider>
             <SidebarContainer>
               <NotificationsScreen />
+            </SidebarContainer>
+          </SidebarProvider>
+        );
+      case 'MessagesScreen':
+        return (
+          <SidebarProvider>
+            <SidebarContainer>
+              <MessagesScreen />
             </SidebarContainer>
           </SidebarProvider>
         );
