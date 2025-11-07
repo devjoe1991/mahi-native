@@ -106,7 +106,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onTabPres
           { translateX: isActive ? withTiming(-10) : withTiming(0) },
           { translateY: isActive ? withTiming(-6) : withTiming(0) },
         ],
-        opacity: isActive ? withTiming(1) : withTiming(0.2),
+        opacity: isActive ? withTiming(1) : withTiming(0.6), // Increased opacity for inactive icons
       };
     });
 
