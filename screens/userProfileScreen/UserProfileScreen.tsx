@@ -285,8 +285,11 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({
       <ProfileHeaderComponent
         onBackPress={handleBackPress}
         onSettingsPress={handleSettingsPress}
+        onFollowPress={handleFollowPress}
         showBackButton={true} // Always show back button to go back to feed
         showSettingsButton={!viewMode}
+        showFollowButton={viewMode}
+        isFollowing={isFollowingUser}
       />
       <View style={styles.headerContainer}>
         <ProfileHeaderSVG headerHeight={headerHeight} />

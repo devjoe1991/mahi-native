@@ -5,6 +5,7 @@ export { ProfileHeaderComponent } from './ProfileHeaderComponent';
 export { Post } from './Post';
 export { CollectionCard } from './CollectionCard';
 export { RemoteImage } from './RemoteImage';
+export { FollowButton } from './FollowButton';
 export type {
   ProfileHeaderProps,
   ProfileBodyProps,
