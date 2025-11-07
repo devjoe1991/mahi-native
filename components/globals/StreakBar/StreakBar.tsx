@@ -11,8 +11,8 @@ import { useAuth } from '../../../store/auth-context';
 const { width: SCREEN_WIDTH } = Dimensions.get('screen');
 const ITEM_SIZE = SCREEN_WIDTH / 5;
 const TRANSLATE_VALUE = ITEM_SIZE / 2;
-const TEXT_HEIGHT = 40; // Space for text label (fontSize 10 + marginTop 5 + padding) - increased significantly for Outfit font
-export const CONTAINER_HEIGHT = ITEM_SIZE + TRANSLATE_VALUE + TEXT_HEIGHT + 20; // Added TEXT_HEIGHT to prevent text cutoff
+const TEXT_HEIGHT = 50; // Space for text label (fontSize 10 + marginTop + padding) - increased for proper spacing
+export const CONTAINER_HEIGHT = ITEM_SIZE + TRANSLATE_VALUE + TEXT_HEIGHT + 30; // Increased buffer to prevent text cutoff
 
 interface StreakBarProps {
   streaks: StreakData[];
@@ -136,10 +136,10 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
 
   const styles = StyleSheet.create({
     container: {
-      height: CONTAINER_HEIGHT,
+      minHeight: CONTAINER_HEIGHT,
       backgroundColor: colors.background.primary,
       width: '100%',
-      paddingBottom: spacing.xl,
+      paddingBottom: spacing.xl, // Bottom padding to prevent underlap
       overflow: 'visible',
     },
     countdownContainer: {
@@ -176,9 +176,9 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          paddingVertical: spacing.sm, // Vertical padding to prevent text cutoff
+          paddingVertical: spacing.sm,
           paddingHorizontal: SCREEN_WIDTH / 2 - ITEM_SIZE / 2,
-          paddingBottom: spacing.xl, // Extra bottom padding for text labels (increased for Outfit font)
+          paddingBottom: spacing.xl, // Extra bottom padding to prevent underlap
         }}
         snapToInterval={ITEM_SIZE}
         decelerationRate="fast"
@@ -222,7 +222,7 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
                   width: ITEM_SIZE,
                   height: ITEM_SIZE,
                   marginVertical: 5,
-                  marginBottom: 8, // Extra bottom margin for text labels
+                  marginBottom: spacing.md, // Extra bottom margin for text labels
                 }}
               >
                 <View
@@ -236,18 +236,12 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
                     borderWidth: item.isCurrentUser ? 3.5 : 2.5,
                     borderColor: item.isCurrentUser 
                       ? colors.primary[500] 
-                      : theme === 'dark' 
-                        ? `${streakColor}80` 
-                        : streakColor,
-                    shadowColor: streakColor,
-                    shadowOffset: { width: 0, height: 6 },
-                    shadowOpacity: item.isLocked 
-                      ? 0.15 
-                      : theme === 'dark' 
-                        ? 0.5 
-                        : 0.25,
-                    shadowRadius: theme === 'dark' ? 12 : 10,
-                    elevation: item.isLocked ? 4 : 10,
+                      : colors.border.primary,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 8,
+                    elevation: item.isLocked ? 4 : 8,
                     opacity: item.isLocked ? 0.65 : 1,
                   }}
                 >
@@ -353,12 +347,13 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
                     color: colors.text.primary,
                     textAlign: 'center',
                     marginTop: spacing.sm,
-                    paddingTop: spacing.xs, // Extra padding to prevent cutoff
-                    paddingBottom: spacing.sm, // Additional bottom padding for Outfit font
+                    paddingTop: spacing.xs,
+                    paddingBottom: spacing.md, // Increased bottom padding for text labels
+                    marginBottom: spacing.xs, // Extra margin to ensure spacing
                     fontWeight: '600',
                     fontFamily: typography.body.fontFamily,
-                    minHeight: 22, // Ensure minimum height for text (increased for Outfit)
-                    lineHeight: 14, // Explicit line height to prevent cutoff
+                    minHeight: 28, // Increased minimum height for text
+                    lineHeight: 14,
                   }}
                   numberOfLines={1}
                   ellipsizeMode="tail"

@@ -37,9 +37,14 @@ export const CollectionCard: React.FC<CollectionCardProps> = ({
       width: CARD_WIDTH,
       height: CARD_WIDTH,
       margin: spacing.xs,
-      borderRadius: 12,
+      borderRadius: 20,
       overflow: 'hidden',
-      backgroundColor: colors.background.secondary,
+      backgroundColor: colors.background.primary500,
+      elevation: 8,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
     },
     grid: {
       flex: 1,
@@ -73,6 +78,8 @@ export const CollectionCard: React.FC<CollectionCardProps> = ({
       textShadowColor: colors.text.primary,
       textShadowOffset: { width: 0, height: 1 },
       textShadowRadius: 2,
+      letterSpacing: 0.5,
+      lineHeight: 18 * 1.2,
     },
   });
 

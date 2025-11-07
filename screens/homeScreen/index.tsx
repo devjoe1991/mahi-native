@@ -114,9 +114,8 @@ export const HomeScreen: React.FC = () => {
     },
     streakBarContainer: {
       backgroundColor: colors.background.primary,
-      // No visible border - clean separation
-      marginBottom: spacing.lg, // Add breathing room to avoid underlap with feed
-      marginTop: -spacing.sm, // Move streak bar up slightly
+      marginBottom: spacing.lg, // Bottom margin to prevent underlap
+      marginTop: -spacing.sm,
     },
     content: {
       flex: 1,

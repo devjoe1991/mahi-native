@@ -48,24 +48,24 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
     container: {
       width: POST_WIDTH,
       alignSelf: 'center',
-      backgroundColor: colors.background.secondary,
+      backgroundColor: colors.background.primary500,
       marginBottom: spacing.lg,
       marginHorizontal: POST_HORIZONTAL_MARGIN, // Consistent horizontal margin
-      borderRadius: 20,
+      borderRadius: 24,
       overflow: 'hidden',
       borderWidth: theme === 'dark' ? 0 : 1,
       borderColor: theme === 'dark' ? 'transparent' : colors.border.primary,
       // Refined shadow for depth and elegance
-      shadowColor: theme === 'dark' ? '#000000' : '#000000',
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: theme === 'dark' ? 0.4 : 0.08,
-      shadowRadius: theme === 'dark' ? 12 : 16,
-      elevation: theme === 'dark' ? 8 : 4,
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
     },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
-      padding: spacing.md + spacing.xs,
+      padding: spacing.lg,
       paddingBottom: spacing.md,
     },
     avatar: {
@@ -74,16 +74,13 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       borderRadius: 22,
       marginRight: spacing.md,
       backgroundColor: colors.primary[500],
-      // Refined border with subtle glow
-      borderWidth: 2.5,
-      borderColor: theme === 'dark' 
-        ? `${colors.brand.blue}60` 
-        : `${colors.brand.purple}40`,
-      shadowColor: theme === 'dark' ? colors.brand.blue : colors.brand.purple,
+      borderWidth: 2,
+      borderColor: colors.border.primary,
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.3,
+      shadowOpacity: 0.25,
       shadowRadius: 4,
-      elevation: 3,
+      elevation: 4,
     },
     headerText: {
       flex: 1,
@@ -96,6 +93,8 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       fontWeight: typography.h2.fontWeight as any,
       fontFamily: typography.h2.fontFamily,
       color: colors.text.primary,
+      letterSpacing: 0.2,
+      lineHeight: typography.body.fontSize * 1.4,
     },
     streakBadge: {
       flexDirection: 'row',
@@ -103,13 +102,13 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       backgroundColor: colors.brand.orange,
       paddingHorizontal: spacing.sm,
       paddingVertical: 4,
-      borderRadius: 12,
+      borderRadius: 15,
       marginLeft: spacing.xs,
-      shadowColor: colors.brand.orange,
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.3,
+      shadowOpacity: 0.25,
       shadowRadius: 4,
-      elevation: 2,
+      elevation: 4,
     },
     streakText: {
       fontSize: 10,
@@ -124,7 +123,7 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       resizeMode: 'cover',
     },
     footer: {
-      padding: spacing.md + spacing.xs,
+      padding: spacing.lg,
       paddingTop: spacing.md,
     },
     caption: {
@@ -132,6 +131,8 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       fontFamily: typography.body.fontFamily,
       color: colors.text.primary,
       marginBottom: spacing.xs,
+      letterSpacing: 0.2,
+      lineHeight: typography.body.fontSize * 1.5,
     },
     stats: {
       flexDirection: 'row',
@@ -144,6 +145,8 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       fontFamily: typography.body.fontFamily,
       color: colors.text.secondary,
       marginLeft: spacing.xs,
+      letterSpacing: 0.2,
+      lineHeight: 12 * 1.3,
     },
     commentButton: {
       flexDirection: 'row',
