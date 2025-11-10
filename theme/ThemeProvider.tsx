@@ -224,30 +224,30 @@ const spacing: Spacing = {
   xl: 32,
 };
 
-const createTypography = (textColor: string, fontFamily: string = 'Urbanist'): Typography => ({
+const createTypography = (textColor: string, fontFamily: string = 'Outfit'): Typography => ({
   fontFamily,
   h1: {
     fontSize: 32,
     fontWeight: '700',
-    fontFamily: 'Urbanist_700Bold',
+    fontFamily: 'Outfit_700Bold',
     color: textColor,
   },
   h2: {
     fontSize: 24,
     fontWeight: '600',
-    fontFamily: 'Urbanist_600SemiBold',
+    fontFamily: 'Outfit_600SemiBold',
     color: textColor,
   },
   h3: {
     fontSize: 20,
     fontWeight: '500',
-    fontFamily: 'Urbanist_500Medium',
+    fontFamily: 'Outfit_500Medium',
     color: textColor,
   },
   body: {
     fontSize: 16,
     fontWeight: '400',
-    fontFamily: 'Urbanist_400Regular',
+    fontFamily: 'Outfit_400Regular',
     color: textColor,
   },
 });
@@ -267,7 +267,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   };
 
   const colors = theme === 'light' ? lightColors : darkColors;
-  const typography = createTypography(colors.text.primary, 'Urbanist');
+  const typography = createTypography(colors.text.primary, 'Outfit');
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, colors, spacing, typography }}>

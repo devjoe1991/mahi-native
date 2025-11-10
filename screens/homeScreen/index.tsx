@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -114,15 +114,15 @@ export const HomeScreen: React.FC = () => {
     },
     streakBarContainer: {
       backgroundColor: colors.background.primary,
-      // No visible border - clean separation
-      marginBottom: 0, // No margin to prevent gap
+      marginBottom: spacing.lg, // Bottom margin to prevent underlap
+      marginTop: -spacing.sm,
     },
     content: {
       flex: 1,
       paddingBottom: 100, // Space for tab bar
     },
     feed: {
-      paddingTop: spacing.md,
+      paddingTop: spacing.lg,
     },
     loadingContainer: {
       flex: 1,
@@ -163,13 +163,19 @@ export const HomeScreen: React.FC = () => {
           fetchPosts();
         },
       });
+    } else if (tab === 'messages') {
+      navigate('MessagesScreen');
+    } else if (tab === 'nearby') {
+      navigate('NearbyScreen');
+    } else if (tab === 'diary') {
+      navigate('DiaryScreen');
     } else {
       setActiveTab(tab);
     }
   };
 
   const handleSearchPress = () => {
-    console.log('Search pressed');
+    openSheet('SEARCH');
   };
 
   const handleNotificationsPress = () => {
@@ -222,17 +228,23 @@ export const HomeScreen: React.FC = () => {
             <ActivityIndicator size="large" color={colors.primary[500]} />
           </View>
         ) : posts.length > 0 ? (
-          <ScrollView
-            style={styles.feed}
+          <FlatList
+            data={posts}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => <FeedPost post={item} />}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: spacing.md }}
+            contentContainerStyle={[
+              styles.feed,
+              { paddingBottom: spacing.md }
+            ]}
             onMomentumScrollBegin={handleMomentumScrollBegin}
             onMomentumScrollEnd={handleMomentumScrollEnd}
-          >
-            {posts.map((post) => (
-              <FeedPost key={post._id} post={post} />
-            ))}
-          </ScrollView>
+            ListEmptyComponent={
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No posts yet</Text>
+              </View>
+            }
+          />
         ) : (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>No posts yet</Text>

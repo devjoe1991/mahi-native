@@ -12,7 +12,7 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({
   onSaved,
   initialImage,
 }) => {
-  const { colors, spacing, typography } = useTheme();
+  const { colors, spacing, typography, theme } = useTheme();
   const { closeSheet } = useBottomSheet();
   const { userData } = useAuth();
 
@@ -72,11 +72,25 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({
       // For now, simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
       
+      const currentUserId = userId || userData?._id;
+      const currentStreakDays = userData?.streak_days || 0;
+      const newStreakDays = currentStreakDays + 1;
+      
       console.log('Streak update:', {
-        userId: userId || userData?._id,
+        userId: currentUserId,
         image: selectedImage,
         caption: caption.trim(),
+        streakDays: newStreakDays,
       });
+
+      // Sync streak to device calendar
+      try {
+        const { syncTodayStreak } = await import('../../../../utils/calendarSync');
+        await syncTodayStreak(currentUserId || '', newStreakDays);
+      } catch (calendarError) {
+        console.error('Failed to sync streak to calendar:', calendarError);
+        // Don't block the save if calendar sync fails
+      }
 
       onSaved?.();
       closeSheet();
@@ -103,16 +117,23 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({
       fontFamily: typography.h2.fontFamily,
       color: colors.text.primary,
       marginBottom: spacing.md,
+      letterSpacing: 0.5,
+      lineHeight: typography.h2.fontSize * 1.2,
     },
     imageContainer: {
       width: '100%',
       aspectRatio: 1,
-      borderRadius: spacing.md,
+      borderRadius: 24,
       backgroundColor: colors.background.primary,
-      borderWidth: 1,
+      borderWidth: theme === 'dark' ? 0 : 1,
       borderColor: colors.border.primary,
       marginBottom: spacing.md,
       overflow: 'hidden',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
     },
     image: {
       width: '100%',
@@ -130,11 +151,12 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({
       marginTop: spacing.sm,
     },
     addImageButton: {
-      backgroundColor: colors.background.primary,
-      borderWidth: 1,
+      backgroundColor: colors.background.primary500,
+      borderWidth: 2,
       borderColor: colors.border.primary,
-      borderRadius: spacing.md,
-      padding: spacing.md,
+      borderStyle: 'dashed',
+      borderRadius: 24,
+      padding: spacing.lg,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
@@ -147,17 +169,19 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({
       marginLeft: spacing.sm,
     },
     input: {
-      backgroundColor: colors.background.primary,
+      backgroundColor: colors.background.primary500,
       borderWidth: 1,
       borderColor: colors.border.primary,
-      borderRadius: spacing.md,
-      padding: spacing.md,
+      borderRadius: 16,
+      padding: 15,
       color: colors.text.primary,
       fontSize: typography.body.fontSize,
       fontFamily: typography.body.fontFamily,
       minHeight: 100,
       textAlignVertical: 'top',
       marginBottom: spacing.md,
+      letterSpacing: 0.2,
+      lineHeight: typography.body.fontSize * 1.5,
     },
     buttonRow: {
       flexDirection: 'row',
@@ -165,23 +189,32 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({
     },
     button: {
       flex: 1,
-      padding: spacing.md,
-      borderRadius: spacing.md,
+      paddingVertical: 20,
+      paddingHorizontal: 24,
+      borderRadius: 50,
       alignItems: 'center',
       justifyContent: 'center',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 4,
     },
     cancelButton: {
       backgroundColor: colors.background.primary,
-      borderWidth: 1,
+      borderWidth: 1.5,
       borderColor: colors.border.primary,
     },
     saveButton: {
       backgroundColor: colors.primary[500],
+      shadowColor: colors.primary[500],
+      shadowOpacity: 0.3,
     },
     buttonText: {
-      fontSize: typography.body.fontSize,
+      fontSize: 18,
       fontFamily: typography.body.fontFamily,
-      fontWeight: typography.body.fontWeight as any,
+      fontWeight: '700',
+      letterSpacing: 0.5,
     },
     cancelButtonText: {
       color: colors.text.primary,

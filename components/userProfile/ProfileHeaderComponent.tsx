@@ -3,19 +3,26 @@ import { View, StyleSheet, Pressable, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../theme/ThemeProvider';
+import { FollowButton } from './FollowButton';
 
 interface ProfileHeaderComponentProps {
   onBackPress?: () => void;
   onSettingsPress?: () => void;
+  onFollowPress?: () => void;
   showBackButton?: boolean;
   showSettingsButton?: boolean;
+  showFollowButton?: boolean;
+  isFollowing?: boolean;
 }
 
 export const ProfileHeaderComponent: React.FC<ProfileHeaderComponentProps> = ({
   onBackPress,
   onSettingsPress,
+  onFollowPress,
   showBackButton = true,
   showSettingsButton = true,
+  showFollowButton = false,
+  isFollowing = false,
 }) => {
   const { colors, spacing } = useTheme();
   const { width: SCREEN_WIDTH } = Dimensions.get('screen');
@@ -47,9 +54,9 @@ export const ProfileHeaderComponent: React.FC<ProfileHeaderComponentProps> = ({
       backgroundColor: colors.background.primary,
       justifyContent: 'center',
       alignItems: 'center',
-      shadowColor: colors.text.primary,
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
+      shadowOpacity: 0.25,
       shadowRadius: 4,
       elevation: 3,
     },
@@ -63,6 +70,9 @@ export const ProfileHeaderComponent: React.FC<ProfileHeaderComponentProps> = ({
       flexDirection: 'row',
       justifyContent: 'flex-end',
       alignItems: 'center',
+    },
+    buttonSpacing: {
+      marginLeft: spacing.xs,
     },
   });
 
@@ -82,6 +92,15 @@ export const ProfileHeaderComponent: React.FC<ProfileHeaderComponentProps> = ({
             )}
           </View>
           <View style={styles.rightContainer}>
+            {showFollowButton && onFollowPress && (
+              <>
+                <FollowButton
+                  isFollowing={isFollowing}
+                  onPress={onFollowPress}
+                />
+                {showSettingsButton && <View style={styles.buttonSpacing} />}
+              </>
+            )}
             {showSettingsButton && (
               <Pressable style={styles.button} onPress={onSettingsPress}>
                 <Ionicons

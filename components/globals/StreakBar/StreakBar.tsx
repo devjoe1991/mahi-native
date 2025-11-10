@@ -11,8 +11,8 @@ import { useAuth } from '../../../store/auth-context';
 const { width: SCREEN_WIDTH } = Dimensions.get('screen');
 const ITEM_SIZE = SCREEN_WIDTH / 5;
 const TRANSLATE_VALUE = ITEM_SIZE / 2;
-const TEXT_HEIGHT = 20; // Space for text label (fontSize 10 + marginTop 5 + padding)
-export const CONTAINER_HEIGHT = ITEM_SIZE + TRANSLATE_VALUE + TEXT_HEIGHT + 10; // Added TEXT_HEIGHT to prevent text cutoff
+const TEXT_HEIGHT = 50; // Space for text label (fontSize 10 + marginTop + padding) - increased for proper spacing
+export const CONTAINER_HEIGHT = ITEM_SIZE + TRANSLATE_VALUE + TEXT_HEIGHT + 30; // Increased buffer to prevent text cutoff
 
 interface StreakBarProps {
   streaks: StreakData[];
@@ -136,15 +136,15 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
 
   const styles = StyleSheet.create({
     container: {
-      height: CONTAINER_HEIGHT,
+      minHeight: CONTAINER_HEIGHT,
       backgroundColor: colors.background.primary,
       width: '100%',
-      paddingBottom: spacing.xs,
+      paddingBottom: spacing.xl, // Bottom padding to prevent underlap
       overflow: 'visible',
     },
     countdownContainer: {
       paddingHorizontal: spacing.md,
-      paddingTop: spacing.xs,
+      paddingTop: spacing.sm,
       paddingBottom: spacing.xs,
       flexDirection: 'row',
       alignItems: 'center',
@@ -176,9 +176,9 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          paddingVertical: spacing.xs, // Vertical padding to prevent text cutoff
+          paddingVertical: spacing.sm,
           paddingHorizontal: SCREEN_WIDTH / 2 - ITEM_SIZE / 2,
-          paddingBottom: spacing.sm, // Extra bottom padding for text labels
+          paddingBottom: spacing.xl, // Extra bottom padding to prevent underlap
         }}
         snapToInterval={ITEM_SIZE}
         decelerationRate="fast"
@@ -222,6 +222,7 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
                   width: ITEM_SIZE,
                   height: ITEM_SIZE,
                   marginVertical: 5,
+                  marginBottom: spacing.md, // Extra bottom margin for text labels
                 }}
               >
                 <View
@@ -232,14 +233,16 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
                     backgroundColor: streakColor,
                     justifyContent: 'center',
                     alignItems: 'center',
-                    borderWidth: item.isCurrentUser ? 3 : 2,
-                    borderColor: item.isCurrentUser ? colors.primary[500] : streakColor,
-                    shadowColor: streakColor,
+                    borderWidth: item.isCurrentUser ? 3.5 : 2.5,
+                    borderColor: item.isCurrentUser 
+                      ? colors.primary[500] 
+                      : colors.border.primary,
+                    shadowColor: '#000',
                     shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: item.isLocked ? 0.1 : theme === 'dark' ? 0.3 : 0.2,
+                    shadowOpacity: 0.3,
                     shadowRadius: 8,
-                    elevation: 8,
-                    opacity: item.isLocked ? 0.6 : 1,
+                    elevation: item.isLocked ? 4 : 8,
+                    opacity: item.isLocked ? 0.65 : 1,
                   }}
                 >
                   {item.type === 'add_story' ? (
@@ -343,11 +346,14 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
                     fontSize: 10,
                     color: colors.text.primary,
                     textAlign: 'center',
-                    marginTop: spacing.xs,
-                    paddingTop: spacing.xs, // Extra padding to prevent cutoff
+                    marginTop: spacing.sm,
+                    paddingTop: spacing.xs,
+                    paddingBottom: spacing.md, // Increased bottom padding for text labels
+                    marginBottom: spacing.xs, // Extra margin to ensure spacing
                     fontWeight: '600',
                     fontFamily: typography.body.fontFamily,
-                    minHeight: 16, // Ensure minimum height for text
+                    minHeight: 28, // Increased minimum height for text
+                    lineHeight: 14,
                   }}
                   numberOfLines={1}
                   ellipsizeMode="tail"

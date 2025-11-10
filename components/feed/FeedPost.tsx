@@ -30,52 +30,61 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
   const { userData } = useAuth();
   const { openSheet } = useBottomSheet();
   const [postAuthorStreak, setPostAuthorStreak] = React.useState<number | null>(null);
+  const [postAuthorTrophyCount, setPostAuthorTrophyCount] = React.useState<number>(0);
 
-  // Fetch post author's streak
+  // Fetch post author's streak and trophy count
   React.useEffect(() => {
-    const fetchAuthorStreak = async () => {
+    const fetchAuthorData = async () => {
       try {
         const author = await getUserById(post.userId);
         setPostAuthorStreak(author?.streak_days || null);
+        // Calculate trophy count (every 7 days = 1 trophy)
+        const trophyCount = author?.streak_days ? Math.floor(author.streak_days / 7) : 0;
+        setPostAuthorTrophyCount(trophyCount);
       } catch (error) {
-        // Silently fail - streak badge is optional
+        // Silently fail - badges are optional
       }
     };
-    fetchAuthorStreak();
+    fetchAuthorData();
   }, [post.userId]);
 
   const styles = StyleSheet.create({
     container: {
       width: POST_WIDTH,
       alignSelf: 'center',
-      backgroundColor: colors.background.secondary,
-      marginBottom: spacing.md,
+      backgroundColor: colors.background.primary500,
+      marginBottom: spacing.lg,
       marginHorizontal: POST_HORIZONTAL_MARGIN, // Consistent horizontal margin
-      borderRadius: 12,
+      borderRadius: 24,
       overflow: 'hidden',
-      borderWidth: 1,
-      borderColor: colors.border.primary,
-      // Subtle aura shadow for motivational feel
-      shadowColor: theme === 'dark' ? AURA_BLUE : MOTIVATIONAL_PURPLE,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: theme === 'dark' ? 0.2 : 0.08,
+      borderWidth: theme === 'dark' ? 0 : 1,
+      borderColor: theme === 'dark' ? 'transparent' : colors.border.primary,
+      // Refined shadow for depth and elegance
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
       shadowRadius: 8,
-      elevation: 3,
+      elevation: 8,
     },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
-      padding: spacing.md,
+      padding: spacing.lg,
+      paddingBottom: spacing.md,
     },
     avatar: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      marginRight: spacing.sm,
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      marginRight: spacing.md,
       backgroundColor: colors.primary[500],
-      // Subtle aura border
       borderWidth: 2,
-      borderColor: theme === 'dark' ? `${AURA_BLUE}40` : `${MOTIVATIONAL_PURPLE}30`,
+      borderColor: colors.border.primary,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 4,
     },
     headerText: {
       flex: 1,
@@ -88,17 +97,48 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       fontWeight: typography.h2.fontWeight as any,
       fontFamily: typography.h2.fontFamily,
       color: colors.text.primary,
+      letterSpacing: 0.2,
+      lineHeight: typography.body.fontSize * 1.4,
     },
     streakBadge: {
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: colors.brand.orange,
-      paddingHorizontal: spacing.xs,
-      paddingVertical: 2,
-      borderRadius: 8,
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+      borderRadius: 15,
       marginLeft: spacing.xs,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 4,
     },
     streakText: {
+      fontSize: 10,
+      fontFamily: typography.body.fontFamily,
+      fontWeight: '600',
+      color: colors.background.primary,
+      marginLeft: 2,
+    },
+    trophyBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.primary[500],
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+      borderRadius: 15,
+      marginLeft: spacing.xs,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 4,
+    },
+    trophyEmoji: {
+      fontSize: 10,
+    },
+    trophyText: {
       fontSize: 10,
       fontFamily: typography.body.fontFamily,
       fontWeight: '600',
@@ -111,24 +151,30 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       resizeMode: 'cover',
     },
     footer: {
-      padding: spacing.md,
+      padding: spacing.lg,
+      paddingTop: spacing.md,
     },
     caption: {
       fontSize: typography.body.fontSize,
       fontFamily: typography.body.fontFamily,
       color: colors.text.primary,
       marginBottom: spacing.xs,
+      letterSpacing: 0.2,
+      lineHeight: typography.body.fontSize * 1.5,
     },
     stats: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginTop: spacing.xs,
+      marginTop: spacing.sm,
+      marginBottom: spacing.xs,
     },
     statText: {
       fontSize: 12,
       fontFamily: typography.body.fontFamily,
       color: colors.text.secondary,
       marginLeft: spacing.xs,
+      letterSpacing: 0.2,
+      lineHeight: 12 * 1.3,
     },
     commentButton: {
       flexDirection: 'row',
@@ -170,6 +216,12 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
               <Text style={styles.streakText}>{postAuthorStreak}</Text>
             </View>
           )}
+          {postAuthorTrophyCount > 0 && (
+            <View style={styles.trophyBadge}>
+              <Text style={styles.trophyEmoji}>🏆</Text>
+              <Text style={styles.trophyText}>{postAuthorTrophyCount}</Text>
+            </View>
+          )}
         </View>
       </View>
       
@@ -180,8 +232,8 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
           <Pressable style={styles.heartIcon}>
             <Ionicons 
               name="heart-outline" 
-              size={20} 
-              color={theme === 'dark' ? `${AURA_BLUE}CC` : `${MOTIVATIONAL_PURPLE}CC`} 
+              size={22} 
+              color={theme === 'dark' ? colors.brand.red : colors.brand.pink} 
             />
           </Pressable>
           <Text style={styles.statText}>{post.likes || 0}</Text>
@@ -191,8 +243,8 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
           >
             <Ionicons 
               name="chatbubble-outline" 
-              size={20} 
-              color={theme === 'dark' ? `${AURA_BLUE}CC` : `${MOTIVATIONAL_PURPLE}CC`} 
+              size={22} 
+              color={theme === 'dark' ? colors.brand.blue : colors.brand.blue100} 
             />
             <Text style={styles.statText}>{post.comments || 0}</Text>
           </Pressable>

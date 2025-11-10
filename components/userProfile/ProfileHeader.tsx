@@ -46,17 +46,19 @@ const ProfileStat: React.FC<ProfileStatProps> = ({ text, subText, onPress }) => 
 export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   userData,
   viewMode = false,
+  isFollowing = false,
   onEditPress,
   onMessagePress,
+  onFollowPress,
 }) => {
-  const { colors, spacing, typography } = useTheme();
+  const { colors, spacing, typography, theme } = useTheme();
   const profilePic = userData.picturePath || DEFAULT_AVATAR;
 
   const styles = StyleSheet.create({
     container: {
       alignItems: 'center',
-      margin: spacing.md,
-      paddingTop: spacing.lg,
+      margin: spacing.lg,
+      paddingTop: spacing.xl,
     },
     avatarContainer: {
       width: 150,
@@ -68,6 +70,13 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       width: 150,
       height: 150,
       borderRadius: 75,
+      borderWidth: 4,
+      borderColor: colors.background.primary,
+      shadowColor: '#000000',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.2,
+      shadowRadius: 16,
+      elevation: 8,
     },
     avatarImage: {
       borderRadius: 75,
@@ -77,26 +86,30 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       right: 0,
       bottom: 5,
       backgroundColor: colors.background.primary,
-      padding: spacing.sm,
-      borderRadius: 25,
-      shadowColor: colors.text.primary,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
+      padding: spacing.md,
+      borderRadius: 28,
+      borderWidth: 2,
+      borderColor: colors.border.primary,
+      shadowColor: '#000000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 5,
     },
     messageButton: {
       position: 'absolute',
       left: 0,
       top: 5,
       backgroundColor: colors.background.primary,
-      padding: spacing.sm,
-      borderRadius: 25,
-      shadowColor: colors.text.primary,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
+      padding: spacing.md,
+      borderRadius: 28,
+      borderWidth: 2,
+      borderColor: colors.border.primary,
+      shadowColor: '#000000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 5,
     },
     name: {
       fontWeight: typography.h2.fontWeight as any,
@@ -111,17 +124,50 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       color: colors.text.secondary,
       marginTop: spacing.xs,
     },
+    followButton: {
+      marginTop: spacing.md,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.xl,
+      borderRadius: 50,
+      backgroundColor: colors.primary[500],
+      borderWidth: 1,
+      borderColor: colors.primary[500],
+      shadowColor: '#000000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 4,
+    },
+    followingButton: {
+      backgroundColor: colors.background.primary500,
+      borderColor: colors.border.primary,
+    },
+    followButtonText: {
+      fontSize: typography.body.fontSize,
+      fontFamily: typography.body.fontFamily,
+      fontWeight: '700' as any,
+      color: colors.text.primary,
+      letterSpacing: 0.5,
+    },
     statsContainer: {
       flexDirection: 'row',
       justifyContent: 'space-around',
       alignItems: 'center',
-      marginTop: spacing.lg,
+      marginTop: spacing.xl,
       marginBottom: spacing.lg,
       backgroundColor: colors.background.secondary,
-      borderRadius: 20,
+      borderRadius: 24,
       marginHorizontal: spacing.md,
-      paddingVertical: spacing.md,
+      paddingVertical: spacing.lg,
+      paddingHorizontal: spacing.md,
       width: SCREEN_WIDTH - spacing.md * 2,
+      borderWidth: theme === 'dark' ? 0 : 1,
+      borderColor: colors.border.primary,
+      shadowColor: '#000000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: theme === 'dark' ? 0.3 : 0.08,
+      shadowRadius: theme === 'dark' ? 12 : 16,
+      elevation: theme === 'dark' ? 6 : 3,
     },
   });
 
@@ -149,22 +195,13 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             </Pressable>
           )}
           {viewMode && (
-            <>
-              <Pressable style={styles.messageButton} onPress={onMessagePress}>
-                <Ionicons
-                  name="chatbubble-ellipses"
-                  size={30}
-                  color={colors.text.primary}
-                />
-              </Pressable>
-              <Pressable style={styles.editButton} onPress={onEditPress}>
-                <Ionicons
-                  name="person-add-outline"
-                  size={25}
-                  color={colors.text.primary}
-                />
-              </Pressable>
-            </>
+            <Pressable style={styles.messageButton} onPress={onMessagePress}>
+              <Ionicons
+                name="chatbubble-ellipses"
+                size={30}
+                color={colors.text.primary}
+              />
+            </Pressable>
           )}
         </ImageBackground>
       </View>
@@ -186,10 +223,25 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </Text>
       )}
 
+      {/* Follow Button - Only show in viewMode */}
+      {viewMode && onFollowPress && (
+        <Pressable
+          style={[
+            styles.followButton,
+            isFollowing && styles.followingButton,
+          ]}
+          onPress={onFollowPress}
+        >
+          <Text style={styles.followButtonText}>
+            {isFollowing ? 'Following' : 'Follow'}
+          </Text>
+        </Pressable>
+      )}
+
       <View style={styles.statsContainer}>
         <ProfileStat
-          text={String(userData.posts || 0)}
-          subText="Posts"
+          text={`${Math.floor((userData.streak_days || 0) / 7)} 🏆`}
+          subText="Milestones"
         />
         <ProfileStat
           text={String(userData.followers || 0)}

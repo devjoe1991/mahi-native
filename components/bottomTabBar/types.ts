@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 
-export type TabType = 'home' | 'nearby' | 'plus' | 'reels' | 'messages';
+export type TabType = 'home' | 'nearby' | 'plus' | 'diary' | 'messages';
 
 export interface BottomTabBarProps {
   activeTab: TabType;

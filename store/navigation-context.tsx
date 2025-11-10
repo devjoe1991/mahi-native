@@ -3,9 +3,14 @@ import { HomeScreen } from '../screens/homeScreen';
 import { UserProfileScreen } from '../screens/userProfileScreen';
 import { EditProfileScreen } from '../screens/userProfileScreen';
 import { NotificationsScreen } from '../screens/notificationsScreen';
+import { MessagesScreen } from '../screens/messagesScreen';
+import { NearbyScreen } from '../screens/nearbyScreen';
+import { DiaryScreen } from '../screens/diaryScreen';
 import { SidebarProvider, SidebarContainer } from '../components/globals/Sidebar';
+import { GlobalBottomSheetProvider } from '../components/globals/globalBottomSheet';
+import { GlobalModalProvider } from '../components/globals/globalModal';
 
-type ScreenName = 'HomeScreen' | 'UserProfileScreen' | 'EditProfileScreen' | 'NotificationsScreen';
+type ScreenName = 'HomeScreen' | 'UserProfileScreen' | 'EditProfileScreen' | 'NotificationsScreen' | 'MessagesScreen' | 'NearbyScreen' | 'DiaryScreen';
 
 interface NavigationContextType {
   currentScreen: ScreenName;
@@ -35,7 +40,7 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = () => {
 
   const navigate = useCallback((screen: ScreenName | string, navigationParams?: any) => {
     const screenName = screen as ScreenName;
-    if (['HomeScreen', 'UserProfileScreen', 'EditProfileScreen', 'NotificationsScreen'].includes(screenName)) {
+    if (['HomeScreen', 'UserProfileScreen', 'EditProfileScreen', 'NotificationsScreen', 'MessagesScreen', 'NearbyScreen', 'DiaryScreen'].includes(screenName)) {
       setScreenHistory((prev) => [...prev, currentScreen]);
       setCurrentScreen(screenName);
       setParams(navigationParams || {});
@@ -92,6 +97,30 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = () => {
             </SidebarContainer>
           </SidebarProvider>
         );
+      case 'MessagesScreen':
+        return (
+          <SidebarProvider>
+            <SidebarContainer>
+              <MessagesScreen />
+            </SidebarContainer>
+          </SidebarProvider>
+        );
+      case 'NearbyScreen':
+        return (
+          <SidebarProvider>
+            <SidebarContainer>
+              <NearbyScreen />
+            </SidebarContainer>
+          </SidebarProvider>
+        );
+      case 'DiaryScreen':
+        return (
+          <SidebarProvider>
+            <SidebarContainer>
+              <DiaryScreen />
+            </SidebarContainer>
+          </SidebarProvider>
+        );
       default:
         return (
           <SidebarProvider>
@@ -112,7 +141,11 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = () => {
 
   return (
     <NavigationContext.Provider value={value}>
-      {renderScreen()}
+      <GlobalBottomSheetProvider>
+        <GlobalModalProvider>
+          {renderScreen()}
+        </GlobalModalProvider>
+      </GlobalBottomSheetProvider>
     </NavigationContext.Provider>
   );
 };

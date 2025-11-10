@@ -21,9 +21,16 @@ const { width: SCREEN_WIDTH } = Dimensions.get('screen');
 
 type TabType = 'images' | 'videos';
 
-const PostsTab: React.FC<{ userId: string; refreshing?: boolean }> = ({
+const PostsTab: React.FC<{ 
+  userId: string; 
+  refreshing?: boolean;
+  onMomentumScrollBegin?: (event: any) => void;
+  onMomentumScrollEnd?: (event: any) => void;
+}> = ({
   userId,
   refreshing,
+  onMomentumScrollBegin,
+  onMomentumScrollEnd,
 }) => {
   const { colors, spacing } = useTheme();
   const [posts, setPosts] = useState<PostData[]>([]);
@@ -58,6 +65,7 @@ const PostsTab: React.FC<{ userId: string; refreshing?: boolean }> = ({
     container: {
       flex: 1,
       backgroundColor: colors.background.primary,
+      minHeight: 0, // Important for FlatList scrolling
     },
     loadingContainer: {
       flex: 1,
@@ -131,11 +139,19 @@ const PostsTab: React.FC<{ userId: string; refreshing?: boolean }> = ({
       contentContainerStyle={styles.postsGrid}
       columnWrapperStyle={{ justifyContent: 'flex-start' }}
       showsVerticalScrollIndicator={false}
+      onMomentumScrollBegin={onMomentumScrollBegin}
+      onMomentumScrollEnd={onMomentumScrollEnd}
     />
   );
 };
 
-const VideosTab: React.FC = () => {
+const VideosTab: React.FC<{
+  onMomentumScrollBegin?: (event: any) => void;
+  onMomentumScrollEnd?: (event: any) => void;
+}> = ({
+  onMomentumScrollBegin,
+  onMomentumScrollEnd,
+}) => {
   const { colors, spacing } = useTheme();
   const videoCollections = [1, 2, 3, 4, 5, 6];
 
@@ -143,6 +159,7 @@ const VideosTab: React.FC = () => {
     container: {
       flex: 1,
       backgroundColor: colors.background.primary,
+      minHeight: 0, // Important for FlatList scrolling
     },
     list: {
       paddingBottom: 100, // Space for tab bar
@@ -183,6 +200,8 @@ const VideosTab: React.FC = () => {
             <Text style={styles.emptyText}>No videos yet</Text>
           </View>
         }
+        onMomentumScrollBegin={onMomentumScrollBegin}
+        onMomentumScrollEnd={onMomentumScrollEnd}
       />
     </View>
   );
@@ -192,6 +211,8 @@ export const ProfileBody: React.FC<ProfileBodyProps> = ({
   userId,
   refreshing,
   onRefresh,
+  onMomentumScrollBegin,
+  onMomentumScrollEnd,
 }) => {
   const { colors, spacing, typography } = useTheme();
   const [activeTab, setActiveTab] = useState<TabType>('images');
@@ -229,6 +250,7 @@ export const ProfileBody: React.FC<ProfileBodyProps> = ({
     },
     content: {
       flex: 1,
+      minHeight: 0, // Important for FlatList scrolling
     },
   });
 
@@ -265,9 +287,17 @@ export const ProfileBody: React.FC<ProfileBodyProps> = ({
 
       <View style={styles.content}>
         {activeTab === 'images' ? (
-          <PostsTab userId={userId} refreshing={refreshing} />
+          <PostsTab 
+            userId={userId} 
+            refreshing={refreshing}
+            onMomentumScrollBegin={onMomentumScrollBegin}
+            onMomentumScrollEnd={onMomentumScrollEnd}
+          />
         ) : (
-          <VideosTab />
+          <VideosTab 
+            onMomentumScrollBegin={onMomentumScrollBegin}
+            onMomentumScrollEnd={onMomentumScrollEnd}
+          />
         )}
       </View>
     </View>

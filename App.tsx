@@ -4,25 +4,39 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import {
-  Urbanist_400Regular,
-  Urbanist_600SemiBold,
-  Urbanist_700Bold,
-} from '@expo-google-fonts/urbanist';
+  Outfit_400Regular,
+  Outfit_500Medium,
+  Outfit_600SemiBold,
+  Outfit_700Bold,
+} from '@expo-google-fonts/outfit';
 import { ThemeProvider } from './theme/ThemeProvider';
-import { AuthProvider } from './store/auth-context';
+import { AuthProvider, useAuth } from './store/auth-context';
 import { NavigationProvider } from './store/navigation-context';
-import { GlobalBottomSheetProvider } from './components/globals/globalBottomSheet';
-import { GlobalModalProvider } from './components/globals/globalModal';
-import { SidebarProvider, SidebarContainer } from './components/globals/Sidebar';
+import { AuthScreen } from './screens/onboardingScreen/AuthScreen';
+import { useCalendarSync } from './hooks/useCalendarSync';
 
 // Prevent the splash screen from auto-hiding before fonts are loaded
 SplashScreen.preventAutoHideAsync();
 
+function AppContent() {
+  const { isAuthenticated } = useAuth();
+  
+  // Sync streaks to calendar when authenticated
+  useCalendarSync();
+
+  if (!isAuthenticated) {
+    return <AuthScreen onAuthSuccess={() => {}} />;
+  }
+
+  return <NavigationProvider />;
+}
+
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({
-    Urbanist_400Regular,
-    Urbanist_600SemiBold,
-    Urbanist_700Bold,
+    Outfit_400Regular,
+    Outfit_500Medium,
+    Outfit_600SemiBold,
+    Outfit_700Bold,
   });
 
   useEffect(() => {
@@ -41,11 +55,7 @@ export default function App() {
     <SafeAreaProvider>
       <ThemeProvider>
         <AuthProvider>
-          <GlobalBottomSheetProvider>
-            <GlobalModalProvider>
-              <NavigationProvider />
-            </GlobalModalProvider>
-          </GlobalBottomSheetProvider>
+          <AppContent />
         </AuthProvider>
         <StatusBar style="auto" />
       </ThemeProvider>

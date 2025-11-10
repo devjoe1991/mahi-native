@@ -23,15 +23,13 @@ export const Post: React.FC<PostProps> = ({ postData, onPress }) => {
       borderRadius: 8,
       overflow: 'hidden',
       backgroundColor: colors.background.secondary,
-      // Subtle aura shadow for motivational feel
-      shadowColor: theme === 'dark' ? AURA_BLUE : MOTIVATIONAL_PURPLE,
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: theme === 'dark' ? 0.15 : 0.06,
-      shadowRadius: 4,
-      elevation: 2,
-      // Subtle border with aura tint
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
       borderWidth: 1,
-      borderColor: theme === 'dark' ? `${AURA_BLUE}20` : `${MOTIVATIONAL_PURPLE}15`,
+      borderColor: colors.border.primary,
     },
     image: {
       width: '100%',

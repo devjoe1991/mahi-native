@@ -15,9 +15,9 @@ export const MOCK_USER_DATA: UserData = {
   posts: 255,
   followers: 14600,
   followings: 378,
-  streak_days: 1, // Current streak - Ready for Supabase: SELECT streak_days FROM profiles WHERE id = userId
-  streak_level: 1, // Current level - Ready for Supabase: SELECT streak_level FROM profiles WHERE id = userId
-  longest_streak: 5, // Longest streak ever - For loss aversion warnings
+  streak_days: 21, // Current streak - Ready for Supabase: SELECT streak_days FROM profiles WHERE id = userId (21 days = 3 milestone badges)
+  streak_level: 7, // Current level - Ready for Supabase: SELECT streak_level FROM profiles WHERE id = userId
+  longest_streak: 21, // Longest streak ever - For loss aversion warnings
   rest_days: [], // Rest days - Ready for Supabase: SELECT rest_days FROM profiles WHERE id = userId
 };
 
@@ -28,9 +28,9 @@ export const MOCK_USERS: UserData[] = [
   MOCK_USER_DATA,
   {
     _id: '2',
-    fullName: 'Sarah Smith',
-    username: 'sarah',
-    email: 'sarah@example.com',
+    fullName: 'Maximus',
+    username: 'maximus',
+    email: 'maximus@example.com',
     bio: 'Yoga instructor | Mindfulness advocate',
     occupation: 'Yoga Instructor',
     picturePath: undefined,
@@ -40,9 +40,9 @@ export const MOCK_USERS: UserData[] = [
   },
   {
     _id: '3',
-    fullName: 'Mike Johnson',
-    username: 'mike',
-    email: 'mike@example.com',
+    fullName: 'Verity',
+    username: 'verity',
+    email: 'verity@example.com',
     bio: 'Marathon runner | Fitness coach',
     occupation: 'Personal Trainer',
     picturePath: undefined,
@@ -96,9 +96,9 @@ export const getAllUsers = async (): Promise<UserData[]> => {
     },
     {
       _id: '5',
-      fullName: 'Emma Fitness',
-      username: 'emma',
-      email: 'emma@example.com',
+      fullName: 'Ellie',
+      username: 'ellie',
+      email: 'ellie@example.com',
       bio: 'Fitness coach',
       streak_days: 30,
       streak_level: 4,
@@ -107,5 +107,98 @@ export const getAllUsers = async (): Promise<UserData[]> => {
       followings: 300,
     },
   ];
+};
+
+/**
+ * Mock follow relationships
+ * In real app, this would be stored in Supabase follows table
+ */
+const MOCK_FOLLOWS: { followerId: string; followingId: string }[] = [
+  // User 1 (current user) follows user 2
+  { followerId: '1', followingId: '2' },
+];
+
+/**
+ * Check if current user is following another user
+ */
+export const isFollowing = async (
+  currentUserId: string,
+  targetUserId: string
+): Promise<boolean> => {
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  return MOCK_FOLLOWS.some(
+    (f) => f.followerId === currentUserId && f.followingId === targetUserId
+  );
+};
+
+/**
+ * Follow a user
+ */
+export const followUser = async (
+  currentUserId: string,
+  targetUserId: string
+): Promise<boolean> => {
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  
+  // Check if already following
+  const alreadyFollowing = MOCK_FOLLOWS.some(
+    (f) => f.followerId === currentUserId && f.followingId === targetUserId
+  );
+  
+  if (alreadyFollowing) {
+    return false;
+  }
+  
+  // Add follow relationship
+  MOCK_FOLLOWS.push({ followerId: currentUserId, followingId: targetUserId });
+  
+  // Update follower count for target user
+  const targetUser = MOCK_USERS.find((u) => u._id === targetUserId);
+  if (targetUser) {
+    targetUser.followers = (targetUser.followers || 0) + 1;
+  }
+  
+  // Update following count for current user
+  const currentUser = MOCK_USERS.find((u) => u._id === currentUserId);
+  if (currentUser) {
+    currentUser.followings = (currentUser.followings || 0) + 1;
+  }
+  
+  return true;
+};
+
+/**
+ * Unfollow a user
+ */
+export const unfollowUser = async (
+  currentUserId: string,
+  targetUserId: string
+): Promise<boolean> => {
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  
+  // Find and remove follow relationship
+  const index = MOCK_FOLLOWS.findIndex(
+    (f) => f.followerId === currentUserId && f.followingId === targetUserId
+  );
+  
+  if (index === -1) {
+    return false;
+  }
+  
+  MOCK_FOLLOWS.splice(index, 1);
+  
+  // Update follower count for target user
+  const targetUser = MOCK_USERS.find((u) => u._id === targetUserId);
+  if (targetUser && targetUser.followers && targetUser.followers > 0) {
+    targetUser.followers = targetUser.followers - 1;
+  }
+  
+  // Update following count for current user
+  const currentUser = MOCK_USERS.find((u) => u._id === currentUserId);
+  if (currentUser && currentUser.followings && currentUser.followings > 0) {
+    currentUser.followings = currentUser.followings - 1;
+  }
+  
+  return true;
 };
 
