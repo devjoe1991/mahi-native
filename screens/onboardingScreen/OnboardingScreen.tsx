@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../theme/ThemeProvider';
 import { useOnboarding } from '../../store/onboarding-context';
 import { useAuth } from '../../store/auth-context';
-import { WelcomeScreen } from './views/WelcomeScreen';
 import { NameScreen } from './views/NameScreen';
 import { EmailPhoneScreen } from './views/EmailPhoneScreen';
 import { OTPConfirmationScreen } from './views/OTPConfirmationScreen';
@@ -14,9 +13,10 @@ import { PrivacyPermissionsScreen } from './views/PrivacyPermissionsScreen';
 
 interface OnboardingScreenProps {
   onComplete: () => void;
+  onBack?: () => void;
 }
 
-export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
+export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onBack }) => {
   const { colors } = useTheme();
   const { currentStep, setCurrentStep, totalSteps, onboardingData } = useOnboarding();
   const { authenticate } = useAuth();
@@ -45,6 +45,9 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }
   const handleBack = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
+    } else {
+      // If we're on the first step (NameScreen), go back to welcome screen
+      onBack?.();
     }
   };
 
@@ -77,21 +80,19 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        return <WelcomeScreen onNext={handleNext} />;
-      case 1:
         return <NameScreen onNext={handleNext} onBack={handleBack} />;
-      case 2:
+      case 1:
         return <EmailPhoneScreen onNext={handleNext} onBack={handleBack} />;
-      case 3:
+      case 2:
         return <OTPConfirmationScreen onNext={handleNext} onBack={handleBack} />;
-      case 4:
+      case 3:
         return <DateOfBirthScreen onNext={handleNext} onBack={handleBack} />;
-      case 5:
+      case 4:
         return <FitnessGoalsScreen onNext={handleNext} onBack={handleBack} />;
-      case 6:
+      case 5:
         return <PrivacyPermissionsScreen onNext={handleNext} onBack={handleBack} />;
       default:
-        return <WelcomeScreen onNext={handleNext} />;
+        return <NameScreen onNext={handleNext} onBack={handleBack} />;
     }
   };
 

@@ -13,12 +13,16 @@ import { ThemeProvider } from './theme/ThemeProvider';
 import { AuthProvider, useAuth } from './store/auth-context';
 import { NavigationProvider } from './store/navigation-context';
 import { AuthScreen } from './screens/onboardingScreen/AuthScreen';
+import { useCalendarSync } from './hooks/useCalendarSync';
 
 // Prevent the splash screen from auto-hiding before fonts are loaded
 SplashScreen.preventAutoHideAsync();
 
 function AppContent() {
   const { isAuthenticated } = useAuth();
+  
+  // Sync streaks to calendar when authenticated
+  useCalendarSync();
 
   if (!isAuthenticated) {
     return <AuthScreen onAuthSuccess={() => {}} />;

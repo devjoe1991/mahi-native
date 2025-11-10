@@ -19,7 +19,8 @@ export const DateOfBirthScreen: React.FC<DateOfBirthScreenProps> = ({ onNext, on
   );
   const [showPicker, setShowPicker] = useState(Platform.OS === 'ios');
 
-  const isValid = date !== null;
+  // Development mode: always valid
+  const isValid = true;
 
   const styles = StyleSheet.create({
     container: {
@@ -130,10 +131,9 @@ export const DateOfBirthScreen: React.FC<DateOfBirthScreenProps> = ({ onNext, on
   };
 
   const handleNext = () => {
-    if (isValid) {
-      updateOnboardingData({ dateOfBirth: date });
-      onNext();
-    }
+    // Development mode: allow proceeding without validation
+    updateOnboardingData({ dateOfBirth: date || new Date() });
+    onNext();
   };
 
   return (

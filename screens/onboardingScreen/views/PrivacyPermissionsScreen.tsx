@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Calendar from 'expo-calendar';
 import * as ImagePicker from 'expo-image-picker';
-import * as Audio from 'expo-av';
 import { useTheme } from '../../../theme/ThemeProvider';
 import { useOnboarding } from '../../../store/onboarding-context';
 
@@ -135,13 +134,12 @@ export const PrivacyPermissionsScreen: React.FC<PrivacyPermissionsScreenProps> =
   };
 
   const requestMicrophonePermission = async () => {
-    try {
-      const { status } = await Audio.requestPermissionsAsync();
-      setMicrophonePermission(status === 'granted');
-      updateOnboardingData({ microphonePermission: status === 'granted' });
-    } catch (error) {
-      console.error('Microphone permission error:', error);
-    }
+    // Note: Microphone permission is marked as "coming soon" in the UI
+    // This will be implemented in a future update with proper permission handling
+    Alert.alert(
+      'Microphone Permission', 
+      'Microphone permission will be available in a future update. This feature is coming soon!'
+    );
   };
 
   const handlePermissionToggle = async (type: 'calendar' | 'camera' | 'microphone') => {
@@ -250,7 +248,7 @@ export const PrivacyPermissionsScreen: React.FC<PrivacyPermissionsScreenProps> =
           <View style={styles.permissionContent}>
             <Text style={styles.permissionTitle}>Microphone Access</Text>
             <Text style={styles.permissionDescription}>
-              Record audio for video posts (coming soon)
+              Record audio for video posts
             </Text>
           </View>
           <Switch

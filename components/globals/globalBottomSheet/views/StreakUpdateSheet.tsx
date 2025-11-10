@@ -72,11 +72,25 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({
       // For now, simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
       
+      const currentUserId = userId || userData?._id;
+      const currentStreakDays = userData?.streak_days || 0;
+      const newStreakDays = currentStreakDays + 1;
+      
       console.log('Streak update:', {
-        userId: userId || userData?._id,
+        userId: currentUserId,
         image: selectedImage,
         caption: caption.trim(),
+        streakDays: newStreakDays,
       });
+
+      // Sync streak to device calendar
+      try {
+        const { syncTodayStreak } = await import('../../../../utils/calendarSync');
+        await syncTodayStreak(currentUserId || '', newStreakDays);
+      } catch (calendarError) {
+        console.error('Failed to sync streak to calendar:', calendarError);
+        // Don't block the save if calendar sync fails
+      }
 
       onSaved?.();
       closeSheet();

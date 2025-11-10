@@ -1,22 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, Modal, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Modal, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../../../theme/ThemeProvider';
 import { useAuth } from '../../../../store/auth-context';
 import { RestDaysSetupModalProps } from '../types';
-
-const DAYS_OF_WEEK = [
-  { key: 'monday', label: 'Monday', short: 'Mon' },
-  { key: 'tuesday', label: 'Tuesday', short: 'Tue' },
-  { key: 'wednesday', label: 'Wednesday', short: 'Wed' },
-  { key: 'thursday', label: 'Thursday', short: 'Thu' },
-  { key: 'friday', label: 'Friday', short: 'Fri' },
-  { key: 'saturday', label: 'Saturday', short: 'Sat' },
-  { key: 'sunday', label: 'Sunday', short: 'Sun' },
-];
+import { RestDaysCalendar } from '../../../calendar/RestDaysCalendar';
+import { syncAllRestDaysToCalendar, getRestDaysFromCalendar } from '../../../../utils/calendarSync';
+import { hasCalendarPermissions, requestCalendarPermissions } from '../../../../utils/healthIntegration';
 
 /**
- * Rest Days Setup Modal - Allow users to set which days are rest days
+ * Rest Days Setup Modal - Allow users to set rest days using a calendar
+ * Only shows future dates, syncs with device calendar
  */
 export const RestDaysSetupModal: React.FC<RestDaysSetupModalProps> = ({
   onSave,
@@ -24,29 +18,90 @@ export const RestDaysSetupModal: React.FC<RestDaysSetupModalProps> = ({
 }) => {
   const { colors, spacing, typography } = useTheme();
   const { userData, updateUserData } = useAuth();
-  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [selectedDates, setSelectedDates] = useState<Date[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
-  // Load existing rest days from user profile
+  // Load existing rest days from user profile and device calendar
   useEffect(() => {
-    if (userData?.rest_days) {
-      setSelectedDays(userData.rest_days);
-    }
+    const loadRestDays = async () => {
+      setLoading(true);
+      try {
+        // Check calendar permissions
+        const hasPermission = await hasCalendarPermissions();
+        if (!hasPermission) {
+          const granted = await requestCalendarPermissions();
+          if (!granted) {
+            // If no permission, just load from user profile
+            if (userData?.rest_days) {
+              // Convert day names to dates (for backward compatibility)
+              // For now, we'll start fresh with dates
+              setSelectedDates([]);
+            }
+            setLoading(false);
+            return;
+          }
+        }
+
+        // Load from device calendar
+        const calendarRestDays = await getRestDaysFromCalendar();
+        
+        // Also check user profile for any existing rest days
+        // For backward compatibility, we'll merge both sources
+        const allRestDays = [...calendarRestDays];
+        
+        // Remove duplicates
+        const uniqueDates = Array.from(
+          new Set(
+            allRestDays.map((d) => {
+              const date = new Date(d);
+              date.setHours(0, 0, 0, 0);
+              return date.toISOString().split('T')[0];
+            })
+          )
+        ).map((dateStr) => new Date(dateStr));
+
+        setSelectedDates(uniqueDates);
+      } catch (error) {
+        console.error('Error loading rest days:', error);
+        setSelectedDates([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRestDays();
   }, [userData]);
 
-  const toggleDay = (dayKey: string) => {
-    setSelectedDays((prev) =>
-      prev.includes(dayKey)
-        ? prev.filter((d) => d !== dayKey)
-        : [...prev, dayKey]
-    );
-  };
-
   const handleSave = async () => {
-    // Save to user profile
-    if (userData?._id) {
-      await updateUserData({ rest_days: selectedDays });
+    setSyncing(true);
+    try {
+      // Sync to device calendar
+      const hasPermission = await hasCalendarPermissions();
+      if (hasPermission) {
+        await syncAllRestDaysToCalendar(selectedDates);
+      }
+
+      // Convert dates to ISO strings for storage
+      const restDaysData = selectedDates.map((date) => {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        return d.toISOString();
+      });
+
+      // Save to user profile
+      if (userData?._id) {
+        await updateUserData({ rest_days: restDaysData });
+      }
+
+      // For backward compatibility, also pass as array of date strings
+      onSave?.(restDaysData);
+    } catch (error) {
+      console.error('Error saving rest days:', error);
+      Alert.alert('Error', 'Failed to save rest days. Please try again.');
+    } finally {
+      setSyncing(false);
     }
-    onSave?.(selectedDays);
   };
 
   const styles = StyleSheet.create({
@@ -61,8 +116,9 @@ export const RestDaysSetupModal: React.FC<RestDaysSetupModalProps> = ({
       backgroundColor: colors.background.primary,
       borderRadius: spacing.lg,
       padding: spacing.xl,
-      width: '90%',
-      maxWidth: 400,
+      width: '95%',
+      maxWidth: 500,
+      maxHeight: '90%',
       borderWidth: 1,
       borderColor: colors.border.primary,
       shadowColor: colors.text.primary,
@@ -86,33 +142,14 @@ export const RestDaysSetupModal: React.FC<RestDaysSetupModalProps> = ({
       textAlign: 'center',
       marginBottom: spacing.lg,
     },
-    dayRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
+    calendarContainer: {
+      marginBottom: spacing.lg,
+    },
+    loadingContainer: {
+      padding: spacing.xl,
       alignItems: 'center',
-      paddingVertical: spacing.md,
-      paddingHorizontal: spacing.sm,
-      marginBottom: spacing.xs,
-      borderRadius: spacing.md,
-      backgroundColor: colors.background.secondary,
-    },
-    dayLabel: {
-      fontSize: typography.body.fontSize,
-      fontFamily: typography.body.fontFamily,
-      color: colors.text.primary,
-    },
-    checkbox: {
-      width: 24,
-      height: 24,
-      borderRadius: 6,
-      borderWidth: 2,
-      borderColor: colors.border.primary,
       justifyContent: 'center',
-      alignItems: 'center',
-    },
-    checkboxSelected: {
-      backgroundColor: colors.brand.blue,
-      borderColor: colors.brand.blue,
+      minHeight: 400,
     },
     buttonRow: {
       flexDirection: 'row',
@@ -124,12 +161,14 @@ export const RestDaysSetupModal: React.FC<RestDaysSetupModalProps> = ({
       padding: spacing.md,
       borderRadius: spacing.md,
       alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: 48,
     },
     primaryButton: {
-      backgroundColor: colors.brand.blue,
+      backgroundColor: colors.primary[500],
     },
     secondaryButton: {
-      backgroundColor: colors.background.secondary,
+      backgroundColor: colors.background.primary500,
       borderWidth: 1,
       borderColor: colors.border.primary,
     },
@@ -144,6 +183,9 @@ export const RestDaysSetupModal: React.FC<RestDaysSetupModalProps> = ({
     secondaryButtonText: {
       color: colors.text.primary,
     },
+    disabledButton: {
+      opacity: 0.5,
+    },
   });
 
   return (
@@ -157,52 +199,53 @@ export const RestDaysSetupModal: React.FC<RestDaysSetupModalProps> = ({
         <View style={styles.container}>
           <Text style={styles.title}>Set Your Rest Days</Text>
           <Text style={styles.message}>
-            Select the days when you want to take a break from your streak
+            Plan ahead by selecting rest days for the year. These will sync with your device calendar.
           </Text>
-          <ScrollView style={{ maxHeight: 300 }}>
-            {DAYS_OF_WEEK.map((day) => {
-              const isSelected = selectedDays.includes(day.key);
-              return (
-                <Pressable
-                  key={day.key}
-                  style={styles.dayRow}
-                  onPress={() => toggleDay(day.key)}
-                >
-                  <Text style={styles.dayLabel}>{day.label}</Text>
-                  <View
-                    style={[
-                      styles.checkbox,
-                      isSelected && styles.checkboxSelected,
-                    ]}
-                  >
-                    {isSelected && (
-                      <Ionicons
-                        name="checkmark"
-                        size={16}
-                        color={colors.background.primary}
-                      />
-                    )}
-                  </View>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
+          
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={colors.primary[500]} />
+              <Text style={styles.message}>Loading rest days...</Text>
+            </View>
+          ) : (
+            <ScrollView 
+              style={styles.calendarContainer}
+              showsVerticalScrollIndicator={false}
+            >
+              <RestDaysCalendar
+                selectedDates={selectedDates}
+                onDatesChange={setSelectedDates}
+                minDate={new Date()}
+              />
+            </ScrollView>
+          )}
+
           <View style={styles.buttonRow}>
             <Pressable
               style={[styles.button, styles.secondaryButton]}
               onPress={onCancel}
+              disabled={syncing}
             >
               <Text style={[styles.buttonText, styles.secondaryButtonText]}>
                 Cancel
               </Text>
             </Pressable>
             <Pressable
-              style={[styles.button, styles.primaryButton]}
+              style={[
+                styles.button,
+                styles.primaryButton,
+                syncing && styles.disabledButton,
+              ]}
               onPress={handleSave}
+              disabled={syncing}
             >
-              <Text style={[styles.buttonText, styles.primaryButtonText]}>
-                Save
-              </Text>
+              {syncing ? (
+                <ActivityIndicator size="small" color={colors.background.primary} />
+              ) : (
+                <Text style={[styles.buttonText, styles.primaryButtonText]}>
+                  Save & Sync
+                </Text>
+              )}
             </Pressable>
           </View>
         </View>

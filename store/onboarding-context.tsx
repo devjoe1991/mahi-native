@@ -70,7 +70,7 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
     resetOnboardingData,
     currentStep,
     setCurrentStep,
-    totalSteps: 8, // Welcome, Name, Email/Phone, OTP, DOB, Fitness Goals, Privacy, Complete
+    totalSteps: 6, // Name, Email/Phone, OTP, DOB, Fitness Goals, Privacy
   };
 
   return (

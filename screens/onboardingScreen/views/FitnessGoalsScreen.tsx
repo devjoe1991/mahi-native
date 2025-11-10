@@ -74,7 +74,7 @@ export const FitnessGoalsScreen: React.FC<FitnessGoalsScreenProps> = ({ onNext, 
     },
     goalButtonSelected: {
       borderColor: colors.primary[500],
-      backgroundColor: colors.primary[50] || colors.background.primary500,
+      backgroundColor: colors.background.primary500,
     },
     goalIcon: {
       marginRight: spacing.md,
@@ -120,10 +120,9 @@ export const FitnessGoalsScreen: React.FC<FitnessGoalsScreenProps> = ({ onNext, 
   });
 
   const handleNext = () => {
-    if (selectedGoal) {
-      updateOnboardingData({ fitnessGoal: selectedGoal });
-      onNext();
-    }
+    // Development mode: allow proceeding without selection
+    updateOnboardingData({ fitnessGoal: selectedGoal || 'general' });
+    onNext();
   };
 
   return (
@@ -174,9 +173,8 @@ export const FitnessGoalsScreen: React.FC<FitnessGoalsScreenProps> = ({ onNext, 
 
       <View style={styles.buttonContainer}>
         <Pressable
-          style={[styles.button, !selectedGoal && styles.buttonDisabled]}
+          style={styles.button}
           onPress={handleNext}
-          disabled={!selectedGoal}
         >
           <Text style={styles.buttonText}>Continue</Text>
         </Pressable>

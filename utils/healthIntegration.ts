@@ -131,8 +131,8 @@ export const getUpcomingWorkouts = async (
         title: event.title,
         startDate: new Date(event.startDate),
         endDate: new Date(event.endDate),
-        location: event.location,
-        notes: event.notes,
+        location: event.location ?? undefined,
+        notes: event.notes ?? undefined,
         isWorkout: true,
       }));
 

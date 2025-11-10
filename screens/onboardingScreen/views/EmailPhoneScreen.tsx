@@ -21,7 +21,8 @@ export const EmailPhoneScreen: React.FC<EmailPhoneScreenProps> = ({ onNext, onBa
   const [email, setEmail] = useState(onboardingData.email);
   const [phone, setPhone] = useState(onboardingData.phone || '');
 
-  const isValid = validateEmail(email.trim());
+  // Development mode: allow skipping validation
+  const isValid = true;
 
   const styles = StyleSheet.create({
     container: {
@@ -114,13 +115,12 @@ export const EmailPhoneScreen: React.FC<EmailPhoneScreenProps> = ({ onNext, onBa
   });
 
   const handleNext = () => {
-    if (isValid) {
-      updateOnboardingData({
-        email: email.trim(),
-        phone: phone.trim() || undefined,
-      });
-      onNext();
-    }
+    // Development mode: allow proceeding without validation
+    updateOnboardingData({
+      email: email.trim() || 'test@example.com',
+      phone: phone.trim() || undefined,
+    });
+    onNext();
   };
 
   return (

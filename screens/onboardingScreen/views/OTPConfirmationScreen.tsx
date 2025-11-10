@@ -129,7 +129,8 @@ export const OTPConfirmationScreen: React.FC<OTPConfirmationScreenProps> = ({ on
     },
   });
 
-  const isOtpComplete = otp.every((digit) => digit !== '');
+  // Development mode: allow skipping OTP validation
+  const isOtpComplete = true;
 
   const handleOtpChange = (index: number, value: string) => {
     if (value.length > 1) {
@@ -164,9 +165,8 @@ export const OTPConfirmationScreen: React.FC<OTPConfirmationScreenProps> = ({ on
   };
 
   const handleVerify = () => {
-    const otpCode = otp.join('');
-    // TODO: Verify OTP with Supabase
-    // For now, just simulate verification
+    // Development mode: allow proceeding without OTP verification
+    const otpCode = otp.join('') || '123456';
     updateOnboardingData({ otpCode, otpVerified: true });
     onNext();
   };
@@ -194,7 +194,7 @@ export const OTPConfirmationScreen: React.FC<OTPConfirmationScreenProps> = ({ on
           {otp.map((digit, index) => (
             <TextInput
               key={index}
-              ref={(ref) => (inputRefs.current[index] = ref)}
+              ref={(ref) => { inputRefs.current[index] = ref; }}
               style={[styles.otpInput]}
               value={digit}
               onChangeText={(value) => handleOtpChange(index, value)}
@@ -216,9 +216,8 @@ export const OTPConfirmationScreen: React.FC<OTPConfirmationScreenProps> = ({ on
 
       <View style={styles.buttonContainer}>
         <Pressable
-          style={[styles.button, !isOtpComplete && styles.buttonDisabled]}
+          style={styles.button}
           onPress={handleVerify}
-          disabled={!isOtpComplete}
         >
           <Text style={styles.buttonText}>Verify</Text>
         </Pressable>

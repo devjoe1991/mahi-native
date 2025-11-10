@@ -38,6 +38,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
 
   const handleSignUp = () => {
     setAuthMode('onboarding');
+    // Reset onboarding step will be handled by OnboardingProvider when it mounts
   };
 
   const handleBackToWelcome = () => {
@@ -52,6 +53,11 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
     // Auth context will update isAuthenticated after profile creation, which triggers useEffect above
   };
 
+  const handleOnboardingBack = () => {
+    // Go back to welcome screen from onboarding
+    setAuthMode('welcome');
+  };
+
   return (
     <View style={styles.container}>
       {authMode === 'welcome' ? (
@@ -64,7 +70,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
         />
       ) : (
         <OnboardingProvider>
-          <OnboardingScreen onComplete={handleOnboardingComplete} />
+          <OnboardingScreen onComplete={handleOnboardingComplete} onBack={handleOnboardingBack} />
         </OnboardingProvider>
       )}
     </View>

@@ -68,6 +68,7 @@ export const getLastPostDate = async (userId: string): Promise<Date | null> => {
 
 /**
  * Check if today is a rest day for the user
+ * Supports both date-based rest days (ISO strings) and day-of-week (backward compatibility)
  * Ready for Supabase: Check user's rest_days array from profiles table
  * 
  * In Supabase:
@@ -83,10 +84,27 @@ export const isRestDay = async (userId: string): Promise<boolean> => {
       return false; // No rest days configured
     }
 
-    // Get today's day of week (lowercase, e.g., 'monday', 'tuesday')
-    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-    
-    return restDays.includes(today);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayStr = today.toISOString().split('T')[0];
+    const todayDayOfWeek = today.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+
+    // Check if today matches any rest day
+    return restDays.some((restDay: string) => {
+      // Check if it's a date string (ISO format)
+      if (restDay.includes('T') || restDay.match(/^\d{4}-\d{2}-\d{2}/)) {
+        try {
+          const restDate = new Date(restDay);
+          restDate.setHours(0, 0, 0, 0);
+          const restDateStr = restDate.toISOString().split('T')[0];
+          return restDateStr === todayStr;
+        } catch {
+          return false;
+        }
+      }
+      // Otherwise, treat as day of week (backward compatibility)
+      return restDay.toLowerCase() === todayDayOfWeek;
+    });
   } catch (error) {
     console.error('Error checking rest day:', error);
     return false;

@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, ImageBackground, StatusBar } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../../theme/ThemeProvider';
 
 interface WelcomeAuthScreenProps {
@@ -34,21 +33,14 @@ export const WelcomeAuthScreen: React.FC<WelcomeAuthScreenProps> = ({ onLogin, o
       width: '100%',
       alignItems: 'center',
     },
-    iconContainer: {
-      marginBottom: spacing.xl,
-    },
-    icon: {
-      fontSize: 100,
-      color: colors.background.primary,
-    },
     title: {
-      fontSize: 36,
+      fontSize: 96,
       fontWeight: '700',
       fontFamily: typography.h1.fontFamily,
       color: colors.background.primary,
       textAlign: 'center',
       marginBottom: spacing.md,
-      letterSpacing: 1,
+      letterSpacing: 3,
       textShadowColor: 'rgba(0, 0, 0, 0.5)',
       textShadowOffset: { width: 0, height: 2 },
       textShadowRadius: 4,
@@ -121,10 +113,7 @@ export const WelcomeAuthScreen: React.FC<WelcomeAuthScreenProps> = ({ onLogin, o
       >
         <View style={styles.overlay}>
           <View style={styles.content}>
-            <View style={styles.iconContainer}>
-              <Ionicons name="flame" style={styles.icon} />
-            </View>
-            <Text style={styles.title}>Mahi</Text>
+            <Text style={styles.title}>MAHI</Text>
             <Text style={styles.subtitle}>
               Build your fitness streak, connect with others, and achieve your goals one day at a time.
             </Text>

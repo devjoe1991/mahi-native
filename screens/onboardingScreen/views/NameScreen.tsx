@@ -16,7 +16,8 @@ export const NameScreen: React.FC<NameScreenProps> = ({ onNext, onBack }) => {
   const [firstName, setFirstName] = useState(onboardingData.firstName);
   const [lastName, setLastName] = useState(onboardingData.lastName);
 
-  const isValid = firstName.trim().length > 0 && lastName.trim().length > 0;
+  // Development mode: allow skipping validation
+  const isValid = true;
 
   const styles = StyleSheet.create({
     container: {
@@ -103,10 +104,9 @@ export const NameScreen: React.FC<NameScreenProps> = ({ onNext, onBack }) => {
   });
 
   const handleNext = () => {
-    if (isValid) {
-      updateOnboardingData({ firstName: firstName.trim(), lastName: lastName.trim() });
-      onNext();
-    }
+    // Development mode: allow proceeding without validation
+    updateOnboardingData({ firstName: firstName.trim() || 'Test', lastName: lastName.trim() || 'User' });
+    onNext();
   };
 
   return (
