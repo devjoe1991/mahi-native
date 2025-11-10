@@ -233,11 +233,17 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
     return days;
   };
   
-  // Group days into weeks
+  // Group days into weeks and reverse each week
+  // With row-reverse CSS, we reverse the arrays so dates display 1, 2, 3... left to right
+  // Example: Week [Nov 2, Nov 3, Nov 4, Nov 5, Nov 6, Nov 7, Nov 8] becomes
+  //          [Nov 8, Nov 7, Nov 6, Nov 5, Nov 4, Nov 3, Nov 2]
+  //          Then row-reverse displays it as [Nov 2, Nov 3, Nov 4, Nov 5, Nov 6, Nov 7, Nov 8] ✓
   const groupDaysIntoWeeks = (days: ReturnType<typeof generateMonthDays>) => {
     const weeks = [];
     for (let i = 0; i < days.length; i += 7) {
-      weeks.push(days.slice(i, i + 7));
+      const week = days.slice(i, i + 7);
+      // Reverse the week array so that when row-reverse displays it, dates read left-to-right chronologically
+      weeks.push(week.reverse());
     }
     return weeks;
   };
