@@ -257,7 +257,8 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
     const weeks = groupDaysIntoWeeks(days);
     
     return (
-      <View style={styles.monthContainer}>
+      <View style={styles.monthItemWrapper}>
+        <View style={styles.monthContainer}>
         <View style={styles.weeksContainer}>
           {weeks.map((week, weekIndex) => (
             <View key={weekIndex} style={styles.weekRow}>
@@ -321,6 +322,7 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
             </View>
           ))}
         </View>
+        </View>
       </View>
     );
   };
@@ -352,12 +354,12 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
       // row-reverse applies consistently to ALL months (past, present, future)
       // This ensures dates read left-to-right (1, 2, 3...) for all heatmaps
       flexDirection: 'row-reverse',
-      justifyContent: 'flex-start',
+      justifyContent: 'center', // Center the week row content
       alignItems: 'center',
       marginBottom: spacing.xs,
       width: rowWidth,
       flexWrap: 'nowrap',
-      alignSelf: 'center',
+      alignSelf: 'center', // Center the week row within its container
     },
     day: {
       width: daySize,
@@ -400,9 +402,14 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
       includeFontPadding: false,
       textAlignVertical: 'center',
     },
+    monthItemWrapper: {
+      width: containerWidth,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
     monthContainer: {
       paddingHorizontal: spacing.md,
-      width: containerWidth,
+      width: '100%',
       overflow: 'visible',
       alignItems: 'center',
       justifyContent: 'center',
@@ -411,6 +418,7 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
       width: '100%',
       overflow: 'visible',
       alignItems: 'center',
+      justifyContent: 'center', // Center weeks vertically within container
     },
     trophyDay: {
       width: daySize,
@@ -479,7 +487,7 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
           const index = Math.round(event.nativeEvent.contentOffset.x / containerWidth);
           setCurrentMonthIndex(index);
         }}
-        contentContainerStyle={{ alignItems: 'center' }}
+        contentContainerStyle={{ alignItems: 'center', justifyContent: 'center' }}
       />
       <View style={styles.legend}>
         <Text style={styles.legendTitle}>Legend</Text>
