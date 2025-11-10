@@ -234,6 +234,7 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
   };
   
   // Group days into weeks and reverse each week
+  // This logic applies consistently to ALL months (past, present, and future)
   // With row-reverse CSS, we reverse the arrays so dates display 1, 2, 3... left to right
   // Example: Week [Nov 2, Nov 3, Nov 4, Nov 5, Nov 6, Nov 7, Nov 8] becomes
   //          [Nov 8, Nov 7, Nov 6, Nov 5, Nov 4, Nov 3, Nov 2]
@@ -249,6 +250,8 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
   };
   
   // Render a single month
+  // This function is used for ALL months (past, present, and future as account ages)
+  // The same reversed logic and row-reverse styling applies consistently to all months
   const renderMonth = (monthDate: Date, index: number) => {
     const days = generateMonthDays(monthDate);
     const weeks = groupDaysIntoWeeks(days);
@@ -346,7 +349,9 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
       marginBottom: spacing.sm,
     },
     weekRow: {
-      flexDirection: 'row-reverse', // Reverse the visual order so dates read left-to-right
+      // row-reverse applies consistently to ALL months (past, present, future)
+      // This ensures dates read left-to-right (1, 2, 3...) for all heatmaps
+      flexDirection: 'row-reverse',
       justifyContent: 'flex-start',
       alignItems: 'center',
       marginBottom: spacing.xs,
