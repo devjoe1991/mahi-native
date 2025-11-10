@@ -42,18 +42,20 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSignUp, onLoginSucce
     },
     backButton: {
       padding: spacing.sm,
-      marginRight: spacing.md,
+    },
+    mahiTitle: {
+      flex: 1,
+      fontSize: 48,
+      fontWeight: '700',
+      fontFamily: typography.h1.fontFamily,
+      color: colors.text.primary,
+      textAlign: 'center',
+      letterSpacing: 2,
     },
     headerContent: {
-      flex: 1,
+      width: '100%',
       alignItems: 'center',
-    },
-    iconContainer: {
-      marginBottom: spacing.lg,
-    },
-    icon: {
-      fontSize: 60,
-      color: colors.primary[500],
+      marginTop: spacing.lg,
     },
     title: {
       fontSize: 32,
@@ -194,13 +196,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSignUp, onLoginSucce
               <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
             </Pressable>
           )}
-          <View style={styles.headerContent}>
-            <View style={styles.iconContainer}>
-              <Ionicons name="flame" style={styles.icon} />
-            </View>
-            <Text style={styles.title}>Welcome Back</Text>
-            <Text style={styles.subtitle}>Sign in to continue your fitness journey</Text>
-          </View>
+          <Text style={styles.mahiTitle}>MAHI</Text>
+          {onBack && <View style={{ width: 40 }} />}
+        </View>
+        <View style={styles.headerContent}>
+          <Text style={styles.title}>Welcome Back</Text>
+          <Text style={styles.subtitle}>Sign in to continue your fitness journey</Text>
         </View>
 
         <Text style={styles.inputLabel}>Email</Text>
