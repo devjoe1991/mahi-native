@@ -26,8 +26,8 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [userData, setUserData] = useState<UserData | null>(MOCK_USER_DATA);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true); // Start as authenticated with mock data
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false); // Start as not authenticated
 
   /**
    * Authenticate user with email and password

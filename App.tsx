@@ -10,11 +10,22 @@ import {
   Outfit_700Bold,
 } from '@expo-google-fonts/outfit';
 import { ThemeProvider } from './theme/ThemeProvider';
-import { AuthProvider } from './store/auth-context';
+import { AuthProvider, useAuth } from './store/auth-context';
 import { NavigationProvider } from './store/navigation-context';
+import { AuthScreen } from './screens/onboardingScreen/AuthScreen';
 
 // Prevent the splash screen from auto-hiding before fonts are loaded
 SplashScreen.preventAutoHideAsync();
+
+function AppContent() {
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return <AuthScreen onAuthSuccess={() => {}} />;
+  }
+
+  return <NavigationProvider />;
+}
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({
@@ -40,7 +51,7 @@ export default function App() {
     <SafeAreaProvider>
       <ThemeProvider>
         <AuthProvider>
-          <NavigationProvider />
+          <AppContent />
         </AuthProvider>
         <StatusBar style="auto" />
       </ThemeProvider>
