@@ -336,6 +336,8 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({
               streakDays={userData.streak_days || 0}
               lastPostDate={userData.last_post_date ? new Date(userData.last_post_date) : null}
               restDays={userData.rest_days || []}
+              postDates={posts.map(p => new Date(p.createdAt))}
+              joinedDate={userData.joined_date ? new Date(userData.joined_date) : null}
             />
           </Animated.View>
           

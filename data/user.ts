@@ -19,6 +19,8 @@ export const MOCK_USER_DATA: UserData = {
   streak_level: 7, // Current level - Ready for Supabase: SELECT streak_level FROM profiles WHERE id = userId
   longest_streak: 21, // Longest streak ever - For loss aversion warnings
   rest_days: [], // Rest days - Ready for Supabase: SELECT rest_days FROM profiles WHERE id = userId
+  last_post_date: new Date(), // Last post was today - Ready for Supabase: SELECT MAX(created_at) FROM posts WHERE user_id = userId
+  joined_date: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000), // User joined 60 days ago - Ready for Supabase: SELECT created_at FROM profiles WHERE id = userId
 };
 
 /**

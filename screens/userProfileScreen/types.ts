@@ -15,6 +15,7 @@ export interface UserData {
   longest_streak?: number; // Longest streak ever achieved - For loss aversion
   rest_days?: string[]; // Days of week when user takes rest (e.g., ['sunday', 'saturday'])
   last_post_date?: string | Date; // Last post date for streak calculation (UK timezone)
+  joined_date?: string | Date; // Date when user joined/created account
 }
 
 export interface PostData {
