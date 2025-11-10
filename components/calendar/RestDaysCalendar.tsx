@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { Calendar, DateData } from 'react-native-calendars';
+import { Calendar } from 'react-native-calendars';
+import type { DateData } from 'react-native-calendars';
 import { useTheme } from '../../theme/ThemeProvider';
 
 interface RestDaysCalendarProps {
