@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Dimensions } from 'react-native';
 import { useTheme } from '../../theme/ThemeProvider';
+import { getTodayLocal, formatDateLocal, normalizeDateLocal } from '../../utils/dateUtils';
 
 interface CalendarHeatmapProps {
   streakDays: number;
@@ -28,12 +29,10 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
   
   // Get all months from join date to current month
   const months = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getTodayLocal();
     const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     
-    const joinDateObj = joinedDate ? new Date(joinedDate) : new Date(today);
-    joinDateObj.setHours(0, 0, 0, 0);
+    const joinDateObj = joinedDate ? normalizeDateLocal(joinedDate) : today;
     const joinMonth = new Date(joinDateObj.getFullYear(), joinDateObj.getMonth(), 1);
     
     const monthsList: Date[] = [];
@@ -45,11 +44,16 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
       current = new Date(current.getFullYear(), current.getMonth() - 1, 1);
     }
     
-    return monthsList;
+    // Reverse so oldest month is first, allowing users to swipe right to reveal past months on the left
+    return monthsList.reverse();
   }, [joinedDate]);
   
   // Get current month index (most recent month)
-  const [currentMonthIndex, setCurrentMonthIndex] = useState(0);
+  const [currentMonthIndex, setCurrentMonthIndex] = useState(Math.max(months.length - 1, 0));
+
+  useEffect(() => {
+    setCurrentMonthIndex(Math.max(months.length - 1, 0));
+  }, [months.length]);
 
   // Calculate trophy milestone days (every 7 days: 7, 14, 21, 28, etc.)
   const getTrophyDays = (): Set<string> => {
@@ -57,8 +61,7 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
     
     try {
       const trophyDays = new Set<string>();
-      const localLastPost = new Date(lastPostDate);
-      localLastPost.setHours(0, 0, 0, 0);
+      const localLastPost = normalizeDateLocal(lastPostDate);
       
       if (isNaN(localLastPost.getTime())) {
         return new Set();
@@ -67,11 +70,11 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
       // Find all 7-day milestones in current streak
       for (let day = 7; day <= streakDays; day += 7) {
         const daysBack = streakDays - day;
-        const trophyDate = new Date(localLastPost.getTime() - daysBack * 24 * 60 * 60 * 1000);
-        trophyDate.setHours(0, 0, 0, 0);
+        const trophyDate = new Date(localLastPost);
+        trophyDate.setDate(trophyDate.getDate() - daysBack);
         
         if (!isNaN(trophyDate.getTime())) {
-          trophyDays.add(trophyDate.toISOString().split('T')[0]);
+          trophyDays.add(formatDateLocal(trophyDate));
         }
       }
       
@@ -88,25 +91,26 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
   const getCurrentStreakPeriod = (): { startDate: Date; endDate: Date } | null => {
     if (!lastPostDate || streakDays === 0) return null;
     
-    const localLastPost = new Date(lastPostDate);
-    localLastPost.setHours(0, 0, 0, 0);
+    const localLastPost = normalizeDateLocal(lastPostDate);
     
     const endDate = new Date(localLastPost);
     const startDate = new Date(localLastPost);
-    startDate.setTime(startDate.getTime() - (streakDays - 1) * 24 * 60 * 60 * 1000);
+    startDate.setDate(startDate.getDate() - (streakDays - 1));
     
     return { startDate, endDate };
   };
   
   const streakPeriod = getCurrentStreakPeriod();
   
-  // Create a set of post date strings for quick lookup
+  // Create a set of post date strings for quick lookup (using local timezone)
+  // Normalize all post dates to local timezone to prevent UTC conversion issues
   const postDateStrings = useMemo(() => {
     return new Set(
       postDates.map((date) => {
-        const d = new Date(date);
-        d.setHours(0, 0, 0, 0);
-        return d.toISOString().split('T')[0];
+        // Handle both Date objects and ISO strings
+        const dateObj = date instanceof Date ? date : new Date(date);
+        const localDate = normalizeDateLocal(dateObj);
+        return formatDateLocal(localDate);
       })
     );
   }, [postDates]);
@@ -120,9 +124,8 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
       // Check if it's a date string (ISO format)
       if (restDay.includes('T') || restDay.match(/^\d{4}-\d{2}-\d{2}/)) {
         try {
-          const restDate = new Date(restDay);
-          restDate.setHours(0, 0, 0, 0);
-          restDaySet.add(restDate.toISOString().split('T')[0]);
+          const localRestDate = normalizeDateLocal(restDay);
+          restDaySet.add(formatDateLocal(localRestDate));
         } catch {
           // Invalid date, skip
         }
@@ -136,8 +139,7 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
 
   // Generate days for a specific month
   const generateMonthDays = (monthDate: Date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getTodayLocal();
     
     const year = monthDate.getFullYear();
     const month = monthDate.getMonth();
@@ -173,37 +175,41 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
     
     // Add all days of the month
     for (let day = 1; day <= lastDay.getDate(); day++) {
+      // Create date at midnight in local timezone
       const dayDate = new Date(year, month, day);
-      dayDate.setHours(0, 0, 0, 0);
+      // Normalize to ensure it's at midnight local time
+      const normalizedDayDate = normalizeDateLocal(dayDate);
       
-      const dateKey = dayDate.toISOString().split('T')[0];
-      const isToday = dayDate.getTime() === today.getTime();
+      // Use local date format for comparison (not UTC)
+      const dateKey = formatDateLocal(normalizedDayDate);
+      // Compare normalized dates to ensure accurate "today" detection
+      const isToday = normalizedDayDate.getTime() === today.getTime();
       
       // Check if user posted on this day
       const hasPost = postDateStrings.has(dateKey);
       
       // Check if it's a rest day (date-based or day-of-week)
       const isRestDayDate = restDayStrings.has(dateKey);
-      const dayOfWeek = dayDate.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+      const dayOfWeek = normalizedDayDate.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
       const isRestDayOfWeek = restDays.includes(dayOfWeek);
       const isRestDay = isRestDayDate || isRestDayOfWeek;
       
       // Check if it's in current streak
       const isInStreak = streakPeriod && 
-        dayDate >= streakPeriod.startDate && 
-        dayDate <= streakPeriod.endDate;
+        normalizedDayDate >= streakPeriod.startDate && 
+        normalizedDayDate <= streakPeriod.endDate;
       
       // Check if it's a trophy milestone day
       const isTrophyDay = trophyDays.has(dateKey);
       
-      // Day is active if user posted (either in current streak or past posts)
+      // Day is active (green) ONLY if user posted on this day
       const isActive = hasPost;
       
       days.push({
-        date: dayDate,
+        date: normalizedDayDate,
         isActive,
         isToday,
-        isTrophyDay: isTrophyDay && isActive,
+        isTrophyDay: isTrophyDay && isActive, // Trophy only shows if there's a post
         isRestDay,
         isEmpty: false,
       });
@@ -218,6 +224,7 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
           isActive: false,
           isToday: false,
           isTrophyDay: false,
+          isRestDay: false,
           isEmpty: true,
         });
       }
@@ -242,22 +249,30 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
     
     return (
       <View style={[styles.monthContainer, { width: SCREEN_WIDTH - spacing.md * 2 }]}>
-        <View>
+        <View style={{ width: '100%', overflow: 'visible' }}>
           {weeks.map((week, weekIndex) => (
             <View key={weekIndex} style={styles.weekRow}>
               {week.map((day, dayIndex) => {
                 if (day.isEmpty) {
-                  return <View key={dayIndex} style={styles.dayEmpty} />;
-                }
-                
-                // Show trophy emoji for milestone days
-                if (day.isTrophyDay && day.isActive) {
                   return (
                     <View
                       key={dayIndex}
                       style={[
+                        styles.dayEmpty,
+                        dayIndex === 6 && styles.lastInRow,
+                      ]}
+                    />
+                  );
+                }
+                
+                // Show trophy emoji for milestone days (only if there's a post)
+                if (day.isTrophyDay && day.isActive) {
+                  return (
+                    <View
+                      key={`${weekIndex}-${dayIndex}`}
+                      style={[
                         styles.trophyDay,
-                        day.isToday && styles.dayToday,
+                        day.isToday && styles.dayToday
                       ]}
                     >
                       <Text style={styles.trophyText}>🏆</Text>
@@ -265,18 +280,31 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
                   );
                 }
                 
-                // Regular day square - mark rest days as purple
+                // Regular day square
+                // Today should always be highlighted with purple border (even if no post)
+                // Green only shows when there's a post (day.isActive)
+                // Purple background for rest days
                 return (
                   <View
-                    key={dayIndex}
+                    key={`${weekIndex}-${dayIndex}`}
                     style={[
                       styles.day,
                       day.isRestDay 
                         ? styles.dayRestDay 
                         : (day.isActive ? styles.dayActive : styles.dayInactive),
-                      day.isToday && styles.dayToday,
+                      day.isToday && styles.dayToday
                     ]}
-                  />
+                  >
+      <Text
+        style={[
+          styles.dayNumberText,
+          day.isToday && { color: colors.brand.purple, fontWeight: '700' },
+        ]}
+        allowFontScaling={false}
+      >
+                      {day.date.getDate()}
+                    </Text>
+                  </View>
                 );
               })}
             </View>
@@ -285,6 +313,9 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
       </View>
     );
   };
+
+  const daySize = 12;
+  const rowWidth = daySize * 7 + spacing.xs * 6;
 
   const styles = StyleSheet.create({
     container: {
@@ -303,13 +334,21 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
     weekRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
+      alignItems: 'center',
       marginBottom: spacing.xs,
+      width: rowWidth,
+      flexWrap: 'nowrap',
+      alignSelf: 'center',
     },
     day: {
-      width: 12,
-      height: 12,
+      width: daySize,
+      height: daySize,
       borderRadius: 2,
-      marginHorizontal: 1,
+      marginRight: 0,
+      justifyContent: 'center',
+      alignItems: 'center',
+      overflow: 'visible',
+      flexShrink: 0,
     },
     dayActive: {
       backgroundColor: colors.brand.green,
@@ -325,21 +364,38 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
       borderColor: colors.brand.purple,
     },
     dayEmpty: {
-      width: 12,
-      height: 12,
-      marginHorizontal: 1,
+      width: daySize,
+      height: daySize,
+      marginRight: 0,
+      flexShrink: 0,
+    },
+    dayNumberText: {
+      fontSize: 7,
+      fontWeight: '400',
+      color: colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: daySize,
+      opacity: 0.6,
+      width: daySize,
+      height: daySize,
+      includeFontPadding: false,
+      textAlignVertical: 'center',
     },
     monthContainer: {
       paddingHorizontal: spacing.md,
+      width: '100%',
+      overflow: 'visible',
+      minWidth: 91, // Minimum width for 7 days (12px + 1px margin each = 13px * 7 = 91px)
     },
     trophyDay: {
-      width: 12,
-      height: 12,
+      width: daySize,
+      height: daySize,
       borderRadius: 2,
-      marginHorizontal: 1,
+      marginRight: 0,
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: colors.brand.green,
+      flexShrink: 0,
     },
     trophyText: {
       fontSize: 10,
@@ -390,7 +446,7 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
           offset: (SCREEN_WIDTH - spacing.md * 2) * index,
           index,
         })}
-        initialScrollIndex={0}
+        initialScrollIndex={months.length > 0 ? months.length - 1 : undefined}
         onMomentumScrollEnd={(event) => {
           const index = Math.round(event.nativeEvent.contentOffset.x / (SCREEN_WIDTH - spacing.md * 2));
           setCurrentMonthIndex(index);
@@ -410,6 +466,12 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
           <View style={styles.legendItem}>
             <Text style={styles.trophyText}>🏆</Text>
             <Text style={styles.legendText}>7-day milestone</Text>
+          </View>
+        </View>
+        <View style={styles.legendRow}>
+          <View style={styles.legendItem}>
+            <View style={[styles.day, styles.dayRestDay]} />
+            <Text style={styles.legendText}>Rest day</Text>
           </View>
         </View>
       </View>

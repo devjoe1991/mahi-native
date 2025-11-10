@@ -4,6 +4,7 @@ import { Calendar } from 'react-native-calendars';
 import type { DateData } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../theme/ThemeProvider';
+import { getTodayLocal, formatDateLocal, normalizeDateLocal } from '../../utils/dateUtils';
 
 interface RestDaysCalendarProps {
   selectedDates: Date[];
@@ -24,13 +25,15 @@ interface RestDaysCalendarProps {
 export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
   selectedDates,
   onDatesChange,
-  minDate = new Date(),
+  minDate,
   maxDaysAhead = 30,
   streakDays = 0,
   lastPostDate = null,
   postDates = [],
   showSaveConfirmation = false,
 }) => {
+  // Use local date for minDate if not provided
+  const effectiveMinDate = minDate || getTodayLocal();
   const { colors, spacing, typography } = useTheme();
   const [markedDates, setMarkedDates] = useState<{ [key: string]: any }>({});
 
@@ -39,16 +42,15 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
     if (!lastPostDate || streakDays === 0) return [];
     
     const trophyDays: Date[] = [];
-    const localLastPost = new Date(lastPostDate);
-    localLastPost.setHours(0, 0, 0, 0);
+    const localLastPost = normalizeDateLocal(lastPostDate);
     
     if (isNaN(localLastPost.getTime())) return [];
     
     // Find all 7-day milestones in current streak
     for (let day = 7; day <= streakDays; day += 7) {
       const daysBack = streakDays - day;
-      const trophyDate = new Date(localLastPost.getTime() - daysBack * 24 * 60 * 60 * 1000);
-      trophyDate.setHours(0, 0, 0, 0);
+      const trophyDate = new Date(localLastPost);
+      trophyDate.setDate(trophyDate.getDate() - daysBack);
       
       if (!isNaN(trophyDate.getTime())) {
         trophyDays.push(trophyDate);
@@ -62,12 +64,11 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
   const getCurrentStreakPeriod = (): { startDate: Date; endDate: Date } | null => {
     if (!lastPostDate || streakDays === 0) return null;
     
-    const localLastPost = new Date(lastPostDate);
-    localLastPost.setHours(0, 0, 0, 0);
+    const localLastPost = normalizeDateLocal(lastPostDate);
     
     const endDate = new Date(localLastPost);
     const startDate = new Date(localLastPost);
-    startDate.setTime(startDate.getTime() - (streakDays - 1) * 24 * 60 * 60 * 1000);
+    startDate.setDate(startDate.getDate() - (streakDays - 1));
     
     return { startDate, endDate };
   };
@@ -75,18 +76,16 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
   // Convert dates to marked dates format with streaks and milestones
   useEffect(() => {
     const marked: { [key: string]: any } = {};
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getTodayLocal();
     
     // Mark streak days (past dates) first
     const streakPeriod = getCurrentStreakPeriod();
     const trophyDays = getTrophyDays();
-    const trophyDayStrings = new Set(trophyDays.map(d => d.toISOString().split('T')[0]));
+    const trophyDayStrings = new Set(trophyDays.map(d => formatDateLocal(d)));
     
     postDates.forEach((postDate) => {
-      const date = new Date(postDate);
-      date.setHours(0, 0, 0, 0);
-      const dateStr = date.toISOString().split('T')[0];
+      const date = normalizeDateLocal(postDate);
+      const dateStr = formatDateLocal(date);
       
       // Only mark past dates for streaks
       if (date >= today) {
@@ -140,27 +139,26 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
       }
     });
 
-    // Mark rest days (future dates only)
+    // Mark rest days (show for both past and future dates)
     selectedDates.forEach((date) => {
-      const dateStr = date.toISOString().split('T')[0];
-      if (date >= today) {
-        // If this date already has markings, combine them
-        if (marked[dateStr]) {
-          marked[dateStr] = {
-            ...marked[dateStr],
-            selected: true,
-            selectedColor: colors.primary[500],
-            selectedTextColor: colors.background.primary,
-          };
-        } else {
-          marked[dateStr] = {
-            selected: true,
-            selectedColor: colors.primary[500],
-            selectedTextColor: colors.background.primary,
-            marked: true,
-            dots: [{ key: 'rest', color: colors.background.primary }],
-          };
-        }
+      const normalizedDate = normalizeDateLocal(date);
+      const dateStr = formatDateLocal(normalizedDate);
+      // If this date already has markings, combine them
+      if (marked[dateStr]) {
+        marked[dateStr] = {
+          ...marked[dateStr],
+          selected: true,
+          selectedColor: colors.primary[500],
+          selectedTextColor: colors.background.primary,
+        };
+      } else {
+        marked[dateStr] = {
+          selected: true,
+          selectedColor: colors.primary[500],
+          selectedTextColor: colors.background.primary,
+          marked: true,
+          dots: [{ key: 'rest', color: colors.background.primary }],
+        };
       }
     });
 
@@ -168,11 +166,10 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
   }, [selectedDates, streakDays, lastPostDate, postDates, colors]);
 
   const onDayPress = (day: DateData) => {
-    const pressedDate = new Date(day.dateString);
+    const pressedDate = normalizeDateLocal(new Date(day.dateString));
     const dateStr = day.dateString;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const maxDate = new Date();
+    const today = getTodayLocal();
+    const maxDate = new Date(today);
     maxDate.setDate(maxDate.getDate() + maxDaysAhead);
 
     // Only allow selecting future dates for rest days (up to maxDaysAhead)
@@ -182,7 +179,7 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
 
     // Check if date is already selected
     const isSelected = selectedDates.some(
-      (d) => d.toISOString().split('T')[0] === dateStr
+      (d) => formatDateLocal(normalizeDateLocal(d)) === dateStr
     );
 
     let newSelectedDates: Date[];
@@ -190,7 +187,7 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
     if (isSelected) {
       // Remove date
       newSelectedDates = selectedDates.filter(
-        (d) => d.toISOString().split('T')[0] !== dateStr
+        (d) => formatDateLocal(normalizeDateLocal(d)) !== dateStr
       );
     } else {
       // Add date
@@ -201,10 +198,11 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
   };
 
   // Format min and max dates for calendar
-  const minDateStr = minDate.toISOString().split('T')[0];
-  const maxDate = new Date();
+  const minDateLocal = normalizeDateLocal(effectiveMinDate);
+  const minDateStr = formatDateLocal(minDateLocal);
+  const maxDate = new Date(getTodayLocal());
   maxDate.setDate(maxDate.getDate() + maxDaysAhead);
-  const maxDateStr = maxDate.toISOString().split('T')[0];
+  const maxDateStr = formatDateLocal(maxDate);
 
   const styles = StyleSheet.create({
     container: {
