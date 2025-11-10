@@ -259,7 +259,7 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
                       key={dayIndex}
                       style={[
                         styles.dayEmpty,
-                        dayIndex === 6 && styles.lastInRow,
+                        dayIndex === 0 && styles.lastInRow, // With row-reverse, index 0 is the rightmost (last in row)
                       ]}
                     />
                   );
@@ -273,7 +273,7 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
                       style={[
                         styles.trophyDay,
                         day.isToday && styles.dayToday,
-                        dayIndex === 6 && styles.lastInRow,
+                        dayIndex === 0 && styles.lastInRow, // With row-reverse, index 0 is the rightmost (last in row)
                       ]}
                     >
                       <Text style={styles.trophyText}>🏆</Text>
@@ -294,7 +294,7 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
                         ? styles.dayRestDay 
                         : (day.isActive ? styles.dayActive : styles.dayInactive),
                       day.isToday && styles.dayToday,
-                      dayIndex === 6 && styles.lastInRow,
+                      dayIndex === 0 && styles.lastInRow, // With row-reverse, index 0 is the rightmost (last in row)
                     ]}
                   >
                     <Text
@@ -317,7 +317,7 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
   };
 
   const daySize = 12;
-  const dayGap = spacing.lg;
+  const dayGap = spacing.xl + 4; // 36px - slightly larger than spacing.xl (32px)
   // Calculate available width: screen width minus container margin and padding
   const containerWidth = SCREEN_WIDTH - spacing.md * 2; // Container width (minus margin)
   const availableWidth = containerWidth - (spacing.md * 2); // Available width (minus padding)
@@ -340,7 +340,7 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
       marginBottom: spacing.sm,
     },
     weekRow: {
-      flexDirection: 'row',
+      flexDirection: 'row-reverse', // Reverse the visual order so dates read left-to-right
       justifyContent: 'flex-start',
       alignItems: 'center',
       marginBottom: spacing.xs,
