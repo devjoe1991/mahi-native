@@ -8,6 +8,7 @@ import {
   Alert,
   FlatList,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../theme/ThemeProvider';
@@ -42,9 +43,12 @@ export const DiaryScreen: React.FC = () => {
   const [calendarPermissionGranted, setCalendarPermissionGranted] = useState(false);
   const [loadingWorkouts, setLoadingWorkouts] = useState(false);
   const [restDaysDates, setRestDaysDates] = useState<Date[]>([]);
+  const [pendingRestDays, setPendingRestDays] = useState<Date[]>([]);
+  const [restDaysDirty, setRestDaysDirty] = useState(false);
   const [loadingRestDays, setLoadingRestDays] = useState(false);
   const [postDates, setPostDates] = useState<Date[]>([]);
   const [restDaysSaved, setRestDaysSaved] = useState(false);
+  const [savingRestDays, setSavingRestDays] = useState(false);
 
   const handleTabPress = (tab: TabType) => {
     if (tab === 'home') {
@@ -80,21 +84,49 @@ export const DiaryScreen: React.FC = () => {
     });
   };
 
+  const normalizeRestDates = (dates: Date[]): Date[] => {
+    return dates
+      .map((date) => {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        return d;
+      })
+      .filter((d) => !isNaN(d.getTime()))
+      .sort((a, b) => a.getTime() - b.getTime());
+  };
+
+  const areRestDayArraysEqual = (a: Date[], b: Date[]): boolean => {
+    if (a.length !== b.length) {
+      return false;
+    }
+    for (let i = 0; i < a.length; i++) {
+      if (a[i].getTime() !== b[i].getTime()) {
+        return false;
+      }
+    }
+    return true;
+  };
+
   const loadRestDaysFromCalendar = async () => {
     setLoadingRestDays(true);
     try {
       const hasPermission = await hasCalendarPermissions();
       if (hasPermission) {
         const calendarRestDays = await getRestDaysFromCalendar();
-        setRestDaysDates(calendarRestDays);
+        const normalized = normalizeRestDates(calendarRestDays);
+        setRestDaysDates(normalized);
+        setPendingRestDays(normalized);
+        setRestDaysDirty(false);
       } else {
         // Load from user profile if no calendar permission
         if (userData?.rest_days) {
-          const dates = userData.rest_days
+          const profileDates = userData.rest_days
             .filter((rd: string) => rd.includes('T') || rd.match(/^\d{4}-\d{2}-\d{2}/))
-            .map((rd: string) => new Date(rd))
-            .filter((d: Date) => !isNaN(d.getTime()));
-          setRestDaysDates(dates);
+            .map((rd: string) => new Date(rd));
+          const normalized = normalizeRestDates(profileDates);
+          setRestDaysDates(normalized);
+          setPendingRestDays(normalized);
+          setRestDaysDirty(false);
         }
       }
     } catch (error) {
@@ -104,38 +136,47 @@ export const DiaryScreen: React.FC = () => {
     }
   };
 
-  const handleRestDaysChange = async (dates: Date[]) => {
-    setRestDaysDates(dates);
+  const handleRestDaysChange = (dates: Date[]) => {
+    const normalized = normalizeRestDates(dates);
+    setPendingRestDays(normalized);
+    setRestDaysDirty(!areRestDayArraysEqual(normalized, restDaysDates));
     setRestDaysSaved(false);
-    
-    // Sync to calendar
+  };
+
+  const handleRestDaysSave = async () => {
+    if (!restDaysDirty) {
+      return;
+    }
+
+    setSavingRestDays(true);
     try {
       const hasPermission = await hasCalendarPermissions();
       if (hasPermission) {
-        await syncAllRestDaysToCalendar(dates);
+        await syncAllRestDaysToCalendar(pendingRestDays);
       }
+
+      const restDaysData = pendingRestDays.map((date) => {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        return d.toISOString();
+      });
+
+      // TODO: Update user profile in Supabase
+      // await updateUserData({ rest_days: restDaysData });
+
+      setRestDaysDates(pendingRestDays);
+      setRestDaysDirty(false);
+      setRestDaysSaved(true);
+
+      setTimeout(() => {
+        setRestDaysSaved(false);
+      }, 3000);
     } catch (error) {
-      console.error('Error syncing rest days to calendar:', error);
-      return; // Don't show success if sync failed
+      console.error('Error saving rest days:', error);
+      Alert.alert('Error', 'Failed to save rest days. Please try again.');
+    } finally {
+      setSavingRestDays(false);
     }
-
-    // Save to user profile
-    const restDaysData = dates.map((date) => {
-      const d = new Date(date);
-      d.setHours(0, 0, 0, 0);
-      return d.toISOString();
-    });
-
-    // TODO: Update user profile in Supabase
-    // await updateUserData({ rest_days: restDaysData });
-    
-    // Show success confirmation after successful sync
-    setRestDaysSaved(true);
-    
-    // Hide confirmation after 3 seconds
-    setTimeout(() => {
-      setRestDaysSaved(false);
-    }, 3000);
   };
 
   const handleUpdateStreak = () => {
@@ -339,6 +380,38 @@ export const DiaryScreen: React.FC = () => {
       paddingHorizontal: spacing.lg,
       paddingTop: spacing.md,
       marginBottom: spacing.md,
+    },
+    calendarActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginTop: spacing.sm,
+      paddingHorizontal: spacing.lg,
+    },
+    savePillButton: {
+      backgroundColor: colors.primary[500],
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs,
+      borderRadius: 999,
+      minWidth: 120,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    savePillButtonDisabled: {
+      opacity: 0.5,
+    },
+    savePillButtonText: {
+      color: colors.background.primary,
+      fontSize: typography.body.fontSize - 2,
+      fontFamily: typography.body.fontFamily,
+      fontWeight: '700',
+      letterSpacing: 0.3,
+    },
+    calendarHelperText: {
+      color: colors.text.muted,
+      fontSize: typography.body.fontSize - 2,
+      fontFamily: typography.body.fontFamily,
+      marginLeft: spacing.sm,
     },
     calendarCard: {
       backgroundColor: colors.background.primary500,
@@ -688,16 +761,37 @@ export const DiaryScreen: React.FC = () => {
               <Text style={styles.actionDescription}>Loading rest days...</Text>
             </View>
           ) : (
-            <RestDaysCalendar
-              selectedDates={restDaysDates}
-              onDatesChange={handleRestDaysChange}
-              minDate={new Date()}
-              maxDaysAhead={30}
-              streakDays={userData?.streak_days || 0}
-              lastPostDate={userData?.last_post_date ? new Date(userData.last_post_date) : null}
-              postDates={postDates}
-              showSaveConfirmation={restDaysSaved}
-            />
+            <>
+              <RestDaysCalendar
+                selectedDates={pendingRestDays}
+                onDatesChange={handleRestDaysChange}
+                minDate={new Date()}
+                maxDaysAhead={30}
+                streakDays={userData?.streak_days || 0}
+                lastPostDate={userData?.last_post_date ? new Date(userData.last_post_date) : null}
+                postDates={postDates}
+                showSaveConfirmation={restDaysSaved}
+              />
+              <View style={styles.calendarActions}>
+                <Pressable
+                  style={[
+                    styles.savePillButton,
+                    (savingRestDays || !restDaysDirty) && styles.savePillButtonDisabled,
+                  ]}
+                  onPress={handleRestDaysSave}
+                  disabled={savingRestDays || !restDaysDirty}
+                >
+                  {savingRestDays ? (
+                    <ActivityIndicator size="small" color={colors.background.primary} />
+                  ) : (
+                    <Text style={styles.savePillButtonText}>Save & Sync</Text>
+                  )}
+                </Pressable>
+                {restDaysDirty && (
+                  <Text style={styles.calendarHelperText}>Unsaved changes</Text>
+                )}
+              </View>
+            </>
           )}
         </View>
 

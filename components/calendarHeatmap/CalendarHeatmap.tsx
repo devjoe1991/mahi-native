@@ -248,8 +248,8 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
     const weeks = groupDaysIntoWeeks(days);
     
     return (
-      <View style={[styles.monthContainer, { width: SCREEN_WIDTH - spacing.md * 2 }]}>
-        <View style={{ width: '100%', overflow: 'visible' }}>
+      <View style={styles.monthContainer}>
+        <View style={styles.weeksContainer}>
           {weeks.map((week, weekIndex) => (
             <View key={weekIndex} style={styles.weekRow}>
               {week.map((day, dayIndex) => {
@@ -272,7 +272,8 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
                       key={`${weekIndex}-${dayIndex}`}
                       style={[
                         styles.trophyDay,
-                        day.isToday && styles.dayToday
+                        day.isToday && styles.dayToday,
+                        dayIndex === 6 && styles.lastInRow,
                       ]}
                     >
                       <Text style={styles.trophyText}>🏆</Text>
@@ -292,16 +293,17 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
                       day.isRestDay 
                         ? styles.dayRestDay 
                         : (day.isActive ? styles.dayActive : styles.dayInactive),
-                      day.isToday && styles.dayToday
+                      day.isToday && styles.dayToday,
+                      dayIndex === 6 && styles.lastInRow,
                     ]}
                   >
-      <Text
-        style={[
-          styles.dayNumberText,
-          day.isToday && { color: colors.brand.purple, fontWeight: '700' },
-        ]}
-        allowFontScaling={false}
-      >
+                    <Text
+                      style={[
+                        styles.dayNumberText,
+                        day.isToday && { color: colors.brand.purple, fontWeight: '700' },
+                      ]}
+                      allowFontScaling={false}
+                    >
                       {day.date.getDate()}
                     </Text>
                   </View>
@@ -315,7 +317,13 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
   };
 
   const daySize = 12;
-  const rowWidth = daySize * 7 + spacing.xs * 6;
+  const dayGap = spacing.lg;
+  // Calculate available width: screen width minus container margin and padding
+  const containerWidth = SCREEN_WIDTH - spacing.md * 2; // Container width (minus margin)
+  const availableWidth = containerWidth - (spacing.md * 2); // Available width (minus padding)
+  const calculatedRowWidth = daySize * 7 + dayGap * 6;
+  // Use the smaller of calculated width or available width to prevent overflow
+  const rowWidth = Math.min(calculatedRowWidth, availableWidth);
 
   const styles = StyleSheet.create({
     container: {
@@ -333,7 +341,7 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
     },
     weekRow: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
+      justifyContent: 'flex-start',
       alignItems: 'center',
       marginBottom: spacing.xs,
       width: rowWidth,
@@ -344,7 +352,7 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
       width: daySize,
       height: daySize,
       borderRadius: 2,
-      marginRight: 0,
+      marginRight: dayGap,
       justifyContent: 'center',
       alignItems: 'center',
       overflow: 'visible',
@@ -366,7 +374,7 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
     dayEmpty: {
       width: daySize,
       height: daySize,
-      marginRight: 0,
+      marginRight: dayGap,
       flexShrink: 0,
     },
     dayNumberText: {
@@ -383,19 +391,28 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
     },
     monthContainer: {
       paddingHorizontal: spacing.md,
+      width: containerWidth,
+      overflow: 'visible',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    weeksContainer: {
       width: '100%',
       overflow: 'visible',
-      minWidth: 91, // Minimum width for 7 days (12px + 1px margin each = 13px * 7 = 91px)
+      alignItems: 'center',
     },
     trophyDay: {
       width: daySize,
       height: daySize,
       borderRadius: 2,
-      marginRight: 0,
+      marginRight: dayGap,
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: colors.brand.green,
       flexShrink: 0,
+    },
+    lastInRow: {
+      marginRight: 0,
     },
     trophyText: {
       fontSize: 10,
@@ -442,15 +459,16 @@ export const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({
         keyExtractor={(item, index) => `month-${item.getFullYear()}-${item.getMonth()}-${index}`}
         renderItem={({ item, index }) => renderMonth(item, index)}
         getItemLayout={(data, index) => ({
-          length: SCREEN_WIDTH - spacing.md * 2,
-          offset: (SCREEN_WIDTH - spacing.md * 2) * index,
+          length: containerWidth,
+          offset: containerWidth * index,
           index,
         })}
         initialScrollIndex={months.length > 0 ? months.length - 1 : undefined}
         onMomentumScrollEnd={(event) => {
-          const index = Math.round(event.nativeEvent.contentOffset.x / (SCREEN_WIDTH - spacing.md * 2));
+          const index = Math.round(event.nativeEvent.contentOffset.x / containerWidth);
           setCurrentMonthIndex(index);
         }}
+        contentContainerStyle={{ alignItems: 'center' }}
       />
       <View style={styles.legend}>
         <Text style={styles.legendTitle}>Legend</Text>
