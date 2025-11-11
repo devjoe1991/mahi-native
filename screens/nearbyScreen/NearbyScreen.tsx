@@ -512,9 +512,7 @@ const resolveMilestoneLevel = (user: UserData): number => {
     });
 
     contactInvites.forEach((contact) => {
-      const description =
-        contact.emails[0] ??
-        (contact.phoneNumbers[0] ? `Phone • ${contact.phoneNumbers[0]}` : 'Invite a friend to join Mahi');
+      const description = 'Do your Mahi';
 
       cards.push({
         id: `invite-${contact.id}`,
