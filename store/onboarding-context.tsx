@@ -7,6 +7,7 @@ export interface OnboardingData {
   phone?: string;
   dateOfBirth: Date | null;
   fitnessGoal: 'weight_loss' | 'muscle_gain' | 'endurance' | 'flexibility' | 'general' | null;
+  contactsPermission: boolean;
   calendarPermission: boolean;
   cameraPermission: boolean;
   microphonePermission: boolean;
@@ -30,6 +31,7 @@ const defaultOnboardingData: OnboardingData = {
   phone: undefined,
   dateOfBirth: null,
   fitnessGoal: null,
+  contactsPermission: false,
   calendarPermission: false,
   cameraPermission: false,
   microphonePermission: false,

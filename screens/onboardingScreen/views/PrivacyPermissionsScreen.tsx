@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, Switch, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Calendar from 'expo-calendar';
 import * as ImagePicker from 'expo-image-picker';
+import * as Contacts from 'expo-contacts';
 import { useTheme } from '../../../theme/ThemeProvider';
 import { useOnboarding } from '../../../store/onboarding-context';
 
@@ -18,6 +19,9 @@ export const PrivacyPermissionsScreen: React.FC<PrivacyPermissionsScreenProps> =
 }) => {
   const { colors, spacing, typography } = useTheme();
   const { onboardingData, updateOnboardingData } = useOnboarding();
+  const [contactsPermission, setContactsPermission] = useState(
+    onboardingData.contactsPermission
+  );
   const [calendarPermission, setCalendarPermission] = useState(
     onboardingData.calendarPermission
   );
@@ -25,6 +29,30 @@ export const PrivacyPermissionsScreen: React.FC<PrivacyPermissionsScreenProps> =
   const [microphonePermission, setMicrophonePermission] = useState(
     onboardingData.microphonePermission
   );
+  useEffect(() => {
+    let isMounted = true;
+
+    const syncContactsPermission = async () => {
+      try {
+        const { status } = await Contacts.getPermissionsAsync();
+        const granted = status === Contacts.PermissionStatus.GRANTED;
+
+        if (isMounted) {
+          setContactsPermission(granted);
+          updateOnboardingData({ contactsPermission: granted });
+        }
+      } catch (error) {
+        console.error('Contacts permission check error:', error);
+      }
+    };
+
+    syncContactsPermission();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [updateOnboardingData]);
+
 
   const styles = StyleSheet.create({
     container: {
@@ -133,6 +161,23 @@ export const PrivacyPermissionsScreen: React.FC<PrivacyPermissionsScreenProps> =
     }
   };
 
+  const requestContactsPermission = async () => {
+    try {
+      const { status, canAskAgain } = await Contacts.requestPermissionsAsync();
+      const granted = status === Contacts.PermissionStatus.GRANTED;
+      setContactsPermission(granted);
+      updateOnboardingData({ contactsPermission: granted });
+      if (!granted && !canAskAgain) {
+        Alert.alert(
+          'Contacts Permission',
+          'Contacts access is disabled. You can enable it at any time from your device settings.'
+        );
+      }
+    } catch (error) {
+      console.error('Contacts permission error:', error);
+    }
+  };
+
   const requestMicrophonePermission = async () => {
     // Note: Microphone permission is marked as "coming soon" in the UI
     // This will be implemented in a future update with proper permission handling
@@ -142,8 +187,16 @@ export const PrivacyPermissionsScreen: React.FC<PrivacyPermissionsScreenProps> =
     );
   };
 
-  const handlePermissionToggle = async (type: 'calendar' | 'camera' | 'microphone') => {
+  const handlePermissionToggle = async (type: 'contacts' | 'calendar' | 'camera' | 'microphone') => {
     switch (type) {
+      case 'contacts':
+        if (!contactsPermission) {
+          await requestContactsPermission();
+        } else {
+          setContactsPermission(false);
+          updateOnboardingData({ contactsPermission: false });
+        }
+        break;
       case 'calendar':
         if (!calendarPermission) {
           await requestCalendarPermission();
@@ -173,6 +226,7 @@ export const PrivacyPermissionsScreen: React.FC<PrivacyPermissionsScreenProps> =
 
   const handleNext = () => {
     updateOnboardingData({
+      contactsPermission,
       calendarPermission,
       cameraPermission,
       microphonePermission,
@@ -195,6 +249,27 @@ export const PrivacyPermissionsScreen: React.FC<PrivacyPermissionsScreenProps> =
         <Text style={styles.subtitle}>
           Grant permissions to enhance your Mahi experience
         </Text>
+
+        <View style={styles.permissionItem}>
+          <Ionicons
+            name="people-circle-outline"
+            size={28}
+            color={colors.primary[500]}
+            style={styles.permissionIcon}
+          />
+          <View style={styles.permissionContent}>
+            <Text style={styles.permissionTitle}>Contacts Access</Text>
+            <Text style={styles.permissionDescription}>
+              Find friends already on Mahi and invite others from your contacts
+            </Text>
+          </View>
+          <Switch
+            value={contactsPermission}
+            onValueChange={() => handlePermissionToggle('contacts')}
+            trackColor={{ false: colors.border.primary, true: colors.primary[500] }}
+            thumbColor={colors.background.primary}
+          />
+        </View>
 
         <View style={styles.permissionItem}>
           <Ionicons
