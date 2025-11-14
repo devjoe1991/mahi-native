@@ -69,7 +69,7 @@ interface ContactCardItem {
 const INVITE_LINK = 'https://mahi.fit/invite';
 
 export const NearbyScreen: React.FC = () => {
-  const { colors, spacing, typography } = useTheme();
+  const { colors, spacing, typography, theme } = useTheme();
   const { navigate } = useNavigation();
   const { openSheet } = useBottomSheet();
   const { userData } = useAuth();
@@ -610,45 +610,24 @@ const resolveMilestoneLevel = (user: UserData): number => {
       flex: 1,
       paddingBottom: 100,
     },
-    heroSection: {
-      padding: spacing.lg,
-      alignItems: 'center',
-      paddingTop: spacing.lg,
-      paddingBottom: spacing.md,
-    },
-    heroIcon: {
+    contactsSectionWrapper: {
+      marginTop: -25, // Pull up to align with header curve
       marginBottom: spacing.md,
-    },
-    heroTitle: {
-      fontSize: typography.h1.fontSize - 4,
-      fontWeight: typography.h1.fontWeight as any,
-      fontFamily: typography.h1.fontFamily,
-      color: colors.text.primary,
-      textAlign: 'center',
-      marginBottom: spacing.sm,
-      letterSpacing: 0.5,
-      lineHeight: (typography.h1.fontSize - 4) * 1.2,
-    },
-    heroSubtitle: {
-      fontSize: typography.body.fontSize - 2,
-      fontFamily: typography.body.fontFamily,
-      color: colors.text.muted,
-      textAlign: 'center',
-      marginBottom: 0,
-      letterSpacing: 0.2,
-      lineHeight: (typography.body.fontSize - 2) * 1.5,
-      paddingHorizontal: spacing.md,
     },
     contactsSection: {
       paddingHorizontal: spacing.lg,
-      paddingTop: spacing.md,
-      marginBottom: spacing.md,
+      paddingTop: spacing.lg + 25, // Extra padding to account for header curve (25px)
+      paddingBottom: spacing.md,
+      backgroundColor: colors.primary[500],
+      borderTopLeftRadius: 28, // Match header curve radius
+      borderTopRightRadius: 28,
+      overflow: 'hidden', // Ensure the curve is visible
     },
     contactsCarouselContent: {
       paddingRight: spacing.lg,
     },
     contactCard: {
-      backgroundColor: colors.background.primary500,
+      backgroundColor: colors.background.primary,
       borderRadius: 16,
       padding: spacing.md,
       marginRight: spacing.md,
@@ -832,13 +811,22 @@ const resolveMilestoneLevel = (user: UserData): number => {
       paddingBottom: spacing.sm,
     },
     sectionTitle: {
-      fontSize: typography.h2.fontSize - 3,
+      fontSize: typography.h2.fontSize - 4,
       fontWeight: typography.h2.fontWeight as any,
       fontFamily: typography.h2.fontFamily,
       color: colors.text.primary,
       marginBottom: spacing.md,
-      letterSpacing: 0.5,
-      lineHeight: (typography.h2.fontSize - 3) * 1.2,
+      letterSpacing: 0.3,
+      lineHeight: (typography.h2.fontSize - 4) * 1.2,
+    },
+    sectionTitlePurple: {
+      fontSize: typography.h2.fontSize - 4,
+      fontWeight: typography.h2.fontWeight as any,
+      fontFamily: typography.h2.fontFamily,
+      color: colors.background.primary,
+      marginBottom: spacing.md,
+      letterSpacing: 0.3,
+      lineHeight: (typography.h2.fontSize - 4) * 1.2,
     },
     carouselContent: {
       paddingRight: spacing.lg,
@@ -900,7 +888,7 @@ const resolveMilestoneLevel = (user: UserData): number => {
       marginBottom: spacing.md,
     },
     leaderboardCard: {
-      backgroundColor: colors.background.primary500,
+      backgroundColor: colors.background.primary,
       borderRadius: 16,
       padding: spacing.lg,
       borderWidth: 1,
@@ -939,7 +927,7 @@ const resolveMilestoneLevel = (user: UserData): number => {
       shadowRadius: 3,
     },
     rankBadgeTop: {
-      backgroundColor: colors.brand.yellow,
+      backgroundColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.08)',
     },
     rankText: {
       fontSize: typography.h3.fontSize,
@@ -948,7 +936,7 @@ const resolveMilestoneLevel = (user: UserData): number => {
       color: colors.text.primary,
     },
     rankTextTop: {
-      color: colors.background.primary,
+      color: colors.text.primary,
     },
     leaderboardUserInfo: {
       flex: 1,
@@ -989,24 +977,10 @@ const resolveMilestoneLevel = (user: UserData): number => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
       >
-        {/* Hero Section */}
-        <View style={styles.heroSection}>
-          <View style={styles.heroIcon}>
-            <Ionicons
-              name="location"
-              size={80}
-              color={colors.brand.cyan}
-            />
-          </View>
-          <Text style={styles.heroTitle}>Connect Nearby</Text>
-          <Text style={styles.heroSubtitle}>
-            Find fitness enthusiasts, join local groups, and discover workout communities in your area
-          </Text>
-        </View>
-
         {/* Contacts Carousel */}
-        <View style={styles.contactsSection}>
-          <Text style={styles.sectionTitle}>Find Friends</Text>
+        <View style={styles.contactsSectionWrapper}>
+          <View style={styles.contactsSection}>
+          <Text style={styles.sectionTitlePurple}>Find Friends</Text>
           <FlatList
             data={contactCards}
             horizontal
@@ -1100,6 +1074,7 @@ const resolveMilestoneLevel = (user: UserData): number => {
               </View>
             )}
           />
+          </View>
         </View>
 
         {/* Leaderboard Section */}

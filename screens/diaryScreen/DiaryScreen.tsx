@@ -767,26 +767,26 @@ export const DiaryScreen: React.FC = () => {
                       />
                     </View>
                   ) : (
-                    <View
-                      style={[
-                        styles.actionIconContainer,
-                        { backgroundColor: item.color + '20' },
-                      ]}
-                    >
-                      <Ionicons
-                        name={item.icon as any}
-                        size={24}
-                        color={item.color}
-                      />
-                    </View>
+                <View
+                  style={[
+                    styles.actionIconContainer,
+                    { backgroundColor: item.color + '20' },
+                  ]}
+                >
+                  <Ionicons
+                    name={item.icon as any}
+                    size={24}
+                    color={item.color}
+                  />
+                </View>
                   )}
                   <View style={[styles.actionContent, isSquareCard && { alignItems: 'center' }]}>
-                    <Text style={styles.actionTitle}>{item.title}</Text>
-                    <Text style={styles.actionDescription}>
-                      {item.description}
-                    </Text>
-                  </View>
-                </Pressable>
+                  <Text style={styles.actionTitle}>{item.title}</Text>
+                  <Text style={styles.actionDescription}>
+                    {item.description}
+                  </Text>
+                </View>
+              </Pressable>
               );
             }}
           />
