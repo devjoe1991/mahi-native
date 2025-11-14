@@ -118,6 +118,7 @@ export const GlobalBottomSheetProvider: React.FC<Props> = ({ children }) => {
                 backgroundColor: colors.background.secondary,
                 borderTopLeftRadius: 28,
                 borderTopRightRadius: 28,
+                overflow: 'hidden',
                 ...(dynamicHeight ? { height: dynamicHeight, maxHeight: maxSheetHeight } : { maxHeight: maxSheetHeight }),
                 shadowColor: '#000000',
                 shadowOffset: { width: 0, height: -4 },
@@ -148,7 +149,7 @@ export const GlobalBottomSheetProvider: React.FC<Props> = ({ children }) => {
               keyboardShouldPersistTaps="handled"
               scrollEnabled={contentHeight ? contentHeight + handleHeight > maxSheetHeight : true}
             >
-              <View style={[styles.content, { backgroundColor: colors.background.secondary }]}>
+              <View style={styles.content}>
                 {content}
               </View>
             </ScrollView>

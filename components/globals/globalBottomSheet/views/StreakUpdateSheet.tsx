@@ -109,16 +109,17 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({
   const styles = StyleSheet.create({
     container: {
       paddingHorizontal: spacing.md,
-      paddingBottom: spacing.md,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.lg,
     },
     title: {
-      fontSize: typography.h2.fontSize - 3,
+      fontSize: typography.h2.fontSize - 4,
       fontWeight: typography.h2.fontWeight as any,
       fontFamily: typography.h2.fontFamily,
       color: colors.text.primary,
       marginBottom: spacing.md,
-      letterSpacing: 0.5,
-      lineHeight: (typography.h2.fontSize - 3) * 1.2,
+      letterSpacing: 0.3,
+      lineHeight: (typography.h2.fontSize - 4) * 1.2,
     },
     imageContainer: {
       width: '100%',
@@ -185,36 +186,37 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({
     },
     buttonRow: {
       flexDirection: 'row',
-      gap: spacing.md,
+      gap: spacing.sm,
+      marginTop: spacing.xs,
     },
     button: {
       flex: 1,
-      paddingVertical: 20,
-      paddingHorizontal: 24,
-      borderRadius: 50,
+      paddingVertical: 12,
+      paddingHorizontal: spacing.lg,
+      borderRadius: 12,
       alignItems: 'center',
       justifyContent: 'center',
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
-      elevation: 4,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.08,
+      shadowRadius: 3,
+      elevation: 2,
     },
     cancelButton: {
-      backgroundColor: colors.background.primary,
-      borderWidth: 1.5,
+      backgroundColor: colors.background.primary500,
+      borderWidth: 1,
       borderColor: colors.border.primary,
     },
     saveButton: {
       backgroundColor: colors.primary[500],
       shadowColor: colors.primary[500],
-      shadowOpacity: 0.3,
+      shadowOpacity: 0.15,
     },
     buttonText: {
-      fontSize: 18,
+      fontSize: typography.body.fontSize - 1,
       fontFamily: typography.body.fontFamily,
-      fontWeight: '700',
-      letterSpacing: 0.5,
+      fontWeight: '600',
+      letterSpacing: 0.2,
     },
     cancelButtonText: {
       color: colors.text.primary,
@@ -251,7 +253,7 @@ export const StreakUpdateSheet: React.FC<StreakUpdateSheetProps> = ({
       ) : (
         <Pressable style={styles.addImageButton} onPress={showImagePicker}>
           <Ionicons name="camera-outline" size={24} color={colors.text.primary} />
-          <Text style={styles.addImageButtonText}>Take Photo Now</Text>
+          <Text style={styles.addImageButtonText}>Capture Your Mahi</Text>
         </Pressable>
       )}
 

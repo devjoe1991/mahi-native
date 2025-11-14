@@ -139,12 +139,15 @@ const headerStyles = {
     backgroundColor: colors.primary[500], // Spirit Blue
   },
   pillText: {
-    ...typography.button,
+    fontSize: typography.body.fontSize - 2,  // 14px (reduced from 16px)
+    fontFamily: typography.body.fontFamily,
+    fontWeight: typography.body.fontWeight as any,  // '400' (Regular)
     color: colors.text.primary,
+    letterSpacing: 0.15,
   },
   pillTextActive: {
     color: colors.text.inverse,    // White text on active
-    fontWeight: '600',
+    fontWeight: '500',  // '500' (Medium, reduced from '600')
   },
   // Icon Buttons
   iconContainer: {

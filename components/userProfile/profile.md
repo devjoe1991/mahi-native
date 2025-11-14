@@ -89,18 +89,38 @@ const profileStyles = {
 ```
 
 ### **Typography:**
+
+#### **Base Typography System:**
 ```typescript
-// Profile name
-fontSize: typography.h2.fontSize,
-fontWeight: typography.h2.fontWeight as any,
+// Updated Typography Standards (2024):
+// h1: fontSize 32, fontWeight '600' (SemiBold) - Reduced from '700' (Bold)
+// h2: fontSize 24, fontWeight '500' (Medium) - Reduced from '600' (SemiBold)
+// h3: fontSize 20, fontWeight '500' (Medium) - Unchanged
+// body: fontSize 16, fontWeight '400' (Regular) - Unchanged
 
-// Username
-fontSize: typography.body.fontSize,
-fontWeight: typography.body.fontWeight as any,
+// Common Usage Patterns:
+// - Titles (h2): fontSize - 3 to -4 (20-21px), fontWeight '500'
+// - Card Titles (h3): fontSize - 4 (16px), fontWeight '500'
+// - Body Text: fontSize - 2 to -3 (13-14px), fontWeight '400'
+// - Button Text: fontSize - 1 (15px), fontWeight '600' (reduced from '700')
+```
 
-// Statistics
-fontSize: typography.body.fontSize,
-fontWeight: typography.body.fontWeight as any,
+#### **Profile-Specific Typography:**
+```typescript
+// Profile name (reduced for better visual hierarchy)
+fontSize: typography.h2.fontSize - 3,  // 21px (reduced from 24px)
+fontWeight: typography.h2.fontWeight as any,  // '500' (Medium, reduced from '600')
+letterSpacing: 0.15,
+
+// Username (reduced for better readability)
+fontSize: typography.body.fontSize - 2,  // 14px (reduced from 16px)
+fontWeight: typography.body.fontWeight as any,  // '400' (Regular)
+letterSpacing: 0.15,
+
+// Statistics (reduced for consistency)
+fontSize: typography.h3.fontSize - 4,  // 16px (reduced from 20px)
+fontWeight: typography.h3.fontWeight as any,  // '500' (Medium)
+letterSpacing: 0.15,
 ```
 
 ---
@@ -201,16 +221,18 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ userId }) => {
       marginBottom: spacing.sm,
     },
     name: {
-      fontSize: typography.h2.fontSize,
-      fontWeight: typography.h2.fontWeight as any,
+      fontSize: typography.h2.fontSize - 3,  // 21px (reduced from 24px)
+      fontWeight: typography.h2.fontWeight as any,  // '500' (Medium, reduced from '600')
       color: colors.text.primary,
       marginBottom: spacing.xs,
+      letterSpacing: 0.15,
     },
     username: {
-      fontSize: typography.body.fontSize,
-      fontWeight: typography.body.fontWeight as any,
+      fontSize: typography.body.fontSize - 2,  // 14px (reduced from 16px)
+      fontWeight: typography.body.fontWeight as any,  // '400' (Regular)
       color: colors.text.secondary,
       marginBottom: spacing.md,
+      letterSpacing: 0.15,
     },
     statsContainer: {
       flexDirection: 'row',
@@ -222,8 +244,8 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ userId }) => {
       alignItems: 'center',
     },
     statValue: {
-      fontSize: typography.body.fontSize,
-      fontWeight: typography.body.fontWeight as any,
+      fontSize: typography.h3.fontSize - 4,  // 16px (reduced from 20px)
+      fontWeight: typography.h3.fontWeight as any,  // '500' (Medium)
       color: colors.text.primary,
       marginBottom: spacing.xs,
     },
@@ -293,13 +315,14 @@ export const ProfileTabs: React.FC<ProfileTabsProps> = ({ activeTab, onTabChange
       alignItems: 'center',
     },
     tabText: {
-      fontSize: typography.body.fontSize,
-      fontWeight: typography.body.fontWeight as any,
+      fontSize: typography.body.fontSize - 2,  // 14px (reduced from 16px)
+      fontWeight: typography.body.fontWeight as any,  // '400' (Regular)
       color: colors.text.secondary,
+      letterSpacing: 0.15,
     },
     tabTextActive: {
       color: colors.primary[500],
-      fontWeight: '600' as any,
+      fontWeight: '500' as any,  // '500' (Medium, reduced from '600')
     },
     activeIndicator: {
       position: 'absolute',

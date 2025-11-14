@@ -53,11 +53,13 @@ export const SettingsSheet: React.FC = () => {
       paddingBottom: spacing.md,
     },
     title: {
-      fontSize: typography.h2.fontSize - 3,
+      fontSize: typography.h2.fontSize - 4,
       fontWeight: typography.h2.fontWeight as any,
       fontFamily: typography.h2.fontFamily,
       color: colors.text.primary,
       marginBottom: spacing.md,
+      letterSpacing: 0.3,
+      lineHeight: (typography.h2.fontSize - 4) * 1.2,
     },
     item: {
       flexDirection: 'row',

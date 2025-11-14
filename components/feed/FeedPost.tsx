@@ -6,6 +6,7 @@ import { PostData } from '../../screens/userProfileScreen/types';
 import { useAuth } from '../../store/auth-context';
 import { useBottomSheet } from '../globals/globalBottomSheet';
 import { getUserById } from '../../data/user';
+import { useNavigation } from '../../store/navigation-context';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('screen');
 const POST_HORIZONTAL_MARGIN = 16; // Horizontal margin on each side
@@ -29,6 +30,7 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
   const { colors, spacing, typography, theme } = useTheme();
   const { userData } = useAuth();
   const { openSheet } = useBottomSheet();
+  const { navigate } = useNavigation();
   const [postAuthorStreak, setPostAuthorStreak] = React.useState<number | null>(null);
   const [postAuthorTrophyCount, setPostAuthorTrophyCount] = React.useState<number>(0);
 
@@ -232,18 +234,26 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       : { uri: userData.picturePath }
     : null;
 
+  const handleProfilePress = () => {
+    navigate('UserProfileScreen', { userId: post.userId, viewMode: true });
+  };
+
   return (
     <Pressable style={styles.container} onPress={onPress}>
       <View style={styles.imageContainer}>
         <Image source={imageSource} style={styles.image} />
         <View style={styles.header}>
-          {avatarSource ? (
-            <Image source={avatarSource} style={styles.avatar} />
-          ) : (
-            <View style={styles.avatar} />
-          )}
+          <Pressable onPress={handleProfilePress}>
+            {avatarSource ? (
+              <Image source={avatarSource} style={styles.avatar} />
+            ) : (
+              <View style={styles.avatar} />
+            )}
+          </Pressable>
           <View style={styles.headerText}>
-            <Text style={styles.username}>{userData?.username || 'joe'}</Text>
+            <Pressable onPress={handleProfilePress}>
+              <Text style={styles.username}>{userData?.username || 'joe'}</Text>
+            </Pressable>
             {postAuthorStreak !== null && postAuthorStreak > 0 && (
               <View style={styles.streakBadge}>
                 <Ionicons name="flame" size={12} color={colors.background.primary} />
@@ -293,7 +303,7 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
         </View>
         {post.caption && (
           <Text style={styles.caption}>
-            <Text style={styles.captionUsername}>{userData?.username || 'joe'}</Text> {post.caption}
+            <Text style={styles.captionUsername} onPress={handleProfilePress}>{userData?.username || 'joe'}</Text> {post.caption}
           </Text>
         )}
       </View>
