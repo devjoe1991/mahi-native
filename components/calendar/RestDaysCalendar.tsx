@@ -36,6 +36,7 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
   const effectiveMinDate = minDate || getTodayLocal();
   const { colors, spacing, typography } = useTheme();
   const [markedDates, setMarkedDates] = useState<{ [key: string]: any }>({});
+  const [currentMonth, setCurrentMonth] = useState<Date>(minDate || getTodayLocal());
 
   // Calculate trophy milestone days (every 7 days: 7, 14, 21, 28, etc.)
   const getTrophyDays = (): Date[] => {
@@ -96,29 +97,31 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
       const isInStreak = streakPeriod && date >= streakPeriod.startDate && date <= streakPeriod.endDate;
       const isTrophyDay = trophyDayStrings.has(dateStr);
       
+      const dots: Array<{ key: string; color: string }> = [];
+      let customStyles: any = {};
+      let dotColor = colors.text.secondary;
+      
       if (isTrophyDay) {
         // Trophy milestone day
-        marked[dateStr] = {
-          marked: true,
-          dotColor: colors.brand.orange,
-          customStyles: {
-            container: {
-              backgroundColor: colors.brand.orange + '20',
-              borderRadius: 16,
-            },
-            text: {
-              color: colors.text.primary,
-              fontWeight: '700',
-            },
+        dots.push({ key: 'trophy', color: colors.brand.orange });
+        customStyles = {
+          container: {
+            backgroundColor: colors.brand.orange + '20',
+            borderRadius: 16,
           },
-          dots: [{ key: 'trophy', color: colors.brand.orange }],
+          text: {
+            color: colors.text.primary,
+            fontWeight: '700',
+          },
         };
-      } else if (isInStreak) {
+        dotColor = colors.brand.orange;
+      }
+      
+      if (isInStreak) {
         // Active streak day
-        marked[dateStr] = {
-          marked: true,
-          dotColor: colors.brand.green,
-          customStyles: {
+        dots.push({ key: 'streak', color: colors.brand.green });
+        if (!isTrophyDay) {
+          customStyles = {
             container: {
               backgroundColor: colors.brand.green + '15',
               borderRadius: 16,
@@ -126,17 +129,22 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
             text: {
               color: colors.text.primary,
             },
-          },
-          dots: [{ key: 'streak', color: colors.brand.green }],
-        };
-      } else {
-        // Past post (not in current streak)
-        marked[dateStr] = {
-          marked: true,
-          dotColor: colors.text.secondary,
-          dots: [{ key: 'post', color: colors.text.secondary }],
-        };
+          };
+          dotColor = colors.brand.green;
+        }
       }
+      
+      if (dots.length === 0) {
+        // Past post (not in current streak)
+        dots.push({ key: 'post', color: colors.text.secondary });
+      }
+      
+      marked[dateStr] = {
+        marked: true,
+        dotColor,
+        customStyles,
+        dots,
+      };
     });
 
     // Mark rest days (show for both past and future dates)
@@ -145,11 +153,14 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
       const dateStr = formatDateLocal(normalizedDate);
       // If this date already has markings, combine them
       if (marked[dateStr]) {
+        // Add rest day dot to existing dots
+        const existingDots = marked[dateStr].dots || [];
         marked[dateStr] = {
           ...marked[dateStr],
           selected: true,
           selectedColor: colors.primary[500],
           selectedTextColor: colors.background.primary,
+          dots: [...existingDots, { key: 'rest', color: colors.background.primary }],
         };
       } else {
         marked[dateStr] = {
@@ -212,21 +223,30 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
       borderRadius: spacing.md,
       overflow: 'hidden',
     },
-    headerText: {
+    customHeaderContainer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingTop: spacing.xs,
+      paddingBottom: spacing.xs,
+    },
+    monthYearContainer: {
+      alignItems: 'center',
+    },
+    monthText: {
       fontSize: typography.h2.fontSize,
       fontWeight: typography.h2.fontWeight as any,
       fontFamily: typography.h2.fontFamily,
       color: colors.text.primary,
-      marginBottom: spacing.md,
       letterSpacing: 0.5,
       lineHeight: typography.h2.fontSize * 1.2,
     },
-    description: {
+    yearText: {
       fontSize: typography.body.fontSize,
+      fontWeight: '400',
       fontFamily: typography.body.fontFamily,
-      color: colors.text.secondary,
-      marginBottom: spacing.md,
-      lineHeight: typography.body.fontSize * 1.5,
+      color: colors.text.primary,
+      marginTop: 2,
     },
     selectedInfoContainer: {
       marginTop: spacing.md,
@@ -278,22 +298,112 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
     },
   });
 
+  // Format month name
+  const getMonthName = (date: Date): string => {
+    return date.toLocaleDateString('en-US', { month: 'long' });
+  };
+
+  // Get year from date
+  const getYear = (date: Date): string => {
+    return date.getFullYear().toString();
+  };
+
+  // Handle month change
+  const onMonthChange = (month: DateData) => {
+    setCurrentMonth(new Date(month.year, month.month - 1, 1));
+  };
+
+  const monthName = getMonthName(currentMonth);
+  const year = getYear(currentMonth);
+  const currentMonthStr = formatDateLocal(currentMonth);
+
+  // Custom header renderer for the calendar
+  const renderHeader = (date: Date) => {
+    const displayMonth = getMonthName(date);
+    const displayYear = getYear(date);
+    
+    return (
+      <View style={styles.customHeaderContainer}>
+        <View style={styles.monthYearContainer}>
+          <Text style={styles.monthText}>{displayMonth}</Text>
+          <Text style={styles.yearText}>{displayYear}</Text>
+        </View>
+      </View>
+    );
+  };
+
+  // Custom day renderer to display month name instead of day number
+  const renderDay = (day: DateData, state: string) => {
+    if (!day) return null;
+    
+    const isDisabled = state === 'disabled';
+    const isSelected = state === 'selected';
+    const isToday = state === 'today';
+    const date = new Date(day.dateString);
+    const monthName = getMonthName(date);
+    const dateStr = formatDateLocal(date);
+    const markedDate = markedDates[dateStr];
+    const dots = markedDate?.dots || [];
+    
+    return (
+      <View style={{ flex: 1, height: 45, alignItems: 'center', justifyContent: 'center', paddingTop: 4 }}>
+        <Text
+          style={{
+            textAlign: 'center',
+            color: isDisabled 
+              ? colors.text.secondary + '40' 
+              : isSelected 
+                ? colors.background.primary 
+                : isToday
+                  ? colors.primary[500]
+                  : colors.text.primary,
+            fontSize: 12,
+            fontFamily: typography.body.fontFamily,
+            fontWeight: isToday ? '600' : '400',
+            marginBottom: dots.length > 0 ? 2 : 0,
+          }}
+          accessibilityLabel={monthName}
+          accessibilityHint={monthName}
+          numberOfLines={1}
+        >
+          {monthName}
+        </Text>
+        {dots.length > 0 && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 2 }}>
+            {dots.map((dot, index) => (
+              <View
+                key={`${dateStr}-dot-${index}`}
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: 3,
+                  backgroundColor: dot.color,
+                  marginLeft: index > 0 ? 3 : 0,
+                }}
+              />
+            ))}
+          </View>
+        )}
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Your Diary</Text>
-      <Text style={styles.description}>
-        See progress. Set rest days.
-      </Text>
-      
       <Calendar
         style={styles.calendar}
-        current={minDateStr}
+        current={currentMonthStr}
         minDate={undefined} // Show all dates (past and future) to see streaks
         maxDate={maxDateStr} // Limit rest day selection to maxDaysAhead days
         onDayPress={onDayPress}
+        onMonthChange={onMonthChange}
         markedDates={markedDates}
         markingType="multi-dot"
         disableAllTouchEventsForDisabledDays={false}
+        hideExtraDays={true}
+        renderHeader={renderHeader}
+        renderDay={renderDay}
+        dateFormat="MMMM"
         theme={{
           backgroundColor: colors.background.primary,
           calendarBackground: colors.background.primary,
@@ -306,40 +416,20 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
           dotColor: colors.primary[500],
           selectedDotColor: colors.background.primary,
           arrowColor: colors.primary[500],
-          monthTextColor: colors.text.primary,
+          monthTextColor: 'transparent', // Hide default month text
           indicatorColor: colors.primary[500],
           textDayFontFamily: typography.body.fontFamily,
           textMonthFontFamily: typography.h2.fontFamily,
           textDayHeaderFontFamily: typography.body.fontFamily,
           textDayFontSize: 16,
-          textMonthFontSize: 18,
+          textMonthFontSize: 0, // Hide default month text
           textDayHeaderFontSize: 14,
         }}
         enableSwipeMonths={true}
       />
 
-      {/* Legend */}
+      {/* Line separator */}
       <View style={styles.legendContainer}>
-        <View style={styles.legendRow}>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: colors.brand.green || colors.primary[500] }]} />
-            <Text style={styles.legendText}>Active Streak</Text>
-          </View>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: colors.brand.orange }]} />
-            <Text style={styles.legendText}>Milestone 🏆</Text>
-          </View>
-        </View>
-        <View style={styles.legendRow}>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: colors.text.secondary }]} />
-            <Text style={styles.legendText}>Past Post</Text>
-          </View>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: colors.primary[500] }]} />
-            <Text style={styles.legendText}>Rest Day</Text>
-          </View>
-        </View>
       </View>
 
       {selectedDates.length > 0 && (

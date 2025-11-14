@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../../theme/ThemeProvider';
 import { useNavigation } from '../../store/navigation-context';
 import { useAuth } from '../../store/auth-context';
@@ -326,8 +327,8 @@ export const DiaryScreen: React.FC = () => {
       color: colors.text.muted,
       textAlign: 'center',
       marginBottom: 0,
-      letterSpacing: 0.2,
-      lineHeight: typography.body.fontSize * 1.5,
+      letterSpacing: 0.15,
+      lineHeight: typography.body.fontSize * 1.3,
       paddingHorizontal: spacing.md,
     },
     actionsSection: {
@@ -346,30 +347,35 @@ export const DiaryScreen: React.FC = () => {
     },
     actionCard: {
       backgroundColor: colors.background.primary500,
-      borderRadius: 20,
+      borderRadius: 16,
       padding: spacing.md,
       marginBottom: spacing.sm,
       flexDirection: 'row',
       alignItems: 'center',
-      elevation: 8,
+      borderWidth: 1,
+      borderColor: colors.border.primary,
+      elevation: 4,
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
       shadowRadius: 8,
       overflow: 'hidden',
     },
     actionCardCarousel: {
       backgroundColor: colors.background.primary500,
-      borderRadius: 20,
+      borderRadius: 16,
       padding: spacing.md,
       marginRight: spacing.md,
       width: Dimensions.get('window').width - (spacing.lg * 2) - spacing.md, // Full width minus padding and margin
+      height: Dimensions.get('window').width - (spacing.lg * 2) - spacing.md, // Make it square
       flexDirection: 'row',
       alignItems: 'center',
-      elevation: 8,
+      borderWidth: 1,
+      borderColor: colors.border.primary,
+      elevation: 4,
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
       shadowRadius: 8,
       overflow: 'hidden',
     },
@@ -391,11 +397,16 @@ export const DiaryScreen: React.FC = () => {
     savePillButton: {
       backgroundColor: colors.primary[500],
       paddingHorizontal: spacing.md,
-      paddingVertical: spacing.xs,
-      borderRadius: 999,
-      minWidth: 120,
+      paddingVertical: 10,
+      borderRadius: 12,
+      minWidth: 110,
       alignItems: 'center',
       justifyContent: 'center',
+      elevation: 1,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
     },
     savePillButtonDisabled: {
       opacity: 0.5,
@@ -404,8 +415,8 @@ export const DiaryScreen: React.FC = () => {
       color: colors.background.primary,
       fontSize: typography.body.fontSize - 2,
       fontFamily: typography.body.fontFamily,
-      fontWeight: '700',
-      letterSpacing: 0.3,
+      fontWeight: '600',
+      letterSpacing: 0.2,
     },
     calendarHelperText: {
       color: colors.text.muted,
@@ -415,12 +426,14 @@ export const DiaryScreen: React.FC = () => {
     },
     calendarCard: {
       backgroundColor: colors.background.primary500,
-      borderRadius: 20,
+      borderRadius: 16,
       padding: spacing.md,
-      elevation: 8,
+      borderWidth: 1,
+      borderColor: colors.border.primary,
+      elevation: 4,
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
       shadowRadius: 8,
       overflow: 'hidden',
     },
@@ -431,6 +444,20 @@ export const DiaryScreen: React.FC = () => {
       justifyContent: 'center',
       alignItems: 'center',
       marginRight: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.border.primary,
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 3,
+    },
+    plusButtonGradient: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      justifyContent: 'center',
+      alignItems: 'center',
       elevation: 4,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
@@ -446,25 +473,28 @@ export const DiaryScreen: React.FC = () => {
       fontFamily: typography.h3.fontFamily,
       color: colors.text.primary,
       marginBottom: spacing.xs,
-      letterSpacing: 0.2,
+      letterSpacing: 0.15,
       lineHeight: typography.h3.fontSize * 1.2,
     },
     actionDescription: {
       fontSize: typography.body.fontSize,
       fontFamily: typography.body.fontFamily,
+      fontWeight: '400',
       color: colors.text.muted,
-      letterSpacing: 0.2,
-      lineHeight: typography.body.fontSize * 1.5,
+      letterSpacing: 0.15,
+      lineHeight: typography.body.fontSize * 1.3,
     },
     streakInfoCard: {
       backgroundColor: colors.background.primary500,
-      borderRadius: 20,
+      borderRadius: 16,
       padding: spacing.md,
       marginBottom: spacing.sm,
-      elevation: 8,
+      borderWidth: 1,
+      borderColor: colors.border.primary,
+      elevation: 4,
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
       shadowRadius: 8,
       overflow: 'hidden',
     },
@@ -484,14 +514,14 @@ export const DiaryScreen: React.FC = () => {
       fontSize: typography.body.fontSize,
       fontFamily: typography.body.fontFamily,
       color: colors.text.muted,
-      letterSpacing: 0.2,
+      letterSpacing: 0.15,
     },
     streakInfoValue: {
       fontSize: typography.h3.fontSize,
       fontWeight: '700',
       fontFamily: typography.h3.fontFamily,
       color: colors.text.primary,
-      letterSpacing: 0.2,
+      letterSpacing: 0.15,
     },
     streakInfoValueHighlight: {
       color: colors.brand.orange,
@@ -516,14 +546,17 @@ export const DiaryScreen: React.FC = () => {
     },
     featureCardCarousel: {
       backgroundColor: colors.background.primary500,
-      borderRadius: 20,
+      borderRadius: 16,
       padding: spacing.md,
       marginRight: spacing.md,
       width: Dimensions.get('window').width * 0.75,
-      elevation: 8,
+      height: Dimensions.get('window').width * 0.75, // Make it square
+      borderWidth: 1,
+      borderColor: colors.border.primary,
+      elevation: 4,
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
       shadowRadius: 8,
       overflow: 'hidden',
       justifyContent: 'flex-start',
@@ -535,11 +568,13 @@ export const DiaryScreen: React.FC = () => {
       justifyContent: 'center',
       alignItems: 'center',
       marginBottom: spacing.sm,
-      elevation: 4,
+      borderWidth: 1,
+      borderColor: colors.border.primary,
+      elevation: 2,
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 3,
     },
     featureContentCarousel: {
       flex: 1,
@@ -550,21 +585,22 @@ export const DiaryScreen: React.FC = () => {
       fontFamily: typography.h3.fontFamily,
       color: colors.text.primary,
       marginBottom: spacing.xs,
-      letterSpacing: 0.2,
+      letterSpacing: 0.15,
       lineHeight: typography.h3.fontSize * 1.2,
     },
     featureDescriptionCarousel: {
       fontSize: typography.body.fontSize - 1,
       fontFamily: typography.body.fontFamily,
+      fontWeight: '400',
       color: colors.text.muted,
-      letterSpacing: 0.2,
-      lineHeight: (typography.body.fontSize - 1) * 1.4,
+      letterSpacing: 0.15,
+      lineHeight: (typography.body.fontSize - 1) * 1.3,
     },
     comingSoonBadge: {
       backgroundColor: colors.brand.blue,
       paddingHorizontal: spacing.sm,
-      paddingVertical: 4,
-      borderRadius: 50,
+      paddingVertical: 5,
+      borderRadius: 12,
       marginLeft: spacing.sm,
       alignSelf: 'flex-start',
     },
@@ -573,17 +609,19 @@ export const DiaryScreen: React.FC = () => {
       fontFamily: typography.body.fontFamily,
       fontWeight: '700',
       color: colors.background.primary,
-      letterSpacing: 0.2,
+      letterSpacing: 0.15,
     },
     workoutCard: {
       backgroundColor: colors.background.primary500,
-      borderRadius: 20,
+      borderRadius: 16,
       padding: spacing.md,
       marginBottom: spacing.sm,
-      elevation: 8,
+      borderWidth: 1,
+      borderColor: colors.border.primary,
+      elevation: 4,
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
       shadowRadius: 8,
       overflow: 'hidden',
     },
@@ -598,7 +636,7 @@ export const DiaryScreen: React.FC = () => {
       fontFamily: typography.h3.fontFamily,
       color: colors.text.primary,
       marginLeft: spacing.sm,
-      letterSpacing: 0.2,
+      letterSpacing: 0.15,
     },
     workoutItem: {
       paddingVertical: spacing.sm,
@@ -614,13 +652,13 @@ export const DiaryScreen: React.FC = () => {
       fontFamily: typography.body.fontFamily,
       color: colors.text.primary,
       marginBottom: spacing.xs,
-      letterSpacing: 0.2,
+      letterSpacing: 0.15,
     },
     workoutTime: {
       fontSize: typography.body.fontSize - 2,
       fontFamily: typography.body.fontFamily,
       color: colors.text.muted,
-      letterSpacing: 0.2,
+      letterSpacing: 0.15,
     },
     workoutMoreText: {
       fontSize: typography.body.fontSize - 2,
@@ -628,7 +666,7 @@ export const DiaryScreen: React.FC = () => {
       color: colors.brand.blue,
       marginTop: spacing.sm,
       textAlign: 'center',
-      letterSpacing: 0.2,
+      letterSpacing: 0.15,
     },
     workoutEmptyText: {
       fontSize: typography.body.fontSize,
@@ -657,19 +695,26 @@ export const DiaryScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
       >
-        {/* Hero Section */}
-        <View style={styles.heroSection}>
-          <View style={styles.heroIcon}>
-            <Ionicons
-              name="book"
-              size={64}
-              color={colors.brand.purple}
-            />
-          </View>
-          <Text style={styles.heroTitle}>My Mahi Diary</Text>
-          <Text style={styles.heroSubtitle}>
-            Set up your Mahi, track your progress, and maintain your streak
-          </Text>
+        {/* Rest Days Calendar */}
+        <View style={styles.calendarSection}>
+          {loadingRestDays ? (
+            <View style={{ padding: spacing.xl, alignItems: 'center' }}>
+              <Text style={styles.actionDescription}>Loading rest days...</Text>
+            </View>
+          ) : (
+            <>
+              <RestDaysCalendar
+                selectedDates={pendingRestDays}
+                onDatesChange={handleRestDaysChange}
+                minDate={new Date()}
+                maxDaysAhead={30}
+                streakDays={userData?.streak_days || 0}
+                lastPostDate={userData?.last_post_date ? new Date(userData.last_post_date) : null}
+                postDates={postDates}
+                showSaveConfirmation={restDaysSaved}
+              />
+            </>
+          )}
         </View>
 
         {/* Quick Actions - Swipeable */}
@@ -681,28 +726,55 @@ export const DiaryScreen: React.FC = () => {
             showsHorizontalScrollIndicator={false}
             keyExtractor={(item, index) => `action-${index}`}
             contentContainerStyle={styles.actionsCarouselContent}
-            renderItem={({ item }) => (
-              <Pressable style={styles.actionCardCarousel} onPress={item.onPress}>
-                <View
+            renderItem={({ item }) => {
+              const isUpdateStreak = item.title === 'Update Streak';
+              const cardWidth = Dimensions.get('window').width - (spacing.lg * 2) - spacing.md;
+              const updateStreakSize = cardWidth * 0.5; // 50% smaller
+              
+              return (
+                <Pressable 
                   style={[
-                    styles.actionIconContainer,
-                    { backgroundColor: item.color + '20' },
-                  ]}
+                    styles.actionCardCarousel,
+                    isUpdateStreak && {
+                      width: updateStreakSize,
+                      height: updateStreakSize,
+                      backgroundColor: colors.brand.orange,
+                    },
+                  ]} 
+                  onPress={item.onPress}
                 >
-                  <Ionicons
-                    name={item.icon as any}
-                    size={24}
-                    color={item.color}
-                  />
-                </View>
-                <View style={styles.actionContent}>
-                  <Text style={styles.actionTitle}>{item.title}</Text>
-                  <Text style={styles.actionDescription}>
-                    {item.description}
-                  </Text>
-                </View>
-              </Pressable>
-            )}
+                  {isUpdateStreak ? (
+                    <LinearGradient
+                      colors={[colors.primary[500], colors.primary[500]]}
+                      start={{ x: 0, y: 1 }}
+                      end={{ x: 1, y: 0 }}
+                      style={styles.plusButtonGradient}
+                    >
+                      <Ionicons name="add" size={20} color={colors.background.primary} />
+                    </LinearGradient>
+                  ) : (
+                    <View
+                      style={[
+                        styles.actionIconContainer,
+                        { backgroundColor: item.color + '20' },
+                      ]}
+                    >
+                      <Ionicons
+                        name={item.icon as any}
+                        size={24}
+                        color={item.color}
+                      />
+                    </View>
+                  )}
+                  <View style={styles.actionContent}>
+                    <Text style={styles.actionTitle}>{item.title}</Text>
+                    <Text style={styles.actionDescription}>
+                      {item.description}
+                    </Text>
+                  </View>
+                </Pressable>
+              );
+            }}
           />
         </View>
 
@@ -752,47 +824,6 @@ export const DiaryScreen: React.FC = () => {
               </View>
             </View>
           </View>
-        </View>
-
-        {/* Rest Days Calendar */}
-        <View style={styles.calendarSection}>
-          {loadingRestDays ? (
-            <View style={{ padding: spacing.xl, alignItems: 'center' }}>
-              <Text style={styles.actionDescription}>Loading rest days...</Text>
-            </View>
-          ) : (
-            <>
-              <RestDaysCalendar
-                selectedDates={pendingRestDays}
-                onDatesChange={handleRestDaysChange}
-                minDate={new Date()}
-                maxDaysAhead={30}
-                streakDays={userData?.streak_days || 0}
-                lastPostDate={userData?.last_post_date ? new Date(userData.last_post_date) : null}
-                postDates={postDates}
-                showSaveConfirmation={restDaysSaved}
-              />
-              <View style={styles.calendarActions}>
-                <Pressable
-                  style={[
-                    styles.savePillButton,
-                    (savingRestDays || !restDaysDirty) && styles.savePillButtonDisabled,
-                  ]}
-                  onPress={handleRestDaysSave}
-                  disabled={savingRestDays || !restDaysDirty}
-                >
-                  {savingRestDays ? (
-                    <ActivityIndicator size="small" color={colors.background.primary} />
-                  ) : (
-                    <Text style={styles.savePillButtonText}>Save & Sync</Text>
-                  )}
-                </Pressable>
-                {restDaysDirty && (
-                  <Text style={styles.calendarHelperText}>Unsaved changes</Text>
-                )}
-              </View>
-            </>
-          )}
         </View>
 
         {/* Coming Soon Features - Horizontal Carousel */}
