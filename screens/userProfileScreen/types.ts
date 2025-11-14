@@ -4,6 +4,8 @@ export interface UserData {
   fullName: string;
   username: string;
   email: string;
+  phone?: string;
+  fitness_goal?: 'weight_loss' | 'muscle_gain' | 'endurance' | 'flexibility' | 'general' | string;
   bio?: string;
   occupation?: string;
   picturePath?: string | number; // Can be URI string or require() asset number
@@ -12,9 +14,11 @@ export interface UserData {
   followings?: number;
   streak_days?: number; // Current streak count - Ready for Supabase integration
   streak_level?: number; // Current streak level - Ready for Supabase integration
+  milestone_level?: number; // Number of streak milestones achieved (every 7 days)
   longest_streak?: number; // Longest streak ever achieved - For loss aversion
   rest_days?: string[]; // Days of week when user takes rest (e.g., ['sunday', 'saturday'])
   last_post_date?: string | Date; // Last post date for streak calculation (UK timezone)
+  joined_date?: string | Date; // Date when user joined/created account
 }
 
 export interface PostData {

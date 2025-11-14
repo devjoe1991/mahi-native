@@ -8,6 +8,7 @@ import {
   Alert,
   FlatList,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../theme/ThemeProvider';
@@ -25,6 +26,9 @@ import {
   hasCalendarPermissions,
   WorkoutEvent,
 } from '../../utils/healthIntegration';
+import { RestDaysCalendar } from '../../components/calendar/RestDaysCalendar';
+import { syncAllRestDaysToCalendar, getRestDaysFromCalendar } from '../../utils/calendarSync';
+import { getPostsByUserId } from '../../data/posts';
 
 export const DiaryScreen: React.FC = () => {
   const { colors, spacing, typography } = useTheme();
@@ -38,6 +42,13 @@ export const DiaryScreen: React.FC = () => {
   const [nextWorkout, setNextWorkout] = useState<WorkoutEvent | null>(null);
   const [calendarPermissionGranted, setCalendarPermissionGranted] = useState(false);
   const [loadingWorkouts, setLoadingWorkouts] = useState(false);
+  const [restDaysDates, setRestDaysDates] = useState<Date[]>([]);
+  const [pendingRestDays, setPendingRestDays] = useState<Date[]>([]);
+  const [restDaysDirty, setRestDaysDirty] = useState(false);
+  const [loadingRestDays, setLoadingRestDays] = useState(false);
+  const [postDates, setPostDates] = useState<Date[]>([]);
+  const [restDaysSaved, setRestDaysSaved] = useState(false);
+  const [savingRestDays, setSavingRestDays] = useState(false);
 
   const handleTabPress = (tab: TabType) => {
     if (tab === 'home') {
@@ -65,10 +76,107 @@ export const DiaryScreen: React.FC = () => {
 
   const handleSetRestDays = () => {
     openModal('REST_DAYS_SETUP', {
-      onSave: (restDays) => {
+      onSave: async (restDays) => {
         console.log('Rest days saved:', restDays);
+        // Reload rest days from calendar after save
+        await loadRestDaysFromCalendar();
       },
     });
+  };
+
+  const normalizeRestDates = (dates: Date[]): Date[] => {
+    return dates
+      .map((date) => {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        return d;
+      })
+      .filter((d) => !isNaN(d.getTime()))
+      .sort((a, b) => a.getTime() - b.getTime());
+  };
+
+  const areRestDayArraysEqual = (a: Date[], b: Date[]): boolean => {
+    if (a.length !== b.length) {
+      return false;
+    }
+    for (let i = 0; i < a.length; i++) {
+      if (a[i].getTime() !== b[i].getTime()) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const loadRestDaysFromCalendar = async () => {
+    setLoadingRestDays(true);
+    try {
+      const hasPermission = await hasCalendarPermissions();
+      if (hasPermission) {
+        const calendarRestDays = await getRestDaysFromCalendar();
+        const normalized = normalizeRestDates(calendarRestDays);
+        setRestDaysDates(normalized);
+        setPendingRestDays(normalized);
+        setRestDaysDirty(false);
+      } else {
+        // Load from user profile if no calendar permission
+        if (userData?.rest_days) {
+          const profileDates = userData.rest_days
+            .filter((rd: string) => rd.includes('T') || rd.match(/^\d{4}-\d{2}-\d{2}/))
+            .map((rd: string) => new Date(rd));
+          const normalized = normalizeRestDates(profileDates);
+          setRestDaysDates(normalized);
+          setPendingRestDays(normalized);
+          setRestDaysDirty(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading rest days:', error);
+    } finally {
+      setLoadingRestDays(false);
+    }
+  };
+
+  const handleRestDaysChange = (dates: Date[]) => {
+    const normalized = normalizeRestDates(dates);
+    setPendingRestDays(normalized);
+    setRestDaysDirty(!areRestDayArraysEqual(normalized, restDaysDates));
+    setRestDaysSaved(false);
+  };
+
+  const handleRestDaysSave = async () => {
+    if (!restDaysDirty) {
+      return;
+    }
+
+    setSavingRestDays(true);
+    try {
+      const hasPermission = await hasCalendarPermissions();
+      if (hasPermission) {
+        await syncAllRestDaysToCalendar(pendingRestDays);
+      }
+
+      const restDaysData = pendingRestDays.map((date) => {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        return d.toISOString();
+      });
+
+      // TODO: Update user profile in Supabase
+      // await updateUserData({ rest_days: restDaysData });
+
+      setRestDaysDates(pendingRestDays);
+      setRestDaysDirty(false);
+      setRestDaysSaved(true);
+
+      setTimeout(() => {
+        setRestDaysSaved(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error saving rest days:', error);
+      Alert.alert('Error', 'Failed to save rest days. Please try again.');
+    } finally {
+      setSavingRestDays(false);
+    }
   };
 
   const handleUpdateStreak = () => {
@@ -121,9 +229,44 @@ export const DiaryScreen: React.FC = () => {
     }
   };
 
+  const loadPostDates = async () => {
+    if (!userData?._id) return;
+    
+    try {
+      const posts = await getPostsByUserId(userData._id);
+      const dates = posts.map((post) => {
+        const date = new Date(post.createdAt);
+        date.setHours(0, 0, 0, 0);
+        return date;
+      });
+      setPostDates(dates);
+    } catch (error) {
+      console.error('Error loading post dates:', error);
+    }
+  };
+
   useEffect(() => {
     fetchWorkouts();
-  }, []);
+    loadRestDaysFromCalendar();
+    loadPostDates();
+  }, [userData?._id]);
+
+  const quickActions = [
+    {
+      icon: 'flame',
+      title: 'Update Streak',
+      description: 'Post your daily Mahi to maintain your streak',
+      color: colors.brand.orange,
+      onPress: handleUpdateStreak,
+    },
+    {
+      icon: 'calendar-outline',
+      title: 'Set Rest Days',
+      description: 'Choose which days you take rest from your streak',
+      color: colors.brand.blue,
+      onPress: handleSetRestDays,
+    },
+  ];
 
   const features = [
     {
@@ -139,13 +282,6 @@ export const DiaryScreen: React.FC = () => {
       description: 'View detailed insights, trends, and progress over time',
       color: colors.brand.cyan,
       comingSoon: true,
-    },
-    {
-      icon: 'calendar',
-      title: 'Workout Calendar',
-      description: 'See your workout history and plan ahead',
-      color: colors.brand.purple,
-      comingSoon: false,
     },
     {
       icon: 'trophy',
@@ -222,6 +358,72 @@ export const DiaryScreen: React.FC = () => {
       shadowRadius: 8,
       overflow: 'hidden',
     },
+    actionCardCarousel: {
+      backgroundColor: colors.background.primary500,
+      borderRadius: 20,
+      padding: spacing.md,
+      marginRight: spacing.md,
+      width: Dimensions.get('window').width - (spacing.lg * 2) - spacing.md, // Full width minus padding and margin
+      flexDirection: 'row',
+      alignItems: 'center',
+      elevation: 8,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      overflow: 'hidden',
+    },
+    actionsCarouselContent: {
+      paddingRight: spacing.lg,
+    },
+    calendarSection: {
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.md,
+      marginBottom: spacing.md,
+    },
+    calendarActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginTop: spacing.sm,
+      paddingHorizontal: spacing.lg,
+    },
+    savePillButton: {
+      backgroundColor: colors.primary[500],
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs,
+      borderRadius: 999,
+      minWidth: 120,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    savePillButtonDisabled: {
+      opacity: 0.5,
+    },
+    savePillButtonText: {
+      color: colors.background.primary,
+      fontSize: typography.body.fontSize - 2,
+      fontFamily: typography.body.fontFamily,
+      fontWeight: '700',
+      letterSpacing: 0.3,
+    },
+    calendarHelperText: {
+      color: colors.text.muted,
+      fontSize: typography.body.fontSize - 2,
+      fontFamily: typography.body.fontFamily,
+      marginLeft: spacing.sm,
+    },
+    calendarCard: {
+      backgroundColor: colors.background.primary500,
+      borderRadius: 20,
+      padding: spacing.md,
+      elevation: 8,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      overflow: 'hidden',
+    },
     actionIconContainer: {
       width: 48,
       height: 48,
@@ -267,13 +469,16 @@ export const DiaryScreen: React.FC = () => {
       overflow: 'hidden',
     },
     streakInfoRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: spacing.sm,
+      marginBottom: spacing.md,
     },
     streakInfoRowLast: {
       marginBottom: 0,
+    },
+    streakInfoLabelContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.xs,
     },
     streakInfoLabel: {
       fontSize: typography.body.fontSize,
@@ -290,6 +495,16 @@ export const DiaryScreen: React.FC = () => {
     },
     streakInfoValueHighlight: {
       color: colors.brand.orange,
+    },
+    progressBarContainer: {
+      height: 4,
+      backgroundColor: colors.background.primary500,
+      borderRadius: 2,
+      overflow: 'hidden',
+    },
+    progressBarFill: {
+      height: '100%',
+      borderRadius: 2,
     },
     featuresSection: {
       paddingHorizontal: spacing.lg,
@@ -457,178 +672,125 @@ export const DiaryScreen: React.FC = () => {
           </Text>
         </View>
 
-        {/* Quick Actions */}
+        {/* Quick Actions - Swipeable */}
         <View style={styles.actionsSection}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
-          
-          <Pressable style={styles.actionCard} onPress={handleUpdateStreak}>
-            <View
-              style={[
-                styles.actionIconContainer,
-                { backgroundColor: colors.brand.orange + '20' },
-              ]}
-            >
-              <Ionicons
-                name="flame"
-                size={24}
-                color={colors.brand.orange}
-              />
-            </View>
-            <View style={styles.actionContent}>
-              <Text style={styles.actionTitle}>Update Streak</Text>
-              <Text style={styles.actionDescription}>
-                Post your daily Mahi to maintain your streak
-              </Text>
-            </View>
-          </Pressable>
-
-          <Pressable style={styles.actionCard} onPress={handleSetRestDays}>
-            <View
-              style={[
-                styles.actionIconContainer,
-                { backgroundColor: colors.brand.blue + '20' },
-              ]}
-            >
-              <Ionicons
-                name="calendar-outline"
-                size={24}
-                color={colors.brand.blue}
-              />
-            </View>
-            <View style={styles.actionContent}>
-              <Text style={styles.actionTitle}>Set Rest Days</Text>
-              <Text style={styles.actionDescription}>
-                Choose which days you take rest from your streak
-              </Text>
-            </View>
-          </Pressable>
+          <FlatList
+            data={quickActions}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item, index) => `action-${index}`}
+            contentContainerStyle={styles.actionsCarouselContent}
+            renderItem={({ item }) => (
+              <Pressable style={styles.actionCardCarousel} onPress={item.onPress}>
+                <View
+                  style={[
+                    styles.actionIconContainer,
+                    { backgroundColor: item.color + '20' },
+                  ]}
+                >
+                  <Ionicons
+                    name={item.icon as any}
+                    size={24}
+                    color={item.color}
+                  />
+                </View>
+                <View style={styles.actionContent}>
+                  <Text style={styles.actionTitle}>{item.title}</Text>
+                  <Text style={styles.actionDescription}>
+                    {item.description}
+                  </Text>
+                </View>
+              </Pressable>
+            )}
+          />
         </View>
 
         {/* Streak Info */}
         <View style={styles.actionsSection}>
           <Text style={styles.sectionTitle}>Your Stats</Text>
           <View style={styles.streakInfoCard}>
+            {/* Current Streak */}
             <View style={styles.streakInfoRow}>
-              <Text style={styles.streakInfoLabel}>Current Streak</Text>
-              <Text style={[styles.streakInfoValue, styles.streakInfoValueHighlight]}>
-                {currentStreak} days 🔥
-              </Text>
+              <View style={styles.streakInfoLabelContainer}>
+                <Text style={styles.streakInfoLabel}>Current Streak</Text>
+                <Text style={[styles.streakInfoValue, styles.streakInfoValueHighlight]}>
+                  {currentStreak} days 🔥
+                </Text>
+              </View>
+              <View style={styles.progressBarContainer}>
+                <View 
+                  style={[
+                    styles.progressBarFill, 
+                    { 
+                      width: `${Math.min((currentStreak / Math.max(longestStreak, 30)) * 100, 100)}%`,
+                      backgroundColor: colors.brand.orange,
+                    }
+                  ]} 
+                />
+              </View>
             </View>
-            <View style={styles.streakInfoRow}>
-              <Text style={styles.streakInfoLabel}>Longest Streak</Text>
-              <Text style={styles.streakInfoValue}>
-                {longestStreak} days
-              </Text>
-            </View>
+
+            {/* Longest Streak */}
             <View style={[styles.streakInfoRow, styles.streakInfoRowLast]}>
-              <Text style={styles.streakInfoLabel}>Rest Days</Text>
-              <Text style={styles.streakInfoValue}>
-                {restDays.length > 0 ? restDays.join(', ') : 'None set'}
-              </Text>
+              <View style={styles.streakInfoLabelContainer}>
+                <Text style={styles.streakInfoLabel}>Longest Streak</Text>
+                <Text style={styles.streakInfoValue}>
+                  {longestStreak} days
+                </Text>
+              </View>
+              <View style={styles.progressBarContainer}>
+                <View 
+                  style={[
+                    styles.progressBarFill, 
+                    { 
+                      width: '100%',
+                      backgroundColor: colors.brand.purple,
+                    }
+                  ]} 
+                />
+              </View>
             </View>
           </View>
         </View>
 
-        {/* Calendar Integration */}
-        <View style={styles.actionsSection}>
-          <Text style={styles.sectionTitle}>Scheduled Workouts</Text>
-          
-          {!calendarPermissionGranted ? (
-            <Pressable style={styles.actionCard} onPress={handleConnectCalendar}>
-              <View
-                style={[
-                  styles.actionIconContainer,
-                  { backgroundColor: colors.brand.purple + '20' },
-                ]}
-              >
-                <Ionicons
-                  name="calendar-outline"
-                  size={24}
-                  color={colors.brand.purple}
-                />
-              </View>
-              <View style={styles.actionContent}>
-                <Text style={styles.actionTitle}>Connect Calendar</Text>
-                <Text style={styles.actionDescription}>
-                  Connect your calendar to detect scheduled workouts and get reminders
-                </Text>
-              </View>
-            </Pressable>
+        {/* Rest Days Calendar */}
+        <View style={styles.calendarSection}>
+          {loadingRestDays ? (
+            <View style={{ padding: spacing.xl, alignItems: 'center' }}>
+              <Text style={styles.actionDescription}>Loading rest days...</Text>
+            </View>
           ) : (
             <>
-              {todayWorkouts.length > 0 && (
-                <View style={styles.workoutCard}>
-                  <View style={styles.workoutHeader}>
-                    <Ionicons name="today" size={20} color={colors.brand.orange} />
-                    <Text style={styles.workoutSectionTitle}>Today's Workouts</Text>
-                  </View>
-                  {todayWorkouts.map((workout) => (
-                    <View key={workout.id} style={styles.workoutItem}>
-                      <View style={styles.workoutItemContent}>
-                        <Text style={styles.workoutTitle}>{workout.title}</Text>
-                        <Text style={styles.workoutTime}>
-                          {workout.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          {workout.location && ` • ${workout.location}`}
-                        </Text>
-                      </View>
-                    </View>
-                  ))}
-                </View>
-              )}
-
-              {nextWorkout && nextWorkout.startDate > new Date() && (
-                <View style={styles.workoutCard}>
-                  <View style={styles.workoutHeader}>
-                    <Ionicons name="time-outline" size={20} color={colors.brand.blue} />
-                    <Text style={styles.workoutSectionTitle}>Next Workout</Text>
-                  </View>
-                  <View style={styles.workoutItem}>
-                    <View style={styles.workoutItemContent}>
-                      <Text style={styles.workoutTitle}>{nextWorkout.title}</Text>
-                      <Text style={styles.workoutTime}>
-                        {nextWorkout.startDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
-                        {' • '}
-                        {nextWorkout.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        {nextWorkout.location && ` • ${nextWorkout.location}`}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              )}
-
-              {upcomingWorkouts.length > 0 && (
-                <View style={styles.workoutCard}>
-                  <View style={styles.workoutHeader}>
-                    <Ionicons name="calendar-outline" size={20} color={colors.brand.purple} />
-                    <Text style={styles.workoutSectionTitle}>Upcoming (Next 7 Days)</Text>
-                  </View>
-                  {upcomingWorkouts.slice(0, 3).map((workout) => (
-                    <View key={workout.id} style={styles.workoutItem}>
-                      <View style={styles.workoutItemContent}>
-                        <Text style={styles.workoutTitle}>{workout.title}</Text>
-                        <Text style={styles.workoutTime}>
-                          {workout.startDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
-                          {' • '}
-                          {workout.startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </Text>
-                      </View>
-                    </View>
-                  ))}
-                  {upcomingWorkouts.length > 3 && (
-                    <Text style={styles.workoutMoreText}>
-                      +{upcomingWorkouts.length - 3} more workouts
-                    </Text>
+              <RestDaysCalendar
+                selectedDates={pendingRestDays}
+                onDatesChange={handleRestDaysChange}
+                minDate={new Date()}
+                maxDaysAhead={30}
+                streakDays={userData?.streak_days || 0}
+                lastPostDate={userData?.last_post_date ? new Date(userData.last_post_date) : null}
+                postDates={postDates}
+                showSaveConfirmation={restDaysSaved}
+              />
+              <View style={styles.calendarActions}>
+                <Pressable
+                  style={[
+                    styles.savePillButton,
+                    (savingRestDays || !restDaysDirty) && styles.savePillButtonDisabled,
+                  ]}
+                  onPress={handleRestDaysSave}
+                  disabled={savingRestDays || !restDaysDirty}
+                >
+                  {savingRestDays ? (
+                    <ActivityIndicator size="small" color={colors.background.primary} />
+                  ) : (
+                    <Text style={styles.savePillButtonText}>Save & Sync</Text>
                   )}
-                </View>
-              )}
-
-              {upcomingWorkouts.length === 0 && todayWorkouts.length === 0 && (
-                <View style={styles.workoutCard}>
-                  <Text style={styles.workoutEmptyText}>
-                    No workouts detected in your calendar. Add workout events to get reminders!
-                  </Text>
-                </View>
-              )}
+                </Pressable>
+                {restDaysDirty && (
+                  <Text style={styles.calendarHelperText}>Unsaved changes</Text>
+                )}
+              </View>
             </>
           )}
         </View>

@@ -16,6 +16,7 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSCalendarsUsageDescription": "Mahi needs access to your calendar to detect scheduled workouts and help you complete your daily goals.",
+        "NSContactsUsageDescription": "Mahi needs access to your contacts so you can find friends already on Mahi and invite others to join.",
         "NSHealthShareUsageDescription": "Mahi would like to access your health data to track your workouts and help you maintain your streak. (Coming soon)",
         "NSHealthUpdateUsageDescription": "Mahi would like to write workout data to Apple Health. (Coming soon)",
         "ITSAppUsesNonExemptEncryption": false
@@ -32,8 +33,10 @@
       "permissions": [
         "READ_CALENDAR",
         "WRITE_CALENDAR",
+        "READ_CONTACTS",
         "android.permission.READ_CALENDAR",
-        "android.permission.WRITE_CALENDAR"
+        "android.permission.WRITE_CALENDAR",
+        "android.permission.READ_CONTACTS"
       ]
     },
     "web": {
@@ -45,6 +48,12 @@
         "expo-calendar",
         {
           "calendarPermission": "Allow Mahi to access your calendar to detect scheduled workouts and help you complete your daily goals."
+        }
+      ],
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "Allow Mahi to access your contacts so you can find friends already on Mahi and invite others to join."
         }
       ]
     ],

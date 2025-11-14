@@ -1,6 +1,7 @@
 import { PostData } from '../screens/userProfileScreen/types';
 import { getAllPosts } from './posts';
 import { getUserById } from './user';
+import { getTodayLocal, formatDateLocal, normalizeDateLocal } from '../utils/dateUtils';
 
 /**
  * Check if user has posted today
@@ -27,13 +28,9 @@ export const hasPostedToday = async (userId: string): Promise<boolean> => {
     );
     const lastPost = sortedPosts[0];
 
-    // Check if last post was today
-    const lastPostDate = new Date(lastPost.createdAt);
-    const today = new Date();
-    
-    // Reset time to compare dates only
-    lastPostDate.setHours(0, 0, 0, 0);
-    today.setHours(0, 0, 0, 0);
+    // Check if last post was today (using local timezone)
+    const lastPostDate = normalizeDateLocal(lastPost.createdAt);
+    const today = getTodayLocal();
 
     return lastPostDate.getTime() === today.getTime();
   } catch (error) {
@@ -84,9 +81,8 @@ export const isRestDay = async (userId: string): Promise<boolean> => {
       return false; // No rest days configured
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayStr = today.toISOString().split('T')[0];
+    const today = getTodayLocal();
+    const todayStr = formatDateLocal(today);
     const todayDayOfWeek = today.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
 
     // Check if today matches any rest day
@@ -94,9 +90,8 @@ export const isRestDay = async (userId: string): Promise<boolean> => {
       // Check if it's a date string (ISO format)
       if (restDay.includes('T') || restDay.match(/^\d{4}-\d{2}-\d{2}/)) {
         try {
-          const restDate = new Date(restDay);
-          restDate.setHours(0, 0, 0, 0);
-          const restDateStr = restDate.toISOString().split('T')[0];
+          const restDate = normalizeDateLocal(restDay);
+          const restDateStr = formatDateLocal(restDate);
           return restDateStr === todayStr;
         } catch {
           return false;

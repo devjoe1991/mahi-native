@@ -9,6 +9,8 @@ export const MOCK_USER_DATA: UserData = {
   fullName: 'Joe John',
   username: 'joe',
   email: 'joe@example.com',
+  phone: '+15555550100',
+  fitness_goal: 'muscle_gain',
   bio: 'Fitness enthusiast | Daily streaks | Living my best life',
   occupation: 'Software Developer',
   picturePath: require('../assets/Jogger.jpg'), // Joe John's profile picture
@@ -17,8 +19,11 @@ export const MOCK_USER_DATA: UserData = {
   followings: 378,
   streak_days: 21, // Current streak - Ready for Supabase: SELECT streak_days FROM profiles WHERE id = userId (21 days = 3 milestone badges)
   streak_level: 7, // Current level - Ready for Supabase: SELECT streak_level FROM profiles WHERE id = userId
+  milestone_level: 3,
   longest_streak: 21, // Longest streak ever - For loss aversion warnings
   rest_days: [], // Rest days - Ready for Supabase: SELECT rest_days FROM profiles WHERE id = userId
+  last_post_date: new Date(), // Last post was today - Ready for Supabase: SELECT MAX(created_at) FROM posts WHERE user_id = userId
+  joined_date: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000), // User joined 60 days ago - Ready for Supabase: SELECT created_at FROM profiles WHERE id = userId
 };
 
 /**
@@ -31,6 +36,8 @@ export const MOCK_USERS: UserData[] = [
     fullName: 'Maximus',
     username: 'maximus',
     email: 'maximus@example.com',
+    phone: '+15555550101',
+    fitness_goal: 'flexibility',
     bio: 'Yoga instructor | Mindfulness advocate',
     occupation: 'Yoga Instructor',
     picturePath: undefined,
@@ -43,6 +50,8 @@ export const MOCK_USERS: UserData[] = [
     fullName: 'Verity',
     username: 'verity',
     email: 'verity@example.com',
+    phone: '+15555550102',
+    fitness_goal: 'endurance',
     bio: 'Marathon runner | Fitness coach',
     occupation: 'Personal Trainer',
     picturePath: undefined,
@@ -87,9 +96,12 @@ export const getAllUsers = async (): Promise<UserData[]> => {
       fullName: 'Alex Runner',
       username: 'alex',
       email: 'alex@example.com',
+      phone: '+15555550103',
+      fitness_goal: 'endurance',
       bio: 'Daily runner',
       streak_days: 45,
       streak_level: 5,
+      milestone_level: 6,
       posts: 120,
       followers: 5000,
       followings: 200,
@@ -99,14 +111,75 @@ export const getAllUsers = async (): Promise<UserData[]> => {
       fullName: 'Ellie',
       username: 'ellie',
       email: 'ellie@example.com',
+      phone: '+15555550104',
+      fitness_goal: 'general',
       bio: 'Fitness coach',
       streak_days: 30,
       streak_level: 4,
+      milestone_level: 4,
       posts: 200,
       followers: 8000,
       followings: 300,
     },
   ];
+};
+
+const normalizeEmail = (email?: string | null): string | null => {
+  if (!email) {
+    return null;
+  }
+  return email.trim().toLowerCase();
+};
+
+const normalizePhone = (phone?: string | null): string | null => {
+  if (!phone) {
+    return null;
+  }
+  const digitsOnly = phone.replace(/\D/g, '');
+  if (!digitsOnly) {
+    return null;
+  }
+
+  return digitsOnly.length > 10 ? digitsOnly.slice(-10) : digitsOnly;
+};
+
+/**
+ * Find users that match the provided emails or phone numbers
+ * This simulates a Supabase lookup and will be replaced once the API is wired in.
+ */
+export const findUsersByContacts = async (
+  emails: string[],
+  phoneNumbers: string[]
+): Promise<UserData[]> => {
+  await new Promise((resolve) => setTimeout(resolve, 250));
+
+  const normalizedEmailSet = new Set(
+    emails
+      .map(normalizeEmail)
+      .filter((value): value is string => Boolean(value))
+  );
+
+  const normalizedPhoneSet = new Set(
+    phoneNumbers
+      .map(normalizePhone)
+      .filter((value): value is string => Boolean(value))
+  );
+
+  if (normalizedEmailSet.size === 0 && normalizedPhoneSet.size === 0) {
+    return [];
+  }
+
+  const users = await getAllUsers();
+
+  return users.filter((user) => {
+    const emailMatch = normalizeEmail(user.email);
+    const phoneMatch = normalizePhone(user.phone);
+
+    const hasEmailMatch = emailMatch ? normalizedEmailSet.has(emailMatch) : false;
+    const hasPhoneMatch = phoneMatch ? normalizedPhoneSet.has(phoneMatch) : false;
+
+    return hasEmailMatch || hasPhoneMatch;
+  });
 };
 
 /**
