@@ -66,11 +66,27 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       shadowRadius: 8,
       elevation: 4,
     },
+    imageContainer: {
+      position: 'relative',
+      width: POST_WIDTH,
+    },
+    image: {
+      width: POST_WIDTH, // Match container width exactly
+      height: Math.min(POST_WIDTH / IMAGE_ASPECT_RATIO, MAX_IMAGE_HEIGHT), // Calculate height, cap at max
+      resizeMode: 'cover',
+    },
     header: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
       flexDirection: 'row',
       alignItems: 'center',
-      padding: spacing.lg,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
       paddingBottom: spacing.md,
+      // Add gradient overlay for better text readability
+      backgroundColor: 'rgba(0, 0, 0, 0.3)',
     },
     avatar: {
       width: 44,
@@ -93,12 +109,15 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       gap: spacing.xs,
     },
     username: {
-      fontSize: typography.body.fontSize,
+      fontSize: typography.body.fontSize - 2,
       fontWeight: typography.h2.fontWeight as any,
       fontFamily: typography.h2.fontFamily,
-      color: colors.text.primary,
+      color: colors.background.primary,
       letterSpacing: 0.15,
-      lineHeight: typography.body.fontSize * 1.3,
+      lineHeight: (typography.body.fontSize - 2) * 1.3,
+      textShadowColor: 'rgba(0, 0, 0, 0.5)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 2,
     },
     streakBadge: {
       flexDirection: 'row',
@@ -147,29 +166,36 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       marginLeft: 3,
       letterSpacing: 0.1,
     },
-    image: {
-      width: POST_WIDTH, // Match container width exactly
-      height: Math.min(POST_WIDTH / IMAGE_ASPECT_RATIO, MAX_IMAGE_HEIGHT), // Calculate height, cap at max
-      resizeMode: 'cover',
-    },
     footer: {
       padding: spacing.lg,
-      paddingTop: spacing.md,
+      paddingTop: spacing.sm,
     },
     caption: {
-      fontSize: typography.body.fontSize,
+      fontSize: typography.body.fontSize - 2,
       fontFamily: typography.body.fontFamily,
       fontWeight: '400',
       color: colors.text.primary,
       marginBottom: spacing.xs,
       letterSpacing: 0.15,
-      lineHeight: typography.body.fontSize * 1.3,
+      lineHeight: (typography.body.fontSize - 2) * 1.3,
+    },
+    captionUsername: {
+      fontSize: typography.body.fontSize - 2,
+      fontWeight: typography.h2.fontWeight as any,
+      fontFamily: typography.h2.fontFamily,
+      color: colors.text.primary,
+      letterSpacing: 0.15,
     },
     stats: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginTop: spacing.sm,
+      justifyContent: 'space-between',
+      marginTop: 0,
       marginBottom: spacing.xs,
+    },
+    statsLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
     },
     statText: {
       fontSize: 12,
@@ -183,6 +209,9 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       flexDirection: 'row',
       alignItems: 'center',
       marginLeft: spacing.md,
+    },
+    saveButton: {
+      padding: spacing.xs,
     },
     // Motivational accent for interactive elements
     heartIcon: {
@@ -205,56 +234,66 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
 
   return (
     <Pressable style={styles.container} onPress={onPress}>
-      <View style={styles.header}>
-        {avatarSource ? (
-          <Image source={avatarSource} style={styles.avatar} />
-        ) : (
-          <View style={styles.avatar} />
-        )}
-        <View style={styles.headerText}>
-          <Text style={styles.username}>{userData?.username || 'joe'}</Text>
-          {postAuthorStreak !== null && postAuthorStreak > 0 && (
-            <View style={styles.streakBadge}>
-              <Ionicons name="flame" size={12} color={colors.background.primary} />
-              <Text style={styles.streakText}>{postAuthorStreak}</Text>
-            </View>
+      <View style={styles.imageContainer}>
+        <Image source={imageSource} style={styles.image} />
+        <View style={styles.header}>
+          {avatarSource ? (
+            <Image source={avatarSource} style={styles.avatar} />
+          ) : (
+            <View style={styles.avatar} />
           )}
-          {postAuthorTrophyCount > 0 && (
-            <View style={styles.trophyBadge}>
-              <Text style={styles.trophyEmoji}>🏆</Text>
-              <Text style={styles.trophyText}>{postAuthorTrophyCount}</Text>
-            </View>
-          )}
+          <View style={styles.headerText}>
+            <Text style={styles.username}>{userData?.username || 'joe'}</Text>
+            {postAuthorStreak !== null && postAuthorStreak > 0 && (
+              <View style={styles.streakBadge}>
+                <Ionicons name="flame" size={12} color={colors.background.primary} />
+                <Text style={styles.streakText}>{postAuthorStreak}</Text>
+              </View>
+            )}
+            {postAuthorTrophyCount > 0 && (
+              <View style={styles.trophyBadge}>
+                <Text style={styles.trophyEmoji}>🏆</Text>
+                <Text style={styles.trophyText}>{postAuthorTrophyCount}</Text>
+              </View>
+            )}
+          </View>
         </View>
       </View>
       
-      <Image source={imageSource} style={styles.image} />
-      
       <View style={styles.footer}>
         <View style={styles.stats}>
-          <Pressable style={styles.heartIcon}>
+          <View style={styles.statsLeft}>
+            <Pressable style={styles.heartIcon}>
+              <Ionicons 
+                name="heart-outline" 
+                size={22} 
+                color={theme === 'dark' ? colors.brand.red : colors.brand.pink} 
+              />
+            </Pressable>
+            <Text style={styles.statText}>{post.likes || 0}</Text>
+            <Pressable
+              style={styles.commentButton}
+              onPress={() => openSheet('COMMENTS', { postId: post._id })}
+            >
+              <Ionicons 
+                name="chatbubble-outline" 
+                size={22} 
+                color={theme === 'dark' ? colors.brand.blue : colors.brand.blue100} 
+              />
+              <Text style={styles.statText}>{post.comments || 0}</Text>
+            </Pressable>
+          </View>
+          <Pressable style={styles.saveButton}>
             <Ionicons 
-              name="heart-outline" 
+              name="bookmark-outline" 
               size={22} 
-              color={theme === 'dark' ? colors.brand.red : colors.brand.pink} 
+              color={colors.text.secondary} 
             />
-          </Pressable>
-          <Text style={styles.statText}>{post.likes || 0}</Text>
-          <Pressable
-            style={styles.commentButton}
-            onPress={() => openSheet('COMMENTS', { postId: post._id })}
-          >
-            <Ionicons 
-              name="chatbubble-outline" 
-              size={22} 
-              color={theme === 'dark' ? colors.brand.blue : colors.brand.blue100} 
-            />
-            <Text style={styles.statText}>{post.comments || 0}</Text>
           </Pressable>
         </View>
         {post.caption && (
           <Text style={styles.caption}>
-            <Text style={styles.username}>{userData?.username || 'joe'}</Text> {post.caption}
+            <Text style={styles.captionUsername}>{userData?.username || 'joe'}</Text> {post.caption}
           </Text>
         )}
       </View>

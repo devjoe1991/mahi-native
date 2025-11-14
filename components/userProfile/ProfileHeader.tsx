@@ -113,14 +113,14 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     },
     name: {
       fontWeight: typography.h2.fontWeight as any,
-      fontSize: 25,
+      fontSize: 22,
       fontFamily: typography.h2.fontFamily,
       color: colors.text.primary,
       marginTop: spacing.md,
       letterSpacing: 0.15,
     },
     username: {
-      fontSize: 15,
+      fontSize: 14,
       fontFamily: typography.body.fontFamily,
       color: colors.text.secondary,
       marginTop: spacing.xs,

@@ -105,14 +105,14 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
         // Trophy milestone day
         dots.push({ key: 'trophy', color: colors.brand.orange });
         customStyles = {
-          container: {
-            backgroundColor: colors.brand.orange + '20',
-            borderRadius: 16,
-          },
-          text: {
-            color: colors.text.primary,
-            fontWeight: '700',
-          },
+            container: {
+              backgroundColor: colors.brand.orange + '20',
+              borderRadius: 16,
+            },
+            text: {
+              color: colors.text.primary,
+              fontWeight: '700',
+            },
         };
         dotColor = colors.brand.orange;
       }
@@ -139,12 +139,12 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
         dots.push({ key: 'post', color: colors.text.secondary });
       }
       
-      marked[dateStr] = {
-        marked: true,
+        marked[dateStr] = {
+          marked: true,
         dotColor,
         customStyles,
         dots,
-      };
+        };
     });
 
     // Mark rest days (show for both past and future dates)

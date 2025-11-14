@@ -42,7 +42,7 @@ export const DateOfBirthScreen: React.FC<DateOfBirthScreenProps> = ({ onNext, on
     },
     title: {
       fontSize: 24,
-      fontWeight: '700',
+      fontWeight: '600',
       fontFamily: typography.h1.fontFamily,
       color: colors.text.primary,
       letterSpacing: 0.5,

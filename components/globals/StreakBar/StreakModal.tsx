@@ -131,7 +131,7 @@ export const StreakModal: React.FC<StreakModalProps> = ({ streak, onClose, onNav
       borderColor: streakColor,
     },
     title: {
-      fontSize: typography.h2.fontSize,
+      fontSize: typography.h2.fontSize - 3,
       fontWeight: typography.h2.fontWeight as any,
       fontFamily: typography.h2.fontFamily,
       color: colors.text.primary,
@@ -139,12 +139,12 @@ export const StreakModal: React.FC<StreakModalProps> = ({ streak, onClose, onNav
       textAlign: 'center',
     },
     description: {
-      fontSize: typography.body.fontSize,
+      fontSize: typography.body.fontSize - 2,
       fontFamily: typography.body.fontFamily,
       color: colors.text.secondary,
       marginBottom: spacing.lg,
       textAlign: 'center',
-      lineHeight: 22,
+      lineHeight: 20,
     },
     button: {
       backgroundColor: streakColor,

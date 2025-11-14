@@ -286,7 +286,7 @@ export const DiaryScreen: React.FC = () => {
     },
     {
       icon: 'trophy',
-      title: 'Achievements & Milestones',
+      title: 'Milestones',
       description: 'Track your achievements and celebrate milestones',
       color: colors.brand.orange,
       comingSoon: true,
@@ -468,35 +468,26 @@ export const DiaryScreen: React.FC = () => {
       flex: 1,
     },
     actionTitle: {
-      fontSize: typography.h3.fontSize,
+      fontSize: typography.h3.fontSize - 4,
       fontWeight: typography.h3.fontWeight as any,
       fontFamily: typography.h3.fontFamily,
       color: colors.text.primary,
       marginBottom: spacing.xs,
       letterSpacing: 0.15,
-      lineHeight: typography.h3.fontSize * 1.2,
+      lineHeight: (typography.h3.fontSize - 4) * 1.2,
     },
     actionDescription: {
-      fontSize: typography.body.fontSize,
+      fontSize: typography.body.fontSize - 2,
       fontFamily: typography.body.fontFamily,
       fontWeight: '400',
       color: colors.text.muted,
       letterSpacing: 0.15,
-      lineHeight: typography.body.fontSize * 1.3,
+      lineHeight: (typography.body.fontSize - 2) * 1.3,
     },
     streakInfoCard: {
-      backgroundColor: colors.background.primary500,
-      borderRadius: 16,
+      backgroundColor: 'transparent',
       padding: spacing.md,
       marginBottom: spacing.sm,
-      borderWidth: 1,
-      borderColor: colors.border.primary,
-      elevation: 4,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.08,
-      shadowRadius: 8,
-      overflow: 'hidden',
     },
     streakInfoRow: {
       marginBottom: spacing.md,
@@ -518,7 +509,7 @@ export const DiaryScreen: React.FC = () => {
     },
     streakInfoValue: {
       fontSize: typography.h3.fontSize,
-      fontWeight: '700',
+      fontWeight: '600',
       fontFamily: typography.h3.fontFamily,
       color: colors.text.primary,
       letterSpacing: 0.15,
@@ -549,8 +540,8 @@ export const DiaryScreen: React.FC = () => {
       borderRadius: 16,
       padding: spacing.md,
       marginRight: spacing.md,
-      width: Dimensions.get('window').width * 0.75,
-      height: Dimensions.get('window').width * 0.75, // Make it square
+      width: Dimensions.get('window').width * 0.5,
+      height: Dimensions.get('window').width * 0.5, // Make it square
       borderWidth: 1,
       borderColor: colors.border.primary,
       elevation: 4,
@@ -580,21 +571,21 @@ export const DiaryScreen: React.FC = () => {
       flex: 1,
     },
     featureTitleCarousel: {
-      fontSize: typography.h3.fontSize,
+      fontSize: typography.h3.fontSize - 4,
       fontWeight: typography.h3.fontWeight as any,
       fontFamily: typography.h3.fontFamily,
       color: colors.text.primary,
       marginBottom: spacing.xs,
       letterSpacing: 0.15,
-      lineHeight: typography.h3.fontSize * 1.2,
+      lineHeight: (typography.h3.fontSize - 4) * 1.2,
     },
     featureDescriptionCarousel: {
-      fontSize: typography.body.fontSize - 1,
+      fontSize: typography.body.fontSize - 3,
       fontFamily: typography.body.fontFamily,
       fontWeight: '400',
       color: colors.text.muted,
       letterSpacing: 0.15,
-      lineHeight: (typography.body.fontSize - 1) * 1.3,
+      lineHeight: (typography.body.fontSize - 3) * 1.3,
     },
     comingSoonBadge: {
       backgroundColor: colors.brand.blue,
@@ -647,7 +638,7 @@ export const DiaryScreen: React.FC = () => {
       marginTop: spacing.sm,
     },
     workoutTitle: {
-      fontSize: typography.body.fontSize,
+      fontSize: typography.body.fontSize - 2,
       fontWeight: '600',
       fontFamily: typography.body.fontFamily,
       color: colors.text.primary,
@@ -719,7 +710,6 @@ export const DiaryScreen: React.FC = () => {
 
         {/* Quick Actions - Swipeable */}
         <View style={styles.actionsSection}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
           <FlatList
             data={quickActions}
             horizontal
@@ -728,17 +718,22 @@ export const DiaryScreen: React.FC = () => {
             contentContainerStyle={styles.actionsCarouselContent}
             renderItem={({ item }) => {
               const isUpdateStreak = item.title === 'Update Streak';
+              const isSetRestDays = item.title === 'Set Rest Days';
+              const isSquareCard = isUpdateStreak || isSetRestDays;
               const cardWidth = Dimensions.get('window').width - (spacing.lg * 2) - spacing.md;
-              const updateStreakSize = cardWidth * 0.5; // 50% smaller
+              const squareCardSize = cardWidth * 0.5; // 50% smaller
               
               return (
                 <Pressable 
                   style={[
                     styles.actionCardCarousel,
-                    isUpdateStreak && {
-                      width: updateStreakSize,
-                      height: updateStreakSize,
-                      backgroundColor: colors.brand.orange,
+                    isSquareCard && {
+                      width: squareCardSize,
+                      height: squareCardSize,
+                      backgroundColor: colors.primary[500] + '15',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      alignItems: 'center',
                     },
                   ]} 
                   onPress={item.onPress}
@@ -748,10 +743,29 @@ export const DiaryScreen: React.FC = () => {
                       colors={[colors.primary[500], colors.primary[500]]}
                       start={{ x: 0, y: 1 }}
                       end={{ x: 1, y: 0 }}
-                      style={styles.plusButtonGradient}
+                      style={[styles.plusButtonGradient, { marginBottom: spacing.sm }]}
                     >
                       <Ionicons name="add" size={20} color={colors.background.primary} />
                     </LinearGradient>
+                  ) : isSetRestDays ? (
+                    <View
+                      style={[
+                        styles.actionIconContainer,
+                        {
+                          backgroundColor: colors.primary[500],
+                          marginBottom: spacing.sm,
+                          width: 36,
+                          height: 36,
+                          borderRadius: 18,
+                        },
+                      ]}
+                    >
+                      <Ionicons
+                        name={item.icon as any}
+                        size={20}
+                        color={colors.background.primary}
+                      />
+                    </View>
                   ) : (
                     <View
                       style={[
@@ -766,7 +780,7 @@ export const DiaryScreen: React.FC = () => {
                       />
                     </View>
                   )}
-                  <View style={styles.actionContent}>
+                  <View style={[styles.actionContent, isSquareCard && { alignItems: 'center' }]}>
                     <Text style={styles.actionTitle}>{item.title}</Text>
                     <Text style={styles.actionDescription}>
                       {item.description}
@@ -780,7 +794,6 @@ export const DiaryScreen: React.FC = () => {
 
         {/* Streak Info */}
         <View style={styles.actionsSection}>
-          <Text style={styles.sectionTitle}>Your Stats</Text>
           <View style={styles.streakInfoCard}>
             {/* Current Streak */}
             <View style={styles.streakInfoRow}>

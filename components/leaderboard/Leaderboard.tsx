@@ -63,7 +63,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
       borderBottomColor: colors.border.primary,
     },
     title: {
-      fontSize: typography.h2.fontSize,
+      fontSize: typography.h2.fontSize - 3,
       fontWeight: typography.h2.fontWeight as any,
       fontFamily: typography.h2.fontFamily,
       color: colors.text.primary,
@@ -83,7 +83,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
       backgroundColor: colors.brand.blue,
     },
     periodButtonText: {
-      fontSize: typography.body.fontSize,
+      fontSize: typography.body.fontSize - 2,
       fontFamily: typography.body.fontFamily,
       color: colors.text.primary,
     },
@@ -99,7 +99,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
     },
     rank: {
       width: 40,
-      fontSize: typography.h3.fontSize,
+      fontSize: typography.h3.fontSize - 4,
       fontWeight: typography.h3.fontWeight as any,
       fontFamily: typography.h3.fontFamily,
       color: colors.text.secondary,
@@ -113,7 +113,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
       marginLeft: spacing.md,
     },
     username: {
-      fontSize: typography.body.fontSize,
+      fontSize: typography.body.fontSize - 2,
       fontWeight: typography.h2.fontWeight as any,
       fontFamily: typography.h2.fontFamily,
       color: colors.text.primary,

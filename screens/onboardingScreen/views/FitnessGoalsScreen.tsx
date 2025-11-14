@@ -47,7 +47,7 @@ export const FitnessGoalsScreen: React.FC<FitnessGoalsScreenProps> = ({ onNext, 
     },
     title: {
       fontSize: 24,
-      fontWeight: '700',
+      fontWeight: '600',
       fontFamily: typography.h1.fontFamily,
       color: colors.text.primary,
       letterSpacing: 0.5,

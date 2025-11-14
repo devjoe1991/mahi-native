@@ -35,7 +35,7 @@ export const WelcomeAuthScreen: React.FC<WelcomeAuthScreenProps> = ({ onLogin, o
     },
     title: {
       fontSize: 96,
-      fontWeight: '700',
+      fontWeight: '600',
       fontFamily: typography.h1.fontFamily,
       color: colors.background.primary,
       textAlign: 'center',

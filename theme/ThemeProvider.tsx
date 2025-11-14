@@ -228,14 +228,14 @@ const createTypography = (textColor: string, fontFamily: string = 'Outfit'): Typ
   fontFamily,
   h1: {
     fontSize: 32,
-    fontWeight: '700',
-    fontFamily: 'Outfit_700Bold',
+    fontWeight: '600',
+    fontFamily: 'Outfit_600SemiBold',
     color: textColor,
   },
   h2: {
     fontSize: 24,
-    fontWeight: '600',
-    fontFamily: 'Outfit_600SemiBold',
+    fontWeight: '500',
+    fontFamily: 'Outfit_500Medium',
     color: textColor,
   },
   h3: {

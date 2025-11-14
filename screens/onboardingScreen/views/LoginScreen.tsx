@@ -46,7 +46,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSignUp, onLoginSucce
     mahiTitle: {
       flex: 1,
       fontSize: 48,
-      fontWeight: '700',
+      fontWeight: '600',
       fontFamily: typography.h1.fontFamily,
       color: colors.text.primary,
       textAlign: 'center',
@@ -59,7 +59,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSignUp, onLoginSucce
     },
     title: {
       fontSize: 32,
-      fontWeight: '700',
+      fontWeight: '600',
       fontFamily: typography.h1.fontFamily,
       color: colors.text.primary,
       textAlign: 'center',

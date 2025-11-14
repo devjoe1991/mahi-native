@@ -14,9 +14,9 @@ export const MahiTextLogo: React.FC<MahiTextLogoProps> = ({
   const { colors, typography } = useTheme();
 
   const sizeMap = {
-    small: { fontSize: 20, fontWeight: '700' },
-    medium: { fontSize: 24, fontWeight: '700' },
-    large: { fontSize: 32, fontWeight: '700' },
+    small: { fontSize: 20, fontWeight: '600' },
+    medium: { fontSize: 24, fontWeight: '600' },
+    large: { fontSize: 32, fontWeight: '600' },
   };
 
   const currentSize = sizeMap[size];

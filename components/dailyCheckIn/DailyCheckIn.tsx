@@ -82,7 +82,7 @@ export const DailyCheckIn: React.FC<DailyCheckInProps> = ({ onComplete }) => {
       marginBottom: spacing.md,
     },
     title: {
-      fontSize: typography.h2.fontSize,
+      fontSize: typography.h2.fontSize - 3,
       fontWeight: typography.h2.fontWeight as any,
       fontFamily: typography.h2.fontFamily,
       color: colors.text.primary,
@@ -90,14 +90,14 @@ export const DailyCheckIn: React.FC<DailyCheckInProps> = ({ onComplete }) => {
       textAlign: 'center',
     },
     message: {
-      fontSize: typography.body.fontSize,
+      fontSize: typography.body.fontSize - 2,
       fontFamily: typography.body.fontFamily,
       color: colors.text.muted,
       textAlign: 'center',
       marginBottom: spacing.lg,
     },
     streakInfo: {
-      fontSize: typography.h3.fontSize,
+      fontSize: typography.h3.fontSize - 4,
       fontFamily: typography.h3.fontFamily,
       color: colors.brand.orange,
       marginBottom: spacing.lg,

@@ -53,7 +53,7 @@ export const SettingsSheet: React.FC = () => {
       paddingBottom: spacing.md,
     },
     title: {
-      fontSize: typography.h2.fontSize,
+      fontSize: typography.h2.fontSize - 3,
       fontWeight: typography.h2.fontWeight as any,
       fontFamily: typography.h2.fontFamily,
       color: colors.text.primary,
@@ -71,7 +71,7 @@ export const SettingsSheet: React.FC = () => {
     },
     label: {
       flex: 1,
-      fontSize: typography.body.fontSize,
+      fontSize: typography.body.fontSize - 2,
       fontFamily: typography.body.fontFamily,
       color: colors.text.primary,
     },

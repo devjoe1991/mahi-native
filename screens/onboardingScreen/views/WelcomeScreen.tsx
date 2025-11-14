@@ -28,7 +28,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNext }) => {
     },
     title: {
       fontSize: 32,
-      fontWeight: '700',
+      fontWeight: '600',
       fontFamily: typography.h1.fontFamily,
       color: colors.text.primary,
       textAlign: 'center',

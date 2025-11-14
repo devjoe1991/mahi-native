@@ -215,18 +215,18 @@ export const UserProfileScreen: React.FC<UserProfileScreenProps> = ({
       marginBottom: 0,
     },
     statLabel: {
-      fontSize: typography.body.fontSize,
+      fontSize: typography.body.fontSize - 2,
       fontFamily: typography.body.fontFamily,
       color: colors.text.secondary,
     },
     statValue: {
-      fontSize: typography.h3.fontSize,
+      fontSize: typography.h3.fontSize - 4,
       fontFamily: typography.h3.fontFamily,
       fontWeight: typography.h3.fontWeight as any,
       color: colors.text.primary,
     },
     statTitle: {
-      fontSize: typography.h2.fontSize,
+      fontSize: typography.h2.fontSize - 3,
       fontFamily: typography.h2.fontFamily,
       fontWeight: typography.h2.fontWeight as any,
       color: colors.text.primary,

@@ -134,12 +134,12 @@ export const MessagesScreen: React.FC = () => {
       marginRight: spacing.sm,
     },
     headerTitle: {
-      fontSize: typography.h2.fontSize,
+      fontSize: typography.h2.fontSize - 3,
       fontWeight: typography.h2.fontWeight as any,
       fontFamily: typography.h2.fontFamily,
       color: colors.text.primary,
       letterSpacing: 0.5,
-      lineHeight: typography.h2.fontSize * 1.2,
+      lineHeight: (typography.h2.fontSize - 3) * 1.2,
     },
     settingsButton: {
       padding: spacing.xs,
@@ -211,13 +211,13 @@ export const MessagesScreen: React.FC = () => {
       marginBottom: spacing.xs,
     },
     username: {
-      fontSize: typography.body.fontSize,
+      fontSize: typography.body.fontSize - 2,
       fontWeight: typography.h2.fontWeight as any,
       fontFamily: typography.h2.fontFamily,
       color: colors.text.primary,
       flex: 1,
       letterSpacing: 0.2,
-      lineHeight: typography.body.fontSize * 1.4,
+      lineHeight: (typography.body.fontSize - 2) * 1.4,
     },
     time: {
       fontSize: 12,
@@ -233,13 +233,13 @@ export const MessagesScreen: React.FC = () => {
       justifyContent: 'space-between',
     },
     lastMessage: {
-      fontSize: typography.body.fontSize,
+      fontSize: typography.body.fontSize - 2,
       fontFamily: typography.body.fontFamily,
       color: colors.text.muted,
       flex: 1,
       marginRight: spacing.sm,
       letterSpacing: 0.2,
-      lineHeight: typography.body.fontSize * 1.5,
+      lineHeight: (typography.body.fontSize - 2) * 1.5,
     },
     unreadBadge: {
       backgroundColor: colors.brand.blue,

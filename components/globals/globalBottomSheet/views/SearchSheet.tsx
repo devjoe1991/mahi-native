@@ -188,7 +188,7 @@ export const SearchSheet: React.FC = () => {
       borderRadius: 50,
       paddingHorizontal: spacing.lg,
       paddingVertical: spacing.md,
-      fontSize: typography.body.fontSize,
+      fontSize: typography.body.fontSize - 2,
       fontFamily: typography.body.fontFamily,
       color: colors.text.primary,
       borderWidth: 1,
@@ -234,7 +234,7 @@ export const SearchSheet: React.FC = () => {
       flex: 1,
     },
     resultTitle: {
-      fontSize: typography.body.fontSize,
+      fontSize: typography.body.fontSize - 2,
       fontFamily: typography.body.fontFamily,
       fontWeight: '600',
       color: colors.text.primary,
@@ -242,7 +242,7 @@ export const SearchSheet: React.FC = () => {
       letterSpacing: 0.2,
     },
     resultSubtitle: {
-      fontSize: typography.body.fontSize - 2,
+      fontSize: typography.body.fontSize - 3,
       fontFamily: typography.body.fontFamily,
       color: colors.text.muted,
       letterSpacing: 0.2,
@@ -254,7 +254,7 @@ export const SearchSheet: React.FC = () => {
       paddingVertical: spacing.xl * 2,
     },
     emptyText: {
-      fontSize: typography.body.fontSize,
+      fontSize: typography.body.fontSize - 2,
       fontFamily: typography.body.fontFamily,
       color: colors.text.muted,
       textAlign: 'center',
