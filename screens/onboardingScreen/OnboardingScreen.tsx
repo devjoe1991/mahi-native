@@ -9,7 +9,6 @@ import { EmailPhoneScreen } from './views/EmailPhoneScreen';
 import { OTPConfirmationScreen } from './views/OTPConfirmationScreen';
 import { DateOfBirthScreen } from './views/DateOfBirthScreen';
 import { FitnessGoalsScreen } from './views/FitnessGoalsScreen';
-import { PrivacyPermissionsScreen } from './views/PrivacyPermissionsScreen';
 
 interface OnboardingScreenProps {
   onComplete: () => void;
@@ -89,8 +88,6 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, 
         return <DateOfBirthScreen onNext={handleNext} onBack={handleBack} />;
       case 4:
         return <FitnessGoalsScreen onNext={handleNext} onBack={handleBack} />;
-      case 5:
-        return <PrivacyPermissionsScreen onNext={handleNext} onBack={handleBack} />;
       default:
         return <NameScreen onNext={handleNext} onBack={handleBack} />;
     }

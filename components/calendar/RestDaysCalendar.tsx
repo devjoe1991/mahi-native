@@ -1,10 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import type { DateData } from 'react-native-calendars';
+import type { MarkingProps } from 'react-native-calendars/src/calendar/day/marking';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../theme/ThemeProvider';
 import { getTodayLocal, formatDateLocal, normalizeDateLocal } from '../../utils/dateUtils';
+
+type DayState = 'selected' | 'disabled' | 'inactive' | 'today' | '';
+
+type CalendarDot = NonNullable<MarkingProps['dots']>[number];
+
+type CalendarMarkedDate = MarkingProps;
+
+type CalendarMarkedDates = Record<string, CalendarMarkedDate>;
+
+type CustomDayComponentProps = {
+  date?: DateData;
+  state?: DayState;
+  marking?: CalendarMarkedDate;
+};
 
 interface RestDaysCalendarProps {
   selectedDates: Date[];
@@ -35,7 +50,7 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
   // Use local date for minDate if not provided
   const effectiveMinDate = minDate || getTodayLocal();
   const { colors, spacing, typography } = useTheme();
-  const [markedDates, setMarkedDates] = useState<{ [key: string]: any }>({});
+  const [markedDates, setMarkedDates] = useState<CalendarMarkedDates>({});
   const [currentMonth, setCurrentMonth] = useState<Date>(minDate || getTodayLocal());
 
   // Calculate trophy milestone days (every 7 days: 7, 14, 21, 28, etc.)
@@ -76,7 +91,7 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
 
   // Convert dates to marked dates format with streaks and milestones
   useEffect(() => {
-    const marked: { [key: string]: any } = {};
+    const marked: CalendarMarkedDates = {};
     const today = getTodayLocal();
     
     // Mark streak days (past dates) first
@@ -97,7 +112,7 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
       const isInStreak = streakPeriod && date >= streakPeriod.startDate && date <= streakPeriod.endDate;
       const isTrophyDay = trophyDayStrings.has(dateStr);
       
-      const dots: Array<{ key: string; color: string }> = [];
+      const dots: CalendarDot[] = [];
       let customStyles: any = {};
       let dotColor = colors.text.secondary;
       
@@ -208,9 +223,7 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
     onDatesChange(newSelectedDates);
   };
 
-  // Format min and max dates for calendar
-  const minDateLocal = normalizeDateLocal(effectiveMinDate);
-  const minDateStr = formatDateLocal(minDateLocal);
+  // Format max date for calendar
   const maxDate = new Date(getTodayLocal());
   maxDate.setDate(maxDate.getDate() + maxDaysAhead);
   const maxDateStr = formatDateLocal(maxDate);
@@ -332,68 +345,71 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
     );
   };
 
-  // Custom day renderer to display month name instead of day number
-  const renderDay = (day: DateData, state: string) => {
-    if (!day) return null;
-    
-    const isDisabled = state === 'disabled';
-    const isSelected = state === 'selected';
-    const isToday = state === 'today';
-    const date = new Date(day.dateString);
-    const monthName = getMonthName(date);
-    const dateStr = formatDateLocal(date);
-    const markedDate = markedDates[dateStr];
-    const dots = markedDate?.dots || [];
-    
-    return (
-      <View style={{ flex: 1, height: 45, alignItems: 'center', justifyContent: 'center', paddingTop: 4 }}>
-        <Text
-          style={{
-            textAlign: 'center',
-            color: isDisabled 
-              ? colors.text.secondary + '40' 
-              : isSelected 
-                ? colors.background.primary 
-                : isToday
-                  ? colors.primary[500]
-                  : colors.text.primary,
-            fontSize: 12,
-            fontFamily: typography.body.fontFamily,
-            fontWeight: isToday ? '600' : '400',
-            marginBottom: dots.length > 0 ? 2 : 0,
-          }}
-          accessibilityLabel={monthName}
-          accessibilityHint={monthName}
-          numberOfLines={1}
-        >
-          {monthName}
-        </Text>
-        {dots.length > 0 && (
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 2 }}>
-            {dots.map((dot, index) => (
-              <View
-                key={`${dateStr}-dot-${index}`}
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: 3,
-                  backgroundColor: dot.color,
-                  marginLeft: index > 0 ? 3 : 0,
-                }}
-              />
-            ))}
-          </View>
-        )}
-      </View>
-    );
-  };
+  const DayCell = useCallback(
+    ({ date, state, marking }: CustomDayComponentProps) => {
+      if (!date) {
+        return <View style={{ flex: 1, height: 45 }} />;
+      }
+
+      const isDisabled = state === 'disabled' || state === 'inactive';
+      const isSelected = state === 'selected';
+      const isToday = state === 'today';
+      const dateStr = date.dateString;
+      const dayNumber = date.day;
+      const dots = (marking?.dots ?? []) as CalendarDot[];
+
+      const textColor = isDisabled
+        ? colors.text.secondary + '40'
+        : isSelected
+          ? colors.background.primary
+          : isToday
+            ? colors.primary[500]
+            : colors.text.primary;
+
+      return (
+        <View style={{ flex: 1, height: 45, alignItems: 'center', justifyContent: 'center', paddingTop: 4 }}>
+          <Text
+            style={{
+              textAlign: 'center',
+              color: textColor,
+              fontSize: 16,
+              fontFamily: typography.body.fontFamily,
+              fontWeight: isToday ? '600' : '400',
+              marginBottom: dots.length > 0 ? 2 : 0,
+            }}
+            accessibilityLabel={`Day ${dayNumber}`}
+            accessibilityHint={`Day ${dayNumber}`}
+            numberOfLines={1}
+          >
+            {dayNumber}
+          </Text>
+          {dots.length > 0 && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 2 }}>
+              {dots.map((dot: CalendarDot, index: number) => (
+                <View
+                  key={`${dateStr}-dot-${index}`}
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: 3,
+                    backgroundColor: dot.color,
+                    marginLeft: index > 0 ? 3 : 0,
+                  }}
+                />
+              ))}
+            </View>
+          )}
+        </View>
+      );
+    },
+    [colors, typography]
+  );
 
   return (
     <View style={styles.container}>
       <Calendar
         style={styles.calendar}
         current={currentMonthStr}
-        minDate={undefined} // Show all dates (past and future) to see streaks
         maxDate={maxDateStr} // Limit rest day selection to maxDaysAhead days
         onDayPress={onDayPress}
         onMonthChange={onMonthChange}
@@ -402,8 +418,7 @@ export const RestDaysCalendar: React.FC<RestDaysCalendarProps> = ({
         disableAllTouchEventsForDisabledDays={false}
         hideExtraDays={true}
         renderHeader={renderHeader}
-        renderDay={renderDay}
-        dateFormat="MMMM"
+        dayComponent={DayCell}
         theme={{
           backgroundColor: colors.background.primary,
           calendarBackground: colors.background.primary,

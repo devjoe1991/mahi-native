@@ -164,6 +164,18 @@ const resolveMilestoneLevel = (user: UserData): number => {
     try {
       setLoadingContacts(true);
 
+      // Request contacts permission if not granted
+      const { status } = await Contacts.getPermissionsAsync();
+      if (status !== Contacts.PermissionStatus.GRANTED) {
+        const { status: requestStatus } = await Contacts.requestPermissionsAsync();
+        if (requestStatus !== Contacts.PermissionStatus.GRANTED) {
+          setLoadingContacts(false);
+          setContactMatches([]);
+          setContactInvites([]);
+          return;
+        }
+      }
+
       const { data } = await Contacts.getContactsAsync({
         fields: [Contacts.Fields.Emails, Contacts.Fields.PhoneNumbers],
         sort: Contacts.SortTypes.FirstName,
@@ -562,44 +574,6 @@ const resolveMilestoneLevel = (user: UserData): number => {
     loadingContacts,
   ]);
 
-  const features = [
-    {
-      icon: 'people',
-      title: 'Find Nearby Users',
-      description: 'Connect with fitness enthusiasts in your area',
-      color: colors.brand.blue,
-    },
-    {
-      icon: 'people-circle',
-      title: 'Join Local Groups',
-      description: 'Discover workout groups and communities nearby',
-      color: colors.brand.purple,
-    },
-    {
-      icon: 'location',
-      title: 'Location-Based Feeds',
-      description: 'See what people in your area are up to',
-      color: colors.brand.cyan,
-    },
-    {
-      icon: 'calendar',
-      title: 'Group Challenges',
-      description: 'Participate in local fitness challenges',
-      color: colors.brand.orange,
-    },
-    {
-      icon: 'walk',
-      title: 'Meetup Events',
-      description: 'Join group workouts and meetups',
-      color: colors.brand.green,
-    },
-    {
-      icon: 'trophy',
-      title: 'Local Leaderboards',
-      description: 'Compete with people in your neighborhood',
-      color: colors.brand.yellow,
-    },
-  ];
 
   const styles = StyleSheet.create({
     container: {
@@ -786,30 +760,6 @@ const resolveMilestoneLevel = (user: UserData): number => {
     trophyEmoji: {
       fontSize: 10,
     },
-    comingSoonBadge: {
-      backgroundColor: colors.brand.blue,
-      paddingHorizontal: spacing.lg,
-      paddingVertical: spacing.sm,
-      borderRadius: 12,
-      marginTop: spacing.sm,
-      elevation: 2,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.12,
-      shadowRadius: 3,
-    },
-    comingSoonText: {
-      fontSize: typography.body.fontSize,
-      fontFamily: typography.body.fontFamily,
-      fontWeight: '700',
-      color: colors.background.primary,
-      letterSpacing: 0.3,
-    },
-    featuresSection: {
-      paddingHorizontal: spacing.lg,
-      paddingTop: spacing.md,
-      paddingBottom: spacing.sm,
-    },
     sectionTitle: {
       fontSize: typography.h2.fontSize - 4,
       fontWeight: typography.h2.fontWeight as any,
@@ -827,43 +777,6 @@ const resolveMilestoneLevel = (user: UserData): number => {
       marginBottom: spacing.md,
       letterSpacing: 0.3,
       lineHeight: (typography.h2.fontSize - 4) * 1.2,
-    },
-    carouselContent: {
-      paddingRight: spacing.lg,
-    },
-    featureCardCarousel: {
-      backgroundColor: colors.background.primary500,
-      borderRadius: 16,
-      padding: spacing.md,
-      marginRight: spacing.md,
-      width: Dimensions.get('window').width * 0.75,
-      borderWidth: 1,
-      borderColor: colors.border.primary,
-      elevation: 4,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.08,
-      shadowRadius: 8,
-      overflow: 'hidden',
-      justifyContent: 'flex-start',
-    },
-    featureIconContainerCarousel: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginBottom: spacing.sm,
-      borderWidth: 1,
-      borderColor: colors.border.primary,
-      elevation: 2,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.06,
-      shadowRadius: 3,
-    },
-    featureContentCarousel: {
-      flex: 1,
     },
     featureTitleCarousel: {
       fontSize: typography.h3.fontSize - 4,
@@ -1127,39 +1040,6 @@ const resolveMilestoneLevel = (user: UserData): number => {
           ) : null}
         </View>
 
-        {/* Coming Soon Features Section - Horizontal Carousel */}
-        <View style={styles.featuresSection}>
-          <Text style={styles.sectionTitle}>Coming Soon</Text>
-          <FlatList
-            data={features}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item, index) => `feature-${index}`}
-            contentContainerStyle={styles.carouselContent}
-            renderItem={({ item }) => (
-              <Pressable style={styles.featureCardCarousel}>
-                <View
-                  style={[
-                    styles.featureIconContainerCarousel,
-                    { backgroundColor: item.color + '20' },
-                  ]}
-                >
-                  <Ionicons
-                    name={item.icon as any}
-                    size={24}
-                    color={item.color}
-                  />
-                </View>
-                <View style={styles.featureContentCarousel}>
-                  <Text style={styles.featureTitleCarousel}>{item.title}</Text>
-                  <Text style={styles.featureDescriptionCarousel} numberOfLines={3}>
-                    {item.description}
-                  </Text>
-                </View>
-              </Pressable>
-            )}
-          />
-        </View>
       </ScrollView>
 
       <BottomTabBar activeTab={activeTab} onTabPress={handleTabPress} />

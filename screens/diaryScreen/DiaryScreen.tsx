@@ -269,29 +269,6 @@ export const DiaryScreen: React.FC = () => {
     },
   ];
 
-  const features = [
-    {
-      icon: 'fitness',
-      title: 'Health Data Integration',
-      description: 'Connect with Apple Health, Strava, and Garmin to track your workouts automatically',
-      color: colors.brand.blue,
-      comingSoon: true,
-    },
-    {
-      icon: 'analytics',
-      title: 'Progress Analytics',
-      description: 'View detailed insights, trends, and progress over time',
-      color: colors.brand.cyan,
-      comingSoon: true,
-    },
-    {
-      icon: 'trophy',
-      title: 'Milestones',
-      description: 'Track your achievements and celebrate milestones',
-      color: colors.brand.orange,
-      comingSoon: true,
-    },
-  ];
 
   const styles = StyleSheet.create({
     container: {
@@ -526,81 +503,6 @@ export const DiaryScreen: React.FC = () => {
     progressBarFill: {
       height: '100%',
       borderRadius: 2,
-    },
-    featuresSection: {
-      paddingHorizontal: spacing.lg,
-      paddingTop: spacing.md,
-      paddingBottom: spacing.sm,
-    },
-    carouselContent: {
-      paddingRight: spacing.lg,
-    },
-    featureCardCarousel: {
-      backgroundColor: colors.background.primary500,
-      borderRadius: 16,
-      padding: spacing.md,
-      marginRight: spacing.md,
-      width: Dimensions.get('window').width * 0.5,
-      height: Dimensions.get('window').width * 0.5, // Make it square
-      borderWidth: 1,
-      borderColor: colors.border.primary,
-      elevation: 4,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.08,
-      shadowRadius: 8,
-      overflow: 'hidden',
-      justifyContent: 'flex-start',
-    },
-    featureIconContainerCarousel: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginBottom: spacing.sm,
-      borderWidth: 1,
-      borderColor: colors.border.primary,
-      elevation: 2,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.06,
-      shadowRadius: 3,
-    },
-    featureContentCarousel: {
-      flex: 1,
-    },
-    featureTitleCarousel: {
-      fontSize: typography.h3.fontSize - 4,
-      fontWeight: typography.h3.fontWeight as any,
-      fontFamily: typography.h3.fontFamily,
-      color: colors.text.primary,
-      marginBottom: spacing.xs,
-      letterSpacing: 0.15,
-      lineHeight: (typography.h3.fontSize - 4) * 1.2,
-    },
-    featureDescriptionCarousel: {
-      fontSize: typography.body.fontSize - 3,
-      fontFamily: typography.body.fontFamily,
-      fontWeight: '400',
-      color: colors.text.muted,
-      letterSpacing: 0.15,
-      lineHeight: (typography.body.fontSize - 3) * 1.3,
-    },
-    comingSoonBadge: {
-      backgroundColor: colors.brand.blue,
-      paddingHorizontal: spacing.sm,
-      paddingVertical: 5,
-      borderRadius: 12,
-      marginLeft: spacing.sm,
-      alignSelf: 'flex-start',
-    },
-    comingSoonText: {
-      fontSize: 10,
-      fontFamily: typography.body.fontFamily,
-      fontWeight: '700',
-      color: colors.background.primary,
-      letterSpacing: 0.15,
     },
     workoutCard: {
       backgroundColor: colors.background.primary500,
@@ -839,46 +741,6 @@ export const DiaryScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Coming Soon Features - Horizontal Carousel */}
-        <View style={styles.featuresSection}>
-          <Text style={styles.sectionTitle}>Coming Soon</Text>
-          <FlatList
-            data={features}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item, index) => `feature-${index}`}
-            contentContainerStyle={styles.carouselContent}
-            renderItem={({ item }) => (
-              <Pressable style={styles.featureCardCarousel}>
-                <View
-                  style={[
-                    styles.featureIconContainerCarousel,
-                    { backgroundColor: item.color + '20' },
-                  ]}
-                >
-                  <Ionicons
-                    name={item.icon as any}
-                    size={24}
-                    color={item.color}
-                  />
-                </View>
-                <View style={styles.featureContentCarousel}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <Text style={styles.featureTitleCarousel}>{item.title}</Text>
-                    {item.comingSoon && (
-                      <View style={styles.comingSoonBadge}>
-                        <Text style={styles.comingSoonText}>SOON</Text>
-                      </View>
-                    )}
-                  </View>
-                  <Text style={styles.featureDescriptionCarousel} numberOfLines={3}>
-                    {item.description}
-                  </Text>
-                </View>
-              </Pressable>
-            )}
-          />
-        </View>
       </ScrollView>
 
       <BottomTabBar activeTab={activeTab} onTabPress={handleTabPress} />

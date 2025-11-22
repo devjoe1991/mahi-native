@@ -46,3 +46,10 @@ yarn-error.*
 
 # documentation
 documentation/
+
+# MCP Configuration (project-based, local setup)
+.cursor/mcp.json
+.cursor/
+
+# Supabase local configuration
+.supabase/config.toml

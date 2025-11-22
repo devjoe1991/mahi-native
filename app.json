@@ -7,6 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "privacy": "public",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -14,16 +15,23 @@
     },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.mahitechnologies.Mahinativeapp",
+      "buildNumber": "1",
       "infoPlist": {
-        "NSCalendarsUsageDescription": "Mahi needs access to your calendar to detect scheduled workouts and help you complete your daily goals.",
-        "NSContactsUsageDescription": "Mahi needs access to your contacts so you can find friends already on Mahi and invite others to join.",
-        "NSHealthShareUsageDescription": "Mahi would like to access your health data to track your workouts and help you maintain your streak. (Coming soon)",
-        "NSHealthUpdateUsageDescription": "Mahi would like to write workout data to Apple Health. (Coming soon)",
-        "ITSAppUsesNonExemptEncryption": false
+        "NSCalendarsUsageDescription": "Allow Mahi to access your calendar to detect scheduled workouts and help you complete your daily goals.",
+        "NSContactsUsageDescription": "Allow Mahi to access your contacts so you can find friends already on Mahi and invite others to join.",
+        "NSCameraUsageDescription": "Allow Mahi to use your camera for streak updates and profile photos.",
+        "NSPhotoLibraryUsageDescription": "Allow Mahi to access your photos so you can upload media to your profile.",
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPrivacyPolicyURL": "https://mahi.fit/privacy-policy"
       },
-      "bundleIdentifier": "com.mahitechnologies.Mahinativeapp"
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.mahitechnologies.Mahinativeapp",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -31,12 +39,12 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "permissions": [
-        "READ_CALENDAR",
-        "WRITE_CALENDAR",
-        "READ_CONTACTS",
         "android.permission.READ_CALENDAR",
         "android.permission.WRITE_CALENDAR",
-        "android.permission.READ_CONTACTS"
+        "android.permission.READ_CONTACTS",
+        "android.permission.CAMERA",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_EXTERNAL_STORAGE"
       ]
     },
     "web": {
@@ -58,6 +66,11 @@
       ]
     ],
     "extra": {
+      "links": {
+        "privacyPolicy": "https://mahi.fit/privacy-policy",
+        "support": "https://mahi.fit/support",
+        "terms": "https://mahi.fit/terms"
+      },
       "eas": {
         "projectId": "64a44e79-9439-45bb-bd01-f10fcb19f86c"
       }

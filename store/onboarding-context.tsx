@@ -10,7 +10,6 @@ export interface OnboardingData {
   contactsPermission: boolean;
   calendarPermission: boolean;
   cameraPermission: boolean;
-  microphonePermission: boolean;
   otpCode?: string;
   otpVerified: boolean;
 }
@@ -34,7 +33,6 @@ const defaultOnboardingData: OnboardingData = {
   contactsPermission: false,
   calendarPermission: false,
   cameraPermission: false,
-  microphonePermission: false,
   otpCode: undefined,
   otpVerified: false,
 };
@@ -72,7 +70,7 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
     resetOnboardingData,
     currentStep,
     setCurrentStep,
-    totalSteps: 6, // Name, Email/Phone, OTP, DOB, Fitness Goals, Privacy
+    totalSteps: 5, // Name, Email/Phone, OTP, DOB, Fitness Goals
   };
 
   return (

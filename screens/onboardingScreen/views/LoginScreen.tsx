@@ -244,7 +244,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSignUp, onLoginSucce
 
         <Pressable style={styles.forgotPassword} onPress={() => {
           // TODO: Implement forgot password flow
-          Alert.alert('Forgot Password', 'Password reset feature coming soon!');
+          Alert.alert(
+            'Forgot Password',
+            'Please contact support at support@mahi.fit for password reset assistance.',
+            [{ text: 'OK' }]
+          );
         }}>
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </Pressable>

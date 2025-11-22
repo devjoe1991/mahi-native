@@ -5,12 +5,36 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      },
+      "android": {
+        "buildType": "apk"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "simulator": false
+      },
+      "android": {
+        "buildType": "apk"
+      }
     },
-    "production": {}
+    "production": {
+      "ios": {
+        "simulator": false,
+        "bundleIdentifier": "com.mahitechnologies.Mahinativeapp"
+      },
+      "android": {
+        "buildType": "aab",
+        "package": "com.mahitechnologies.Mahinativeapp"
+      },
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
   },
   "submit": {
     "production": {}

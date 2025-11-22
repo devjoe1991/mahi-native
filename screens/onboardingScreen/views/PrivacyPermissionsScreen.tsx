@@ -26,27 +26,41 @@ export const PrivacyPermissionsScreen: React.FC<PrivacyPermissionsScreenProps> =
     onboardingData.calendarPermission
   );
   const [cameraPermission, setCameraPermission] = useState(onboardingData.cameraPermission);
-  const [microphonePermission, setMicrophonePermission] = useState(
-    onboardingData.microphonePermission
-  );
+
   useEffect(() => {
     let isMounted = true;
 
-    const syncContactsPermission = async () => {
+    const syncPermissions = async () => {
       try {
-        const { status } = await Contacts.getPermissionsAsync();
-        const granted = status === Contacts.PermissionStatus.GRANTED;
+        const [{ status: contactsStatus }, { status: calendarStatus }, { status: cameraStatus }] =
+          await Promise.all([
+            Contacts.getPermissionsAsync(),
+            Calendar.getCalendarPermissionsAsync(),
+            ImagePicker.getCameraPermissionsAsync(),
+          ]);
 
-        if (isMounted) {
-          setContactsPermission(granted);
-          updateOnboardingData({ contactsPermission: granted });
+        if (!isMounted) {
+          return;
         }
+
+        const contactsGranted = contactsStatus === Contacts.PermissionStatus.GRANTED;
+        const calendarGranted = calendarStatus === 'granted';
+        const cameraGranted = cameraStatus === 'granted';
+
+        setContactsPermission(contactsGranted);
+        setCalendarPermission(calendarGranted);
+        setCameraPermission(cameraGranted);
+        updateOnboardingData({
+          contactsPermission: contactsGranted,
+          calendarPermission: calendarGranted,
+          cameraPermission: cameraGranted,
+        });
       } catch (error) {
-        console.error('Contacts permission check error:', error);
+        console.error('Permission sync error:', error);
       }
     };
 
-    syncContactsPermission();
+    syncPermissions();
 
     return () => {
       isMounted = false;
@@ -96,6 +110,14 @@ export const PrivacyPermissionsScreen: React.FC<PrivacyPermissionsScreenProps> =
     },
     permissionIcon: {
       marginRight: spacing.md,
+    },
+    permissionInfoCard: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      backgroundColor: colors.background.primary500,
+      padding: spacing.lg,
+      borderRadius: 12,
+      marginTop: spacing.lg,
     },
     permissionContent: {
       flex: 1,
@@ -178,16 +200,7 @@ export const PrivacyPermissionsScreen: React.FC<PrivacyPermissionsScreenProps> =
     }
   };
 
-  const requestMicrophonePermission = async () => {
-    // Note: Microphone permission is marked as "coming soon" in the UI
-    // This will be implemented in a future update with proper permission handling
-    Alert.alert(
-      'Microphone Permission', 
-      'Microphone permission will be available in a future update. This feature is coming soon!'
-    );
-  };
-
-  const handlePermissionToggle = async (type: 'contacts' | 'calendar' | 'camera' | 'microphone') => {
+  const handlePermissionToggle = async (type: 'contacts' | 'calendar' | 'camera') => {
     switch (type) {
       case 'contacts':
         if (!contactsPermission) {
@@ -213,14 +226,6 @@ export const PrivacyPermissionsScreen: React.FC<PrivacyPermissionsScreenProps> =
           updateOnboardingData({ cameraPermission: false });
         }
         break;
-      case 'microphone':
-        if (!microphonePermission) {
-          await requestMicrophonePermission();
-        } else {
-          setMicrophonePermission(false);
-          updateOnboardingData({ microphonePermission: false });
-        }
-        break;
     }
   };
 
@@ -229,7 +234,6 @@ export const PrivacyPermissionsScreen: React.FC<PrivacyPermissionsScreenProps> =
       contactsPermission,
       calendarPermission,
       cameraPermission,
-      microphonePermission,
     });
     onNext();
   };
@@ -313,25 +317,21 @@ export const PrivacyPermissionsScreen: React.FC<PrivacyPermissionsScreenProps> =
           />
         </View>
 
-        <View style={styles.permissionItem}>
+        <View style={styles.permissionInfoCard}>
           <Ionicons
-            name="mic-outline"
-            size={28}
+            name="shield-checkmark-outline"
+            size={24}
             color={colors.primary[500]}
             style={styles.permissionIcon}
           />
           <View style={styles.permissionContent}>
-            <Text style={styles.permissionTitle}>Microphone Access</Text>
+            <Text style={styles.permissionTitle}>You control your data</Text>
             <Text style={styles.permissionDescription}>
-              Record audio for video posts
+              Only the permissions you enable are used, and you can manage them anytime from
+              Settings. Mahi complies with the latest Apple Privacy Manifest and Google Data
+              Safety policies.
             </Text>
           </View>
-          <Switch
-            value={microphonePermission}
-            onValueChange={() => handlePermissionToggle('microphone')}
-            trackColor={{ false: colors.border.primary, true: colors.primary[500] }}
-            thumbColor={colors.background.primary}
-          />
         </View>
       </ScrollView>
 
