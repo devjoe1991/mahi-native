@@ -170,13 +170,14 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
       minHeight: CONTAINER_HEIGHT,
       backgroundColor: colors.background.primary,
       width: '100%',
-      paddingBottom: spacing.sm, // Reduced bottom padding to show more feed
+      paddingBottom: 0, // No bottom padding
+      marginBottom: -spacing.xs, // Negative margin for additional spacing reduction
       overflow: 'visible',
     },
     countdownContainer: {
       paddingHorizontal: spacing.md,
-      paddingTop: spacing.sm,
-      paddingBottom: spacing.xs,
+      paddingTop: 0,
+      paddingBottom: 0,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
@@ -207,9 +208,9 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          paddingVertical: spacing.sm,
+          paddingVertical: 0,
           paddingHorizontal: SCREEN_WIDTH / 2 - ITEM_SIZE / 2,
-          paddingBottom: spacing.sm, // Reduced bottom padding to show more feed
+          paddingBottom: 0, // No padding for minimal spacing
         }}
         snapToInterval={ITEM_SIZE}
         decelerationRate="fast"
@@ -261,8 +262,8 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
                   transform: [{ translateY }, { scale }],
                   width: ITEM_SIZE,
                   height: ITEM_SIZE,
-                  marginVertical: 5,
-                  marginBottom: spacing.md, // Extra bottom margin for text labels
+                  marginVertical: 2,
+                  marginBottom: spacing.xs, // Reduced bottom margin for compact feel
                   overflow: 'visible', // Allow elements to overflow the circle
                 }}
               >
@@ -403,13 +404,13 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
                     fontSize: 10,
                     color: colors.text.primary,
                     textAlign: 'center',
-                    marginTop: spacing.sm,
-                    paddingTop: spacing.xs,
-                    paddingBottom: spacing.md, // Increased bottom padding for text labels
-                    marginBottom: spacing.xs, // Extra margin to ensure spacing
+                    marginTop: spacing.xs,
+                    paddingTop: 0,
+                    paddingBottom: spacing.xs,
+                    marginBottom: 0,
                     fontWeight: '600',
                     fontFamily: typography.body.fontFamily,
-                    minHeight: 28, // Increased minimum height for text
+                    minHeight: 20, // Reduced minimum height for compact feel
                     lineHeight: 14,
                   }}
                   numberOfLines={1}

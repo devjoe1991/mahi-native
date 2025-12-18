@@ -151,7 +151,7 @@ export const HomeScreen: React.FC = () => {
     },
     streakBarContainer: {
       backgroundColor: colors.background.primary,
-      marginBottom: spacing.sm, // Reduced bottom margin to show more feed
+      marginBottom: -spacing.lg, // Increased negative margin for 30% more reduction
       marginTop: -spacing.sm,
     },
     content: {
