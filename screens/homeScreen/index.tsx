@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Dimensions } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -19,6 +19,20 @@ import { MilestoneCelebration } from '../../components/milestoneCelebration';
 import { DailyCheckInTrigger } from '../../components/dailyCheckIn/DailyCheckInTrigger';
 import { getUnreadCount, hasStreakNotification } from '../../data/notifications';
 import { useNavigation } from '../../store/navigation-context';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('screen');
+const IMAGE_ASPECT_RATIO = 9 / 16;
+// Calculate available height: screen height minus header (~100px) and tab bar (~80px)
+const HEADER_HEIGHT = 100;
+const TAB_BAR_HEIGHT = 80;
+const FOOTER_OVERLAY_HEIGHT = 110; // Space needed for footer overlay
+const AVAILABLE_HEIGHT = SCREEN_HEIGHT - HEADER_HEIGHT - TAB_BAR_HEIGHT;
+// Reduce post height significantly to ensure footer overlay is fully visible above tab bar
+const POST_HEIGHT = AVAILABLE_HEIGHT - FOOTER_OVERLAY_HEIGHT; // Reserve space for footer
+// Threshold for first post area - keep streak bar hidden when viewing first post
+const FIRST_POST_THRESHOLD = POST_HEIGHT * 0.2; // 20% of first post height
+// Very top threshold - only hide streak bar when at absolute top
+const TOP_THRESHOLD = 10; // Hide only when very close to top (10px)
 
 export const HomeScreen: React.FC = () => {
   const { colors, spacing, typography } = useTheme();
@@ -61,25 +75,48 @@ export const HomeScreen: React.FC = () => {
     return () => clearInterval(interval);
   }, [userData]);
 
-  // Animated style for streak bar based on scroll direction
+  // Animated style for streak bar based on scroll direction - faster animation
   const streakBarAnimatedStyle = useAnimatedStyle(() => {
     return {
       marginTop: StoryTranslate.value
-        ? withTiming(-CONTAINER_HEIGHT, { duration: 250 })
-        : withTiming(0, { duration: 250 }),
+        ? withTiming(-CONTAINER_HEIGHT, { duration: 150 })
+        : withTiming(0, { duration: 150 }),
       opacity: StoryTranslate.value
-        ? withTiming(0, { duration: 250 })
-        : withTiming(1, { duration: 250 }),
+        ? withTiming(0, { duration: 150 })
+        : withTiming(1, { duration: 150 }),
     };
   });
+
+  // Handle scroll - detect scroll direction immediately for faster feedback
+  const handleScroll = (event: any) => {
+    const scrollY = event.nativeEvent.contentOffset.y;
+    
+    // Show streak bar when at the very top (absolute top)
+    if (scrollY <= TOP_THRESHOLD) {
+      StoryTranslate.value = false; // Show streak bar
+      lastScrollY.value = scrollY;
+      return;
+    }
+    
+    // Determine scroll direction
+    if (scrollY > lastScrollY.value) {
+      // Scrolling down - hide streak bar
+      StoryTranslate.value = true;
+    } else {
+      // Scrolling up - show streak bar
+      StoryTranslate.value = false;
+    }
+    
+    lastScrollY.value = scrollY;
+  };
 
   // Handle momentum scroll begin - detect scroll direction
   const handleMomentumScrollBegin = (event: any) => {
     const scrollY = event.nativeEvent.contentOffset.y;
     
-    // Always show streak bar when near top (within 50px)
-    if (scrollY <= 50) {
-      StoryTranslate.value = false;
+    // Show streak bar when at the very top (absolute top)
+    if (scrollY <= TOP_THRESHOLD) {
+      StoryTranslate.value = false; // Show streak bar
       return;
     }
     
@@ -98,9 +135,9 @@ export const HomeScreen: React.FC = () => {
     const scrollY = event.nativeEvent.contentOffset.y;
     lastScrollY.value = scrollY;
     
-    // Ensure streak bar is visible when at top
-    if (scrollY <= 50) {
-      StoryTranslate.value = false;
+    // Show streak bar when at the very top (absolute top)
+    if (scrollY <= TOP_THRESHOLD) {
+      StoryTranslate.value = false; // Show streak bar
     }
   };
 
@@ -114,15 +151,16 @@ export const HomeScreen: React.FC = () => {
     },
     streakBarContainer: {
       backgroundColor: colors.background.primary,
-      marginBottom: spacing.lg, // Bottom margin to prevent underlap
+      marginBottom: spacing.sm, // Reduced bottom margin to show more feed
       marginTop: -spacing.sm,
     },
     content: {
       flex: 1,
-      paddingBottom: 100, // Space for tab bar
+      paddingBottom: 0, // No extra padding - post height already accounts for tab bar
     },
     feed: {
-      paddingTop: spacing.lg,
+      paddingTop: 0,
+      paddingBottom: 0,
     },
     loadingContainer: {
       flex: 1,
@@ -233,10 +271,18 @@ export const HomeScreen: React.FC = () => {
             keyExtractor={(item) => item._id}
             renderItem={({ item }) => <FeedPost post={item} />}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={[
-              styles.feed,
-              { paddingBottom: spacing.md }
-            ]}
+            snapToInterval={POST_HEIGHT}
+            snapToAlignment="start"
+            decelerationRate="fast"
+            pagingEnabled={false}
+            getItemLayout={(data, index) => ({
+              length: POST_HEIGHT,
+              offset: POST_HEIGHT * index,
+              index,
+            })}
+            contentContainerStyle={styles.feed}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
             onMomentumScrollBegin={handleMomentumScrollBegin}
             onMomentumScrollEnd={handleMomentumScrollEnd}
             ListEmptyComponent={

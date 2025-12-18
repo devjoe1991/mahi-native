@@ -8,18 +8,19 @@ import { useBottomSheet } from '../globals/globalBottomSheet';
 import { getUserById } from '../../data/user';
 import { useNavigation } from '../../store/navigation-context';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('screen');
-const POST_HORIZONTAL_MARGIN = 16; // Horizontal margin on each side
-const MAX_IMAGE_HEIGHT = 350; // Reduced maximum image height
-const IMAGE_ASPECT_RATIO = 4 / 3; // Image aspect ratio
-// Calculate max width based on aspect ratio and max height
-const MAX_IMAGE_WIDTH = MAX_IMAGE_HEIGHT * IMAGE_ASPECT_RATIO;
-// Container width should match the image width exactly (screen width minus margins, capped at max)
-const POST_WIDTH = Math.min(SCREEN_WIDTH - (POST_HORIZONTAL_MARGIN * 2), MAX_IMAGE_WIDTH);
-
-// Motivational colors - Purple and Aura accents
-const MOTIVATIONAL_PURPLE = '#8B5CF6';
-const AURA_BLUE = '#2176AE';
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('screen');
+const IMAGE_ASPECT_RATIO = 9 / 16; // 9:16 aspect ratio (vertical/portrait)
+// Full width for full-screen experience
+const POST_WIDTH = SCREEN_WIDTH;
+// Calculate available height: screen height minus header (~100px) and tab bar (~80px)
+const HEADER_HEIGHT = 100;
+const TAB_BAR_HEIGHT = 80;
+const FOOTER_OVERLAY_HEIGHT = 110; // Space needed for footer overlay
+const AVAILABLE_HEIGHT = SCREEN_HEIGHT - HEADER_HEIGHT - TAB_BAR_HEIGHT;
+// Reduce post height significantly to ensure footer overlay is fully visible above tab bar
+// Footer overlay will be positioned on the bottom portion of the image
+const POST_HEIGHT = AVAILABLE_HEIGHT - FOOTER_OVERLAY_HEIGHT; // Reserve space for footer
+const IMAGE_HEIGHT = POST_HEIGHT; // Image fills container, footer overlays on it
 
 interface FeedPostProps {
   post: PostData;
@@ -53,28 +54,19 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
   const styles = StyleSheet.create({
     container: {
       width: POST_WIDTH,
-      alignSelf: 'center',
+      height: POST_HEIGHT,
       backgroundColor: colors.background.primary500,
-      marginBottom: spacing.lg,
-      marginHorizontal: POST_HORIZONTAL_MARGIN, // Consistent horizontal margin
-      borderRadius: 16,
       overflow: 'hidden',
-      borderWidth: theme === 'dark' ? 0 : 1,
-      borderColor: theme === 'dark' ? 'transparent' : colors.border.primary,
-      // Refined shadow for depth and elegance
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.08,
-      shadowRadius: 8,
-      elevation: 4,
+      justifyContent: 'flex-end', // Ensure footer is positioned at bottom
     },
     imageContainer: {
       position: 'relative',
       width: POST_WIDTH,
+      height: POST_HEIGHT,
     },
     image: {
-      width: POST_WIDTH, // Match container width exactly
-      height: Math.min(POST_WIDTH / IMAGE_ASPECT_RATIO, MAX_IMAGE_HEIGHT), // Calculate height, cap at max
+      width: POST_WIDTH,
+      height: POST_HEIGHT,
       resizeMode: 'cover',
     },
     header: {
@@ -169,23 +161,32 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
       letterSpacing: 0.1,
     },
     footer: {
-      padding: spacing.lg,
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      padding: spacing.md,
       paddingTop: spacing.sm,
+      paddingBottom: spacing.sm,
+      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+      zIndex: 10, // Ensure footer is above image
+      height: 110, // Fixed height to ensure consistency
     },
     caption: {
       fontSize: typography.body.fontSize - 2,
       fontFamily: typography.body.fontFamily,
       fontWeight: '400',
-      color: colors.text.primary,
+      color: colors.background.primary,
       marginBottom: spacing.xs,
       letterSpacing: 0.15,
       lineHeight: (typography.body.fontSize - 2) * 1.3,
+      maxHeight: 50, // Limit caption height to ensure footer fits
     },
     captionUsername: {
       fontSize: typography.body.fontSize - 2,
       fontWeight: typography.h2.fontWeight as any,
       fontFamily: typography.h2.fontFamily,
-      color: colors.text.primary,
+      color: colors.background.primary,
       letterSpacing: 0.15,
     },
     stats: {
@@ -202,7 +203,7 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
     statText: {
       fontSize: 12,
       fontFamily: typography.body.fontFamily,
-      color: colors.text.secondary,
+      color: colors.background.primary,
       marginLeft: spacing.xs,
       letterSpacing: 0.15,
       lineHeight: 12 * 1.3,
@@ -215,9 +216,8 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
     saveButton: {
       padding: spacing.xs,
     },
-    // Motivational accent for interactive elements
     heartIcon: {
-      // Subtle purple/blue tint for motivational feel
+      // Interactive element styling
     },
   });
 
@@ -268,16 +268,15 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
             )}
           </View>
         </View>
-      </View>
-      
-      <View style={styles.footer}>
+        
+        <View style={styles.footer}>
         <View style={styles.stats}>
           <View style={styles.statsLeft}>
             <Pressable style={styles.heartIcon}>
               <Ionicons 
                 name="heart-outline" 
                 size={22} 
-                color={theme === 'dark' ? colors.brand.red : colors.brand.pink} 
+                color={colors.background.primary} 
               />
             </Pressable>
             <Text style={styles.statText}>{post.likes || 0}</Text>
@@ -288,24 +287,25 @@ export const FeedPost: React.FC<FeedPostProps> = ({ post, onPress }) => {
               <Ionicons 
                 name="chatbubble-outline" 
                 size={22} 
-                color={theme === 'dark' ? colors.brand.blue : colors.brand.blue100} 
+                color={colors.background.primary} 
               />
               <Text style={styles.statText}>{post.comments || 0}</Text>
             </Pressable>
           </View>
-          <Pressable style={styles.saveButton}>
+            <Pressable style={styles.saveButton}>
             <Ionicons 
               name="bookmark-outline" 
               size={22} 
-              color={colors.text.secondary} 
+              color={colors.background.primary} 
             />
           </Pressable>
         </View>
         {post.caption && (
-          <Text style={styles.caption}>
+          <Text style={styles.caption} numberOfLines={2} ellipsizeMode="tail">
             <Text style={styles.captionUsername} onPress={handleProfilePress}>{userData?.username || 'joe'}</Text> {post.caption}
           </Text>
         )}
+        </View>
       </View>
     </Pressable>
   );
