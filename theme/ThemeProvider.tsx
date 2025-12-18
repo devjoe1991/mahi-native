@@ -29,7 +29,7 @@ interface Colors {
   };
   // Brand colors (same in both modes)
   brand: {
-    blue: string;
+    blue: string; // Note: Actually purple (#7A40F8) - kept as 'blue' for backward compatibility
     blue100: string;
     cyan: string;
     purple: string;
@@ -129,8 +129,8 @@ const lightColors: Colors = {
   },
   // Brand colors (same in both modes)
   brand: {
-    blue: '#7A40F8',
-    blue100: '#6BB0f5',
+    blue: '#7A40F8', // Purple color (misnamed as 'blue' for backward compatibility)
+    blue100: '#6BB0f5', // Light blue
     cyan: '#4cc9f0',
     purple: '#C3B1E1',
     purpleDark: '#C459F4',
@@ -153,7 +153,7 @@ const lightColors: Colors = {
   },
   // Legacy support
   primary: {
-    500: '#7A40F8', // Maps to brand.blue
+    500: '#7A40F8', // Maps to brand.blue (actually purple)
   },
   border: {
     primary: '#D0D0D0', // Maps to background.primary600
@@ -185,8 +185,8 @@ const darkColors: Colors = {
   },
   // Brand colors (same in both modes)
   brand: {
-    blue: '#7A40F8',
-    blue100: '#6BB0f5',
+    blue: '#7A40F8', // Purple color (misnamed as 'blue' for backward compatibility)
+    blue100: '#6BB0f5', // Light blue
     cyan: '#4cc9f0',
     purple: '#C3B1E1',
     purpleDark: '#C459F4',
@@ -209,7 +209,7 @@ const darkColors: Colors = {
   },
   // Legacy support
   primary: {
-    500: '#7A40F8', // Maps to brand.blue
+    500: '#7A40F8', // Maps to brand.blue (actually purple)
   },
   border: {
     primary: '#3f4152', // Maps to background.primary600

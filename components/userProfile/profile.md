@@ -77,13 +77,13 @@ const profileStyles = {
     background: colors.background.primary,      // Aura White
     text: colors.text.primary,                  // Shadow Gray
     border: colors.border.primary,              // Subtle borders
-    tabActive: colors.primary[500],             // Spirit Blue
+    tabActive: colors.primary[500],             // Primary Purple (Spirit Purple)
   },
   dark: {
     background: colors.background.primary,      // Dark background
     text: colors.text.primary,                  // Light text
     border: colors.border.primary,              // Subtle borders
-    tabActive: colors.primary[500],             // Spirit Blue
+    tabActive: colors.primary[500],             // Primary Purple (Spirit Purple)
   }
 };
 ```

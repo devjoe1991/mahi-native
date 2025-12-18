@@ -136,7 +136,7 @@ const headerStyles = {
     justifyContent: 'center',
   },
   pillItemActive: {
-    backgroundColor: colors.primary[500], // Spirit Blue
+    backgroundColor: colors.primary[500], // Primary Purple (Spirit Purple)
   },
   pillText: {
     fontSize: typography.body.fontSize - 2,  // 14px (reduced from 16px)
@@ -256,7 +256,7 @@ const navigationItems = [
 ### **Pill Navigation:**
 - **Container**: Rounded pill background (Vapor Cream in light mode)
 - **Items**: Individual navigation items with active state
-- **Active State**: Spirit Blue background with white text
+- **Active State**: Primary Purple (Spirit Purple) background with white text
 - **Animation**: Smooth transition between active states (150ms)
 - **Spacing**: Equal distribution of items
 
@@ -265,7 +265,7 @@ const navigationItems = [
 - **Messages Icon**: Circular button next to settings
 - **Size**: 40x40px circular buttons
 - **Background**: Subtle background with border
-- **Active State**: Spirit Blue background when active
+- **Active State**: Primary Purple (Spirit Purple) background when active
 - **Badge**: Optional notification badge for messages
 
 ---

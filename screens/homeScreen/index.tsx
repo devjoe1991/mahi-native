@@ -150,8 +150,8 @@ export const HomeScreen: React.FC = () => {
       zIndex: 10,
     },
     streakBarContainer: {
-      backgroundColor: colors.background.primary,
-      marginBottom: -spacing.lg, // Increased negative margin for 30% more reduction
+      backgroundColor: 'transparent', // Transparent - background handled by StreakBar component
+      marginBottom: spacing.sm, // Padding between streak bar and feed
       marginTop: -spacing.sm,
     },
     content: {

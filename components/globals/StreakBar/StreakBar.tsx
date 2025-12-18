@@ -12,8 +12,9 @@ import { useAuth } from '../../../store/auth-context';
 const { width: SCREEN_WIDTH } = Dimensions.get('screen');
 const ITEM_SIZE = SCREEN_WIDTH / 5;
 const TRANSLATE_VALUE = ITEM_SIZE / 2;
-const TEXT_HEIGHT = 50; // Space for text label (fontSize 10 + marginTop + padding) - increased for proper spacing
-export const CONTAINER_HEIGHT = ITEM_SIZE + TRANSLATE_VALUE + TEXT_HEIGHT + 30; // Increased buffer to prevent text cutoff
+const TEXT_HEIGHT = 0; // No text labels
+const BOTTOM_SPACING = 78; // Space for circles at bottom (70% more: 39 * 1.7 = 78)
+export const CONTAINER_HEIGHT = ITEM_SIZE + TRANSLATE_VALUE + BOTTOM_SPACING; // Height accounting for circles without text
 
 interface StreakBarProps {
   streaks: StreakData[];
@@ -52,11 +53,11 @@ const getOmbreGradientColors = (
   }
 
   // Ombre gradient based on position in streak list
-  // Creates smooth transition from blue -> cyan -> purple -> green -> orange
+  // Creates smooth transition from purple -> cyan -> light blue -> purple -> green -> orange
   const normalizedIndex = index / Math.max(totalStreaks - 1, 1); // 0 to 1
   
   if (normalizedIndex <= 0.2) {
-    // Blue to cyan (first 20%)
+    // Purple to cyan (first 20%) - Note: brand.blue is actually purple (#7A40F8)
     const t = normalizedIndex / 0.2;
     return [colors.brand.blue, colors.brand.cyan];
   } else if (normalizedIndex <= 0.4) {
@@ -168,23 +169,29 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
   const styles = StyleSheet.create({
     container: {
       minHeight: CONTAINER_HEIGHT,
-      backgroundColor: colors.background.primary,
-      width: '100%',
-      paddingBottom: 0, // No bottom padding
-      marginBottom: -spacing.xs, // Negative margin for additional spacing reduction
-      overflow: 'visible',
+      backgroundColor: 'rgba(195, 177, 225, 0.3)', // Pale light purple (purple with 30% opacity)
+      width: SCREEN_WIDTH - (spacing.md * 2), // Width minus horizontal margins
+      alignSelf: 'center', // Center the container
+      paddingBottom: spacing.xl, // Bottom padding to prevent circle underlapping (70% more)
+      marginBottom: spacing.sm, // Padding between streak bar and feed
+      borderTopLeftRadius: 40,
+      borderTopRightRadius: 40,
+      borderBottomLeftRadius: 40,
+      borderBottomRightRadius: 40,
+      overflow: 'hidden', // Ensure corners are rounded and content stays within bounds
     },
     countdownContainer: {
       paddingHorizontal: spacing.md,
-      paddingTop: 0,
+      paddingTop: spacing.md,
       paddingBottom: 0,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
     },
     countdownText: {
-      fontSize: 11,
-      fontFamily: typography.body.fontFamily,
+      fontSize: 14,
+      fontFamily: typography.h2.fontFamily,
+      fontWeight: typography.h2.fontWeight as any, // Bold using h2 typography
       color: colors.text.muted,
       marginLeft: spacing.xs,
     },
@@ -195,7 +202,7 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
       {/* Countdown Timer */}
       {currentStreak > 0 && timeUntilReset && (
         <View style={styles.countdownContainer}>
-          <Ionicons name="time-outline" size={14} color={colors.text.muted} />
+          <Ionicons name="time-outline" size={18} color={colors.text.muted} />
           <Text style={styles.countdownText}>
             {timeUntilReset} until reset
           </Text>
@@ -208,9 +215,9 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          paddingVertical: 0,
+          paddingVertical: spacing.sm,
           paddingHorizontal: SCREEN_WIDTH / 2 - ITEM_SIZE / 2,
-          paddingBottom: 0, // No padding for minimal spacing
+          paddingBottom: spacing.xl, // Bottom padding to prevent circle underlapping (70% more)
         }}
         snapToInterval={ITEM_SIZE}
         decelerationRate="fast"
@@ -263,8 +270,8 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
                   width: ITEM_SIZE,
                   height: ITEM_SIZE,
                   marginVertical: 2,
-                  marginBottom: spacing.xs, // Reduced bottom margin for compact feel
-                  overflow: 'visible', // Allow elements to overflow the circle
+                  marginBottom: 0, // No extra margin - spacing handled by container padding
+                  overflow: 'visible', // Allow badges to overflow the circle
                 }}
               >
                 {item.isLocked ? (
@@ -398,26 +405,6 @@ export const StreakBar: React.FC<StreakBarProps> = ({ streaks, onStreakPress }) 
                     <Ionicons name="lock-closed" size={12} color={colors.background.primary} />
                   </View>
                 )}
-
-                <Text
-                  style={{
-                    fontSize: 10,
-                    color: colors.text.primary,
-                    textAlign: 'center',
-                    marginTop: spacing.xs,
-                    paddingTop: 0,
-                    paddingBottom: spacing.xs,
-                    marginBottom: 0,
-                    fontWeight: '600',
-                    fontFamily: typography.body.fontFamily,
-                    minHeight: 20, // Reduced minimum height for compact feel
-                    lineHeight: 14,
-                  }}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {item.title}
-                </Text>
               </Animated.View>
             </Pressable>
           );
