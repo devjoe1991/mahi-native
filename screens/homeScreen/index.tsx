@@ -31,8 +31,8 @@ const AVAILABLE_HEIGHT = SCREEN_HEIGHT - HEADER_HEIGHT - TAB_BAR_HEIGHT;
 const POST_HEIGHT = AVAILABLE_HEIGHT - FOOTER_OVERLAY_HEIGHT; // Reserve space for footer
 // Threshold for first post area - keep streak bar hidden when viewing first post
 const FIRST_POST_THRESHOLD = POST_HEIGHT * 0.2; // 20% of first post height
-// Very top threshold - only hide streak bar when at absolute top
-const TOP_THRESHOLD = 10; // Hide only when very close to top (10px)
+// Very top threshold - only show streak bar when at absolute top
+const TOP_THRESHOLD = 10; // Show only when very close to top (10px)
 
 export const HomeScreen: React.FC = () => {
   const { colors, spacing, typography } = useTheme();
@@ -91,21 +91,15 @@ export const HomeScreen: React.FC = () => {
   const handleScroll = (event: any) => {
     const scrollY = event.nativeEvent.contentOffset.y;
     
-    // Show streak bar when at the very top (absolute top)
+    // Only show streak bar when at the very top (absolute top)
     if (scrollY <= TOP_THRESHOLD) {
       StoryTranslate.value = false; // Show streak bar
       lastScrollY.value = scrollY;
       return;
     }
     
-    // Determine scroll direction
-    if (scrollY > lastScrollY.value) {
-      // Scrolling down - hide streak bar
-      StoryTranslate.value = true;
-    } else {
-      // Scrolling up - show streak bar
-      StoryTranslate.value = false;
-    }
+    // When not at top, always hide streak bar
+    StoryTranslate.value = true; // Hide streak bar
     
     lastScrollY.value = scrollY;
   };
@@ -114,20 +108,14 @@ export const HomeScreen: React.FC = () => {
   const handleMomentumScrollBegin = (event: any) => {
     const scrollY = event.nativeEvent.contentOffset.y;
     
-    // Show streak bar when at the very top (absolute top)
+    // Only show streak bar when at the very top (absolute top)
     if (scrollY <= TOP_THRESHOLD) {
       StoryTranslate.value = false; // Show streak bar
       return;
     }
     
-    // Determine scroll direction
-    if (scrollY > lastScrollY.value) {
-      // Scrolling down - hide streak bar
-      StoryTranslate.value = true;
-    } else {
-      // Scrolling up - show streak bar
-      StoryTranslate.value = false;
-    }
+    // When not at top, always hide streak bar
+    StoryTranslate.value = true; // Hide streak bar
   };
 
   // Handle momentum scroll end - save final scroll position
@@ -135,9 +123,11 @@ export const HomeScreen: React.FC = () => {
     const scrollY = event.nativeEvent.contentOffset.y;
     lastScrollY.value = scrollY;
     
-    // Show streak bar when at the very top (absolute top)
+    // Only show streak bar when at the very top (absolute top)
     if (scrollY <= TOP_THRESHOLD) {
       StoryTranslate.value = false; // Show streak bar
+    } else {
+      StoryTranslate.value = true; // Hide streak bar when not at top
     }
   };
 
